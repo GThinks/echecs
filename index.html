@@ -206,6 +206,71 @@ h3:has(+ #evalGraph[hidden]) { display: none; }
 #imgOverlay img { width: 100%; border-radius: 8px; -webkit-touch-callout: default; }
 #imgOverlay p { margin: 0; font-size: 14px; color: var(--muted); }
 #clockView { max-width: none !important; }
+
+/* ---------- MAJ 7 */
+#toolSeg button { font-size: 13px; padding: 8px 4px; }
+.backBtn { background: transparent; border: 0; color: var(--accent); padding: 4px 0 8px; font-weight: 650; font-size: 15px; }
+.hubGrid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 14px; }
+.hubGrid button { background: var(--panel); border: 1px solid var(--border); border-radius: 14px; padding: 12px 10px; display: grid; gap: 4px; justify-items: start; text-align: left; min-height: 92px; }
+.hubGrid button .ui-ic { color: var(--accent); }
+.hubGrid button b { font-size: 15px; } .hubGrid button span { font-size: 12px; color: var(--muted); line-height: 1.3; }
+.hubGrid button.done::after { content: "✓"; position: absolute; } .hubGrid button { position: relative; }
+.hubGrid button .tag { position: absolute; top: 8px; right: 10px; font-size: 11px; font-weight: 700; color: #e8890c; }
+.goals { background: var(--panel); border-radius: 14px; padding: 10px 12px; margin: 4px 0 10px; }
+.goals .gh { display: flex; align-items: center; justify-content: space-between; }
+.goals .gh h2 { margin: 0; font-size: 16px; }
+.goals .gl { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-top: 8px; }
+.goal { display: grid; justify-items: center; gap: 2px; font-size: 12px; text-align: center; color: var(--muted); }
+.goal svg { display: block; } .goal select { padding: 2px 6px; font-size: 13px; margin-left: 2px; } .goal span { min-height: 34px; }
+.timeCard a, .keyCard a { color: var(--accent); } .goal.ok { color: #5d9a2b; font-weight: 650; }
+.badgeRow { display: flex; gap: 6px; overflow-x: auto; margin-top: 8px; padding-bottom: 2px; }
+.bdg { flex: none; width: 54px; display: grid; justify-items: center; font-size: 10px; text-align: center; color: var(--muted); line-height: 1.15; }
+.bdg i { width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: var(--panel2); font-style: normal; font-size: 20px; filter: grayscale(1); opacity: .45; }
+.bdg.on i { background: linear-gradient(140deg, #f6c453, #e8890c); filter: none; opacity: 1; box-shadow: 0 2px 6px rgba(232, 137, 12, .35); }
+.bdg.on { color: var(--text); }
+.badgeGrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(96px, 1fr)); gap: 10px; }
+.badgeGrid .bdg { width: auto; font-size: 12px; gap: 4px; } .badgeGrid .bdg i { width: 54px; height: 54px; font-size: 26px; }
+.badgeGrid .bdg small { color: var(--muted); font-size: 10px; }
+.secCard { background: var(--panel); border-radius: 14px; padding: 12px; margin-bottom: 12px; display: grid; gap: 8px; }
+.secCard h2 { margin: 0; font-size: 17px; }
+.secBoard { width: 100%; max-width: 440px; aspect-ratio: 1; margin: 0 auto; position: relative; touch-action: none; user-select: none; -webkit-user-select: none; }
+.secMsg { min-height: 22px; text-align: center; font-size: 14px; }
+.secMsg.ok { color: #5d9a2b; font-weight: 700; } .secMsg.ko { color: #d9452f; font-weight: 700; }
+.secRow { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; } .secRow > * { flex: 1; } .secRow label { display: grid; gap: 2px; font-size: 12px; color: var(--muted); }
+.secList { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+.secList li { border: 1px solid var(--border); border-radius: 10px; padding: 9px 10px; display: grid; grid-template-columns: 1fr auto; gap: 2px 8px; align-items: center; }
+.secList li .t { font-weight: 650; } .secList li .d { grid-column: 1; font-size: 12px; color: var(--muted); } .secList li .s { grid-row: 1 / span 2; grid-column: 2; font-size: 13px; font-weight: 700; color: #5d9a2b; }
+.bigNum { font-size: 34px; font-weight: 800; text-align: center; font-variant-numeric: tabular-nums; }
+.scoreBar { display: flex; justify-content: space-between; font-size: 14px; font-weight: 650; }
+.coordGrid { display: grid; grid-template-columns: repeat(8, 1fr); width: 100%; max-width: 440px; aspect-ratio: 1; margin: 0 auto; border-radius: 6px; overflow: hidden; touch-action: manipulation; }
+.coordGrid div { transition: background .15s; } .coordGrid .flashOk { background: #81b64c !important; } .coordGrid .flashKo { background: #d9452f !important; }
+.coordTarget { font-size: 46px; font-weight: 800; text-align: center; letter-spacing: .02em; }
+.blindOn .piece { visibility: hidden; } body.blindOn .ghost { display: none !important; }
+.blindMoves { font-size: 15px; line-height: 1.6; background: var(--panel2); border-radius: 10px; padding: 8px 10px; min-height: 44px; max-height: 160px; overflow-y: auto; }
+.blindMoves b { color: var(--accent); }
+#myRepPanel { margin-bottom: 8px; display: grid; gap: 6px; }
+#myRepList li { grid-template-columns: 1fr auto; }
+#myRepList .del { padding: 4px 9px; font-size: 13px; grid-row: 1 / span 2; grid-column: 2; }
+#myRepList .nm { grid-column: 1; } #myRepList .ln { grid-column: 1; }
+#repDev { margin-top: 6px; font-size: 13px; padding: 7px 10px; border-radius: 10px; background: rgba(122, 90, 200, .14); cursor: pointer; }
+#repDev b { color: #7a5ac8; }
+#resumeBtn { margin-top: 8px; }
+.keyCard { background: var(--panel); border-radius: 12px; padding: 12px; margin: 12px 0; }
+.keyCard h3 { margin: 0 0 6px; }
+.keyCard p { margin: 4px 0; font-size: 14px; }
+.keyCard ol { margin: 6px 0; padding-left: 0; list-style: none; display: grid; gap: 6px; }
+.keyCard li { font-size: 14px; display: grid; grid-template-columns: auto 1fr; gap: 8px; align-items: start; cursor: pointer; padding: 6px; border-radius: 8px; background: var(--panel2); }
+.timeCard { background: var(--panel); border-radius: 12px; padding: 10px 12px; margin: 12px 0 0; }
+.timeCard h3 { margin: 0 0 6px; }
+.timeCard svg { display: block; width: 100%; height: auto; }
+.timeCard .tstats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; font-size: 12px; color: var(--muted); text-align: center; margin-top: 6px; }
+.timeCard .tstats b { display: block; font-size: 16px; color: var(--text); }
+.timeCard p { font-size: 13px; margin: 6px 0 0; }
+#advBox { background: var(--panel); border-radius: 12px; padding: 10px; margin-bottom: 10px; display: grid; gap: 8px; }
+#advOpening { width: 100%; }
+.advGrid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px 8px; }
+.advGrid label { display: grid; gap: 2px; font-size: 12px; color: var(--muted); }
+.advGrid input, .advGrid select { padding: 7px 8px; font-size: 15px; width: 100%; }
 /* ---------- pendule */
 body[data-view="clock"] #clockView { padding: 0; }
 body[data-view="clock"] #engineStatus { display: none; }
@@ -337,6 +402,20 @@ body.clkRun .clk { height: calc(100dvh - env(safe-area-inset-bottom) - env(safe-
     </select>
     <input id="fQ" placeholder="Adversaire…" autocapitalize="none" spellcheck="false">
   </div>
+  <button id="advToggle" class="ghostBtn" type="button" style="margin:0 0 8px">Recherche avancée</button>
+  <div id="advBox" class="hidden">
+    <input id="advOpening" placeholder="Ouverture (ex. sicilienne, Italian…)" autocapitalize="none" spellcheck="false">
+    <div class="advGrid">
+      <label>Résultat <select id="advRes"><option value="">Tous</option><option value="win">Gagnées</option><option value="draw">Nulles</option><option value="loss">Perdues</option></select></label>
+      <label>Couleur <select id="advColor"><option value="">Les deux</option><option value="w">Blancs</option><option value="b">Noirs</option></select></label>
+      <label>Coups min. <input id="advMin" inputmode="numeric" placeholder="—"></label>
+      <label>Coups max. <input id="advMax" inputmode="numeric" placeholder="—"></label>
+      <label>Contient (de ma part) <select id="advCls"><option value="">—</option><option value="gaffe">une gaffe</option><option value="erreur">une erreur</option><option value="manquee">une occasion manquée</option><option value="brillant">un coup brillant</option><option value="tresbon">un très bon coup</option></select></label>
+      <label>Source <select id="advSrc"><option value="">Toutes</option><option value="chesscom">chess.com</option><option value="lichess">Lichess</option><option value="otb">Club</option><option value="pgn">PGN</option><option value="libre">Échiquier libre</option></select></label>
+    </div>
+    <div class="playBtns"><button id="advClear" type="button">Effacer les critères</button></div>
+    <div id="advStatus" class="muted small"></div>
+  </div>
   <div class="batch">
     <span>Analyser les</span>
     <select id="batchCount" aria-label="Nombre de parties"><option>3</option><option selected>5</option><option>10</option><option>20</option></select>
@@ -350,7 +429,7 @@ body.clkRun .clk { height: calc(100dvh - env(safe-area-inset-bottom) - env(safe-
 </section>
 
 <section id="boardView" class="view">
-  <div id="toolSeg" class="repColor hidden"><button data-mode="free" class="on">♙ Échiquier libre</button><button data-mode="rep">📖 Répertoire</button></div>
+  <div id="toolSeg" class="repColor hidden"><button data-mode="free" class="on">♙ Échiquier libre</button><button data-mode="rep">📖 Ouvertures</button><button data-mode="myrep">★ Mon répertoire</button></div>
   <div id="repPanel" class="hidden">
     <div class="repColor"><button data-color="w" class="on">⚪ Blancs</button><button data-color="b">⚫ Noirs</button></div>
     <input id="repSearch" placeholder="Rechercher (nom ou code ECO)…" autocapitalize="none" spellcheck="false">
@@ -360,6 +439,13 @@ body.clkRun .clk { height: calc(100dvh - env(safe-area-inset-bottom) - env(safe-
     <div class="muted small">Lignes principales seulement, 8 coups maximum. Touchez une ouverture puis avancez avec ▶.</div>
   </div>
   <div class="bcol">
+  <div id="myRepPanel" class="hidden">
+    <div class="repColor"><button data-mc="w" class="on">⚪ Blancs</button><button data-mc="b">⚫ Noirs</button></div>
+    <div id="myRepInfo" class="muted small"></div>
+    <ul id="myRepList" class="repList"></ul>
+    <div class="playBtns"><button id="myRepNew" type="button">Nouvelle ligne</button><button id="myRepSave" type="button">Enregistrer la ligne</button></div>
+    <div class="playBtns"><button id="myRepUndo" type="button">↶ Annuler le coup</button><button id="myRepQuiz" type="button">M'entraîner</button></div>
+  </div>
   <div id="playerTop" class="player"></div>
   <div id="evalBar"><div class="fill"></div><span class="txt"></span></div>
   <div id="board"></div>
@@ -376,6 +462,8 @@ body.clkRun .clk { height: calc(100dvh - env(safe-area-inset-bottom) - env(safe-
   </div>
   <div id="gestureTip" class="muted small hidden">Astuce : balayez l'échiquier vers la gauche ou la droite pour changer de coup, appui long pour voir le meilleur coup.</div>
   <div id="opening" class="muted"></div>
+  <div id="repDev" class="hidden"></div>
+  <button id="resumeBtn" class="ghostBtn hidden" type="button">Reprendre la partie ici contre Stockfish</button>
   <div class="hintBar">
     <label><input type="checkbox" id="hintOn"> Meilleur coup</label>
     <select id="hintDepth" aria-label="Profondeur du conseil">
@@ -420,14 +508,24 @@ body.clkRun .clk { height: calc(100dvh - env(safe-area-inset-bottom) - env(safe-
   </div>
   <h3>Évaluation de la partie</h3>
   <div id="evalGraph" class="graphBox" hidden></div>
+  <div id="timeBox"></div>
   <div id="detail"></div>
+  <div id="keyBox"></div>
   <div id="summary"></div>
   <div id="lines"></div>
   <h3>Coups</h3>
   <div id="moves" class="moves"></div>
   </div>
 </section>
-<section id="trainView" class="view"><div id="dailyBox"></div><div id="trainMount"></div></section>
+<section id="trainView" class="view">
+  <div id="trHub"><div id="goalsBox"></div><div id="hubGrid" class="hubGrid"></div></div>
+  <div id="trSec" class="hidden">
+    <button id="trBack" class="backBtn" type="button">‹ Entraînement</button>
+    <div id="dailyBox" class="sec" data-sec="daily"></div>
+    <div id="trainMount" class="sec" data-sec="ex"></div>
+    <div id="secBox" class="sec" data-sec="other"></div>
+  </div>
+</section>
 <section id="clockView" class="view">
   <div class="clk">
     <button class="clkSide top" data-side="0"><span class="clkTime">5:00</span><span class="clkInfo"></span></button>
@@ -1716,6 +1814,14 @@ const UI = {
   pause: `<path fill="currentColor" d="M7 5h3.5v14H7zM13.5 5H17v14h-3.5z"/>`,
   playi: `<path fill="currentColor" d="M7 4.5v15l12-7.5z"/>`,
   reset: `<path ${S} d="M4.5 12a7.5 7.5 0 1 0 2.2-5.3M4.5 4.5v4h4"/>`,
+  king: `<path ${S} d="M12 3v4M10 5h4M7.5 20h9l-.8-4.5h-7.4zM8.3 15.5C6 13.6 5.3 10.6 7.6 9.3c1.7-1 3.4.2 4.4 2 1-1.8 2.7-3 4.4-2 2.3 1.3 1.6 4.3-.7 6.2"/>`,
+  eye: `<path ${S} d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12z"/><circle ${S} cx="12" cy="12" r="3"/>`,
+  eyeoff: `<path ${S} d="M3 3l18 18M10.6 6.1c.5-.1.9-.1 1.4-.1 6 0 9.5 6 9.5 6s-1 1.8-2.9 3.5M6.6 6.7C4 8.3 2.5 12 2.5 12S6 18.5 12 18.5c1.8 0 3.3-.5 4.6-1.2M9.9 9.9a3 3 0 0 0 4.2 4.2"/>`,
+  grid: `<rect ${S} x="3.5" y="3.5" width="17" height="17" rx="2"/><path ${S} d="M9.2 3.5v17M14.8 3.5v17M3.5 9.2h17M3.5 14.8h17"/>`,
+  bolt: `<path ${S} d="M13 2.5L5 13.5h6l-1 8 8-11h-6z"/>`,
+  medal: `<circle ${S} cx="12" cy="15" r="5.5"/><path ${S} d="M8.5 10.5L5.5 3h4l2.5 5.5M15.5 10.5L18.5 3h-4L12 8.5M12 12.5l.9 1.8 2 .3-1.4 1.4.3 2-1.8-.9-1.8.9.3-2-1.4-1.4 2-.3z"/>`,
+  book: `<path ${S} d="M3.5 5.5c3-1 6-.6 8.5 1v13c-2.5-1.6-5.5-2-8.5-1zM20.5 5.5c-3-1-6-.6-8.5 1v13c2.5-1.6 5.5-2 8.5-1z"/>`,
+  search: `<circle ${S} cx="10.5" cy="10.5" r="6.5"/><path ${S} d="M15.5 15.5L21 21"/>`,
   palette: `<path ${S} d="M12 3a9 9 0 1 0 0 18c1.2 0 1.8-.9 1.4-1.9-.5-1.2.3-2.4 1.6-2.4H17a4 4 0 0 0 4-4C21 7 17 3 12 3z"/><circle cx="7.5" cy="11" r="1.3" fill="currentColor"/><circle cx="10.5" cy="7" r="1.3" fill="currentColor"/><circle cx="15" cy="7.5" r="1.3" fill="currentColor"/>`,
 };
 function uiIcon(name, size = 22) {
@@ -1828,7 +1934,7 @@ function repertoirePlies(item) {
 
 return { buildRepertoire, repertoirePlies };
 })();
-const { openingFr, annotatedPGN, gamesFromPgnText, fromLichess, PLAY_LEVELS, pliesFromAnalysis, exercisesFrom, srsUpdate, srsQueue, progressStats, openingStats, openingReport, weakOpenings } = (() => {
+const { openingFr, annotatedPGN, gamesFromPgnText, fromLichess, PLAY_LEVELS, pliesFromAnalysis, exercisesFrom, srsUpdate, srsQueue, progressStats, openingStats, openingReport, weakOpenings, clocksFromPgn, moveTimes, timeStats, fmtSecs } = (() => {
 // Fonctions partagées Mac / iPhone : noms d'ouvertures en français, export PGN annoté,
 // exercices tirés des erreurs, statistiques de progression, import Lichess / PGN.
 
@@ -2192,7 +2298,60 @@ function weakOpenings(report, max = 5) {
     .sort((a, b) => b.weakness - a.weakness).slice(0, max);
 }
 
-return { openingFr, annotatedPGN, gamesFromPgnText, fromLichess, PLAY_LEVELS, pliesFromAnalysis, exercisesFrom, srsUpdate, srsQueue, progressStats, openingStats, openingReport, weakOpenings };
+// ------------------------------------------------------------------ gestion du temps (horloges [%clk] des PGN chess.com / Lichess)
+function clocksFromPgn(pgn) {
+  // renvoie { base, inc, clocks: [secondes restantes après chaque demi-coup] } ou null
+  if (!pgn || !/%clk/.test(pgn)) return null;
+  const tcm = pgn.match(/\[TimeControl\s+"(\d+)(?:\+(\d+))?"\]/);
+  const body = pgn.replace(/^\s*\[[^\]]*\]\s*$/gm, '');
+  const clocks = [];
+  for (const m of body.matchAll(/\[%clk\s+(\d+):(\d+):(\d+(?:\.\d+)?)\]/g)) clocks.push(Number(m[1]) * 3600 + Number(m[2]) * 60 + Number(m[3]));
+  if (clocks.length < 2) return null;
+  const base = tcm ? Number(tcm[1]) : Math.max(clocks[0], clocks[1]);
+  const inc = tcm && tcm[2] ? Number(tcm[2]) : 0;
+  return { base, inc, clocks };
+}
+function moveTimes(ck) {
+  // temps passé sur chaque demi-coup (secondes), à partir des horloges
+  if (!ck) return null;
+  const { base, inc, clocks } = ck;
+  return clocks.map((c, i) => Math.max(0, (i >= 2 ? clocks[i - 2] : base) - c + (i >= 2 ? inc : 0)));
+}
+const LOW = (base) => Math.max(10, Math.min(60, base * 0.1));
+function timeStats(entries) {
+  // entries : [{ game, plies, sum, color }]
+  const out = { games: 0, moves: 0, phase: { ouverture: [], milieu: [], finale: [] }, low: { moves: 0, errors: 0 }, normal: { moves: 0, errors: 0 }, fast: { moves: 0, errors: 0 }, slow: { moves: 0, errors: 0 }, timeouts: 0, lost: 0, longThinks: [] };
+  for (const { game, plies, sum, color } of entries) {
+    const ck = clocksFromPgn(game.pgn);
+    if (!ck || ck.clocks.length < plies.length - 1) continue;
+    const t = moveTimes(ck);
+    out.games++;
+    const me = color === 'w' ? game.white : game.black;
+    if (me?.result && me.result !== 'win' && !['agreed', 'repetition', 'stalemate', 'insufficient', '50move', 'timevsinsufficient'].includes(me.result)) { out.lost++; if (me.result === 'timeout') out.timeouts++; }
+    const { mid, end } = sum.phases;
+    const mine = plies.map((p, i) => i).filter((i) => plies[i].color === color && t[i] != null && sum.results[i]?.cls && sum.results[i].cls !== 'theorie');
+    const avg = mine.length ? mine.reduce((a, i) => a + t[i], 0) / mine.length : 0;
+    for (const i of mine) {
+      const r = sum.results[i], err = r.cls === 'erreur' || r.cls === 'gaffe' || r.cls === 'manquee';
+      out.moves++;
+      out.phase[i < mid ? 'ouverture' : i < end ? 'milieu' : 'finale'].push(t[i]);
+      const left = (i >= 2 ? ck.clocks[i - 2] : ck.base);
+      const bucket = left < LOW(ck.base) ? out.low : out.normal;
+      bucket.moves++; if (err) bucket.errors++;
+      if (left >= LOW(ck.base)) { const sp = t[i] < Math.max(2, avg * 0.35) ? out.fast : out.slow; sp.moves++; if (err) sp.errors++; }
+      if (t[i] >= Math.max(30, avg * 4)) out.longThinks.push({ gameId: game.id, ply: i, secs: t[i], cls: r.cls, san: plies[i].san, num: plies[i].moveNumber, color });
+    }
+  }
+  const mean = (a) => (a.length ? a.reduce((x, y) => x + y, 0) / a.length : null);
+  out.phaseAvg = Object.fromEntries(Object.entries(out.phase).map(([k, a]) => [k, mean(a)]));
+  const rate = (b) => (b.moves ? (100 * b.errors) / b.moves : null);
+  out.lowRate = rate(out.low); out.normalRate = rate(out.normal); out.fastRate = rate(out.fast); out.slowRate = rate(out.slow);
+  out.longThinks.sort((a, b) => b.secs - a.secs);
+  return out;
+}
+const fmtSecs = (s) => (s == null ? '–' : s < 60 ? `${s < 10 ? s.toFixed(1).replace('.', ',') : Math.round(s)} s` : `${Math.floor(s / 60)} min ${String(Math.round(s % 60)).padStart(2, '0')}`);
+
+return { openingFr, annotatedPGN, gamesFromPgnText, fromLichess, PLAY_LEVELS, pliesFromAnalysis, exercisesFrom, srsUpdate, srsQueue, progressStats, openingStats, openingReport, weakOpenings, clocksFromPgn, moveTimes, timeStats, fmtSecs };
 })();
 const { mountExercises, mountProgress } = (() => {
 // Pages « Exercices » (tirés de vos erreurs, répétition espacée) et « Progression » — partagées Mac / iPhone.
@@ -2368,7 +2527,7 @@ function mountExercises(el, env) {
       board.set(c.fen(), { lastMove: { from: m.from, to: m.to }, lastColor: '#81b64c' });
       st.feedback = `<span class="tr-ok">✓ Bravo, ${esc(sanFr(m.san))} est le bon coup !</span>`;
       st.solved = true;
-      play('correct');
+      play('correct'); env.track?.('ex');
       if (st.tries === 0) await record(true);
     } else {
       st.tries++;
@@ -2406,7 +2565,22 @@ function mountProgress(el, env) {
   injectCss();
   el.innerHTML = '<div class="tr-wrap" data-r="root"><div class="tr-empty">Calcul de vos statistiques…</div></div>';
   const root = el.querySelector('[data-r="root"]');
-  let busy = false;
+  let busy = false, entriesRef = [];
+  function timeCard(T) {
+    if (!T.games) return '';
+    const pct = (x) => (x == null ? '–' : x.toFixed(0) + ' %');
+    const tips = [];
+    if (T.lowRate != null && T.normalRate != null && T.low.moves >= 8 && T.lowRate > T.normalRate * 1.5) tips.push(`Vous faites <b>${(T.lowRate / Math.max(T.normalRate, 0.1)).toFixed(1).replace('.', ',')} fois plus d'erreurs</b> quand il vous reste peu de temps : gardez une réserve pour la fin de partie.`);
+    if (T.fastRate != null && T.slowRate != null && T.fast.moves >= 10 && T.fastRate > T.slowRate * 1.5) tips.push('Vos coups joués très vite contiennent beaucoup d\'erreurs : prenez quelques secondes de vérification (échecs, prises, menaces) avant de jouer.');
+    if (T.lost >= 5 && T.timeouts / T.lost >= 0.25) tips.push(`${T.timeouts} de vos ${T.lost} défaites sont des <b>pertes au temps</b>.`);
+    if (T.phaseAvg.ouverture != null && T.phaseAvg.milieu != null && T.phaseAvg.ouverture > T.phaseAvg.milieu) tips.push('Vous passez plus de temps dans l\'ouverture qu\'au milieu de jeu : travailler votre répertoire vous ferait gagner du temps.');
+    return `<div class="tr-card"><h3>Gestion du temps</h3>
+      <div class="tr-grid"><div class="tr-kpi"><b>${fmtSecs(T.phaseAvg.ouverture)}</b><span>par coup dans l'ouverture</span></div><div class="tr-kpi"><b>${fmtSecs(T.phaseAvg.milieu)}</b><span>au milieu de jeu</span></div><div class="tr-kpi"><b>${fmtSecs(T.phaseAvg.finale)}</b><span>en finale</span></div>
+      <div class="tr-kpi"><b>${pct(T.lowRate)}</b><span>d'erreurs en zeitnot (contre ${pct(T.normalRate)} sinon)</span></div></div>
+      ${tips.length ? `<div class="tr-advice">${tips.join('<br>')}</div>` : ''}
+      ${T.longThinks.length ? `<div class="tr-ctx" style="margin-top:6px">Plus longues réflexions : ${T.longThinks.slice(0, 4).map((l) => `${env.openGame ? `<button class="tr-link" data-gid="${esc(l.gameId)}" data-gply="${l.ply}">${l.num}${l.color === 'w' ? '.' : '…'} ${esc(sanFr(l.san))}</button>` : esc(l.san)} (${fmtSecs(l.secs)}${CLASSES[l.cls] ? ', ' + CLASSES[l.cls].label.toLowerCase() : ''})`).join(' · ')}</div>` : ''}
+      <div class="tr-ctx">Sur ${T.games} parties analysées qui contiennent les temps de la pendule (${T.moves} coups). Zeitnot : moins de 10 % du temps initial.</div></div>`;
+  }
   async function load() {
     if (busy) return;
     busy = true;
@@ -2416,6 +2590,7 @@ function mountProgress(el, env) {
     const S = progressStats(entries);
     const games = env.getGames() || [];
     const ops = openingReport(openingStats(games, env.names(), env.book()), entries, env.names());
+    entriesRef = entries;
     root.innerHTML = render(S, ops, entries.length, games.length);
     root.querySelectorAll('[data-rep]').forEach((b) => b.addEventListener('click', () => env.openRep?.(b.dataset.rep, b.dataset.color)));
     root.querySelectorAll('[data-gply]').forEach((b) => b.addEventListener('click', () => env.openGame?.(b.dataset.gid, Number(b.dataset.gply))));
@@ -2472,6 +2647,7 @@ function mountProgress(el, env) {
       const max = S.motifs[0].n;
       h += `<div class="tr-card"><h3>Types d'erreurs</h3><table class="tr-table">${S.motifs.map((mo) => `<tr><td>${esc(mo.label)}</td><td style="width:45%"><div class="tr-bar"><i style="width:${(100 * mo.n) / max}%"></i></div></td><td>${mo.n}</td></tr>`).join('')}</table></div>`;
     }
+    h += timeCard(timeStats(entriesRef));
     h += `<div class="tr-card"><h3>Dernières parties analysées</h3><div class="tr-scroll"><table class="tr-table"><tr><th>Date</th><th>Adversaire</th><th>Cadence</th><th>Précision</th><th>Elo est.</th></tr>
       ${S.games.slice(-12).reverse().map((g) => `<tr><td>${dateFr(g.date)}</td><td>${g.color === 'w' ? '⚪' : '⚫'} ${env.openGame ? `<button class="tr-link" data-game="${esc(g.id)}">${esc(g.opp)}</button>` : esc(g.opp)}</td><td>${TC[g.tc] || esc(g.tc)}</td><td>${fmt1(g.acc)}</td><td>${g.elo ?? '–'}</td></tr>`).join('')}</table></div></div>`;
     return h + openings(ops, nGames);
@@ -2786,7 +2962,7 @@ async function loadGames(user, progress) {
 }
 
 async function loadLichessGames(user, progress) {
-  const r = await fetch(`https://lichess.org/api/games/user/${encodeURIComponent(user)}?max=500&pgnInJson=true&clocks=false&evals=false&opening=false`, { headers: { Accept: 'application/x-ndjson' } });
+  const r = await fetch(`https://lichess.org/api/games/user/${encodeURIComponent(user)}?max=500&pgnInJson=true&clocks=true&evals=false&opening=true`, { headers: { Accept: 'application/x-ndjson' } });
   if (r.status === 404) { const e = new Error('introuvable'); e.status = 404; throw e; }
   if (!r.ok) throw new Error(`Lichess a répondu ${r.status}`);
   const reader = r.body.getReader(); const dec = new TextDecoder(); let buf = ''; const list = [];
@@ -2834,7 +3010,8 @@ async function loadOpenings() {
 // ===================== Interface iPhone =====================
 const S = { localGames: [], site: 'chesscom', user: '', games: [], shown: 40, game: null, plies: [], startFen: null, analysis: null, sum: null, idx: 0, variation: null, book: new Set(), names: {}, analyzing: null, mode: 'game', saved: null, freeVar: null };
 const hintCache = new Map();
-let CLOCK = null, DAILY = null;
+let CLOCK = null, DAILY = null, TRAIN = null;
+const RENDER_HOOKS = [], ARROW_HOOKS = [];
 const pieceUrl = (code) => (PREFS.pieceSet === 'cburnett' ? PIECE_URLS[code] : remotePieceUrl(PREFS.pieceSet, code));
 const board = new Board($('#board'), { onMove: onBoardMove, pieceUrl });
 onPrefs((k) => { if (k === 'pieceSet') for (const c of Object.keys(PIECE_URLS)) new Image().src = pieceUrl(c); });
@@ -2856,7 +3033,7 @@ function showView(v) {
   for (const b of document.querySelectorAll('.tabbar button')) b.classList.toggle('on', b.dataset.view === v);
   if (v === 'tools') { setMode(S.toolMode || 'free'); maybeEngineMove(); }
   else if (v === 'board') setMode('game');
-  else if (v === 'train') { if (!S.user && !S.localGames.length) toast('Chargez d\'abord vos parties (onglet Parties).'); trainer ||= mountExercises($('#trainMount'), trainerEnv); trainer.refresh(); DAILY.show(); }
+  else if (v === 'train') TRAIN.show();
   else if (v === 'clock') CLOCK.show();
   else if (v === 'stats') { if (!S.user && !S.localGames.length) toast('Chargez d\'abord vos parties (onglet Parties).'); progressPage ||= mountProgress($('#statsView'), trainerEnv); progressPage.refresh(); }
   window.scrollTo(0, 0);
@@ -2875,6 +3052,7 @@ const FRESH = {
   game: () => ({}),
   free: () => ({ variation: { base: 0, moves: [], vidx: 0 }, orient: 'w' }),
   rep: () => ({ orient: REP.color }),
+  myrep: () => ({ variation: { base: 0, moves: [], vidx: 0 }, orient: MYREP.color }),
 };
 function setMode(mode) {
   if (mode === S.mode) { render(); return; }
@@ -2981,7 +3159,7 @@ function outcome(g) {
 const TC = { bullet: 'Bullet', blitz: 'Blitz', rapid: 'Rapide', daily: 'Par jour', classical: 'Classique' };
 function filtered() {
   const tc = $('#fTc').value, q = $('#fQ').value.trim().toLowerCase();
-  return S.games.filter((g) => (tc === 'all' || g.time_class === tc) && (!q || (g.userColor === 'w' ? g.black : g.white).username.toLowerCase().includes(q)));
+  return S.games.filter((g) => (tc === 'all' || g.time_class === tc) && (!q || (g.userColor === 'w' ? g.black : g.white).username.toLowerCase().includes(q)) && advMatch(g));
 }
 function renderGames() {
   const list = filtered();
@@ -3083,7 +3261,7 @@ async function analyze() {
   try {
     const analysis = await analyzeCore(game, plies, job, (d, t, left) => setProgress(pr, d, t, `Coup ${d} / ${t} · encore ~${fmtLeft(left)}`));
     if (analysis) {
-      play('done');
+      play('done'); track('analyse');
       if (S.game === game) { S.analysis = analysis; recompute(); }
       else if (S.store?.game?.game === game) S.store.game.analysis = analysis;
       renderGames();
@@ -3138,6 +3316,7 @@ document.querySelector('.nav').addEventListener('click', (e) => {
 $('#exitVar').addEventListener('click', () => { S.variation = null; render(); });
 
 async function onBoardMove(uci) {
+  if (S.mode === 'myrep') return MYREP.move(uci);
   if (S.mode === 'rep' && S.quiz) return quizMove(uci);
   if (!S.variation && S.idx < S.plies.length && S.plies[S.idx].uci === uci) { go('next'); return; }
   if (S.analyzing) return toast('Attendez la fin de l\'analyse pour jouer vos coups.');
@@ -3207,6 +3386,7 @@ function render() {
   if (c.inCheck()) for (const row of c.board()) for (const p of row) if (p && p.type === 'k' && p.color === c.turn()) opts.check = p.square;
   const hint = (settings.hintOn || S.peek) && !c.isGameOver() ? hintFor(fen) : null;
   if (hint?.lines?.[0]) { const b = hint.lines[0].pv[0]; opts.arrows.push({ from: b.slice(0, 2), to: b.slice(2, 4), color: '#3b82f6', opacity: 0.75 }); }
+  for (const f of ARROW_HOOKS) { try { opts.arrows.push(...(f(fen, c) || [])); } catch (e) { console.error(e); } }
   board.set(fen, opts);
   S.lastOpts = opts;
   renderHint(fen, hint, c);
@@ -3222,8 +3402,9 @@ function render() {
     const n = S.partial && S.partial.depth === D() && S.partial.n === S.plies.length ? S.partial.records.length : 0;
     $('#analyzeBtn').textContent = n ? `Reprendre l'analyse (${n} / ${S.plies.length})` : `Analyser cette partie (profondeur ${D()})`;
   }
-  $('#variationBar').classList.toggle('hidden', !S.variation || S.mode === 'free');
+  $('#variationBar').classList.toggle('hidden', !S.variation || S.mode === 'free' || S.mode === 'myrep');
   renderPlayers(); renderEval(); renderSummary(); renderGraph(); renderDetail(cm); renderLines(); renderMoves(); renderOpening();
+  for (const f of RENDER_HOOKS) { try { f(cm, c); } catch (e) { console.error(e); } }
 }
 function renderPlayers() {
   const g = S.game;
@@ -3380,7 +3561,7 @@ function renderOpening() { const n = openingName(); $('#opening').innerHTML = n 
 
 
 // ------------------------------------------------------------------ échiquier libre et conseil « meilleur coup »
-$('#restartFree').addEventListener('click', () => { S.variation = { base: 0, moves: [], vidx: 0 }; board.setOrientation(PLAY.level ? PLAY.color : 'w'); render(); maybeEngineMove(); });
+$('#restartFree').addEventListener('click', () => { S.startFen = null; S.variation = { base: 0, moves: [], vidx: 0 }; board.setOrientation(PLAY.level ? PLAY.color : 'w'); render(); maybeEngineMove(); });
 $('#hintOn').checked = !!settings.hintOn;
 $('#hintDepth').value = String(settings.hintDepth);
 $('#hintOn').addEventListener('change', (e) => { settings.hintOn = e.target.checked; saveSettings(); render(); });
@@ -3413,7 +3594,7 @@ function renderHint(fen, hint, c) {
 // ------------------------------------------------------------------ outils : segment Libre / Répertoire
 $('#toolSeg').addEventListener('click', (e) => { const b = e.target.closest('button'); if (!b) return; S.toolMode = b.dataset.mode; setMode(b.dataset.mode); maybeEngineMove(); });
 function renderToolSeg() {
-  $('#toolSeg').classList.toggle('hidden', !(S.mode === 'free' || S.mode === 'rep'));
+  $('#toolSeg').classList.toggle('hidden', !(S.mode === 'free' || S.mode === 'rep' || S.mode === 'myrep'));
   for (const b of document.querySelectorAll('#toolSeg button')) b.classList.toggle('on', b.dataset.mode === S.mode);
 }
 
@@ -3473,7 +3654,7 @@ $('#batchStart').addEventListener('click', async () => {
     const plies = c.history({ verbose: true }).map((h) => ({ fenBefore: h.before, uci: h.lan }));
     try {
       const a = await analyzeCore(g, plies, batchJob, (d, t, left) => { $('#batchStatus').textContent = `Partie ${n + 1} / ${todo.length} · coup ${d} / ${t} · encore ~${fmtLeft(left)} pour cette partie`; });
-      if (a) { n++; renderGames(); }
+      if (a) { n++; renderGames(); track('analyse'); }
     } catch (err) { toast('Analyse interrompue : ' + esc(err.message)); break; }
   }
   $('#batchStatus').textContent = `Analyse en lot : ${n} / ${todo.length} parties analysées.${n < todo.length ? ' Relancez pour continuer.' : ''}`;
@@ -3495,6 +3676,7 @@ const trainerEnv = {
   storeGet: (k) => store.get('srs:' + k), storeSet: (k, v) => store.set('srs:' + k, v),
   openGame: (id, ply) => openGame(id, ply + 1), toast,
   openRep: (family, color) => openRepFor(family, color),
+  track: (k) => track(k),
 };
 
 // ------------------------------------------------------------------ jouer contre Stockfish
@@ -3552,7 +3734,8 @@ $('#freeAnalyze').addEventListener('click', () => {
   const plies = v.moves.map((m, i) => ({ san: m.san, uci: m.uci, color: m.color, fenBefore: m.fenBefore, fenAfter: m.fenAfter, moveNumber: m.moveNumber, captured: m.captured, from: m.from, to: m.to, rating: null, prevCapTo: i ? (v.moves[i - 1].captured ? v.moves[i - 1].to : null) : null }));
   S.store.free = snapshot();
   S.mode = 'game';
-  Object.assign(S, { game, analysis: null, sum: null, variation: null, idx: 0, startFen: null, partial: null, plies });
+  game.pgn = (v.moves[0].fenBefore !== new Chess().fen() ? `[SetUp "1"]\n[FEN "${v.moves[0].fenBefore}"]\n` : '') + `[White "${game.white.username}"]\n[Black "${game.black.username}"]\n[Result "${winner ? (winner === 'w' ? '1-0' : '0-1') : '1/2-1/2'}"]\n\n` + v.moves.map((m, i) => (m.color === 'w' ? `${m.moveNumber}. ` : i === 0 ? `${m.moveNumber}... ` : '') + m.san).join(' ');
+  Object.assign(S, { game, analysis: null, sum: null, variation: null, idx: 0, startFen: v.moves[0].fenBefore, partial: null, plies });
   board.setOrientation(game.userColor);
   document.body.dataset.view = 'board';
   for (const b of document.querySelectorAll('.tabbar button')) b.classList.toggle('on', b.dataset.view === 'board');
@@ -3814,7 +3997,7 @@ const OTB = (() => {
       black: { username: bName, rating: bElo, result: res === '0-1' ? 'win' : res === '1-0' ? 'resigned' : 'agreed' },
       userColor: me, pgn,
     };
-    await store.set('game:' + game.id, game);
+    await store.set('game:' + game.id, game); track('otb');
     S.localGames.unshift(game);
     S.games = [game, ...S.games.filter((g) => g.id !== game.id)];
     S.otb = null;
@@ -4099,7 +4282,7 @@ DAILY = (() => {
     const sk = o.streak;
     box.querySelector('.streak').textContent = `🔥 ${sk} jour${sk > 1 ? 's' : ''}`;
     msg(P.helped ? '✓ Problème terminé (avec aide). Revenez demain !' : P.errors ? '✓ Résolu ! Revenez demain pour le suivant.' : '✓ Parfait, résolu du premier coup ! Revenez demain.', 'ok');
-    play('done');
+    play('done'); track('puzzle');
   }
   function opponentReply() {
     if (P.step >= P.sol.length) return solved();
@@ -4147,6 +4330,849 @@ DAILY = (() => {
     loading = false;
   }
   return { show, _state: () => P };
+})();
+
+
+// ===================== MAJ 7 (iPhone) : entraînement (finales, devine le coup, coordonnées, aveugle, course), objectifs et badges,
+// gestion du temps, résumé de partie, reprendre ici, mon répertoire, recherche avancée =====================
+
+const dayKey = (d = new Date()) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+const yesterdayKey = () => { const d = new Date(); d.setDate(d.getDate() - 1); return dayKey(d); };
+const lsGet = (k, d) => { try { return JSON.parse(localStorage.getItem(k)) ?? d; } catch { return d; } };
+const lsSet = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} };
+const numFr = (n) => String(n).replace('.', ',');
+const moveLabel = (p) => `${p.moveNumber}${p.color === 'w' ? '.' : '…'} ${sanFr(p.san)}`;
+
+// ------------------------------------------------------------------ objectifs du jour et badges
+const BADGES = [
+  { id: 'analyse1', ic: '🔍', t: 'Première analyse', d: 'Analyser une partie', ok: (o) => (o.totals.analyse || 0) >= 1 },
+  { id: 'analyse10', ic: '📊', t: '10 analyses', d: '10 parties analysées', ok: (o) => Math.max(o.totals.analyse || 0, o.best.anaCount || 0) >= 10 },
+  { id: 'analyse50', ic: '🏛️', t: '50 analyses', d: '50 parties analysées', ok: (o) => Math.max(o.totals.analyse || 0, o.best.anaCount || 0) >= 50 },
+  { id: 'serie3', ic: '🔥', t: '3 jours', d: 'Objectifs remplis 3 jours d\'affilée', ok: (o) => (o.streak || 0) >= 3 },
+  { id: 'serie7', ic: '🔥', t: '7 jours', d: 'Objectifs remplis 7 jours d\'affilée', ok: (o) => (o.streak || 0) >= 7 },
+  { id: 'serie30', ic: '🏆', t: '30 jours', d: 'Objectifs remplis 30 jours d\'affilée', ok: (o) => (o.streak || 0) >= 30 },
+  { id: 'probleme7', ic: '🧩', t: '7 problèmes', d: '7 problèmes du jour résolus', ok: (o) => (o.totals.puzzle || 0) >= 7 },
+  { id: 'ex50', ic: '🎯', t: '50 exercices', d: '50 exercices réussis', ok: (o) => (o.totals.ex || 0) >= 50 },
+  { id: 'course10', ic: '⚡', t: 'Rapide', d: '10 bonnes réponses en course chrono', ok: (o) => (o.best.course || 0) >= 10 },
+  { id: 'course25', ic: '⚡', t: 'Éclair', d: '25 bonnes réponses en course chrono', ok: (o) => (o.best.course || 0) >= 25 },
+  { id: 'finales', ic: '♔', t: 'Finaliste', d: 'Réussir toutes les finales', ok: () => FIN.doneCount() >= FIN.total },
+  { id: 'coords20', ic: '🗺️', t: 'Géographe', d: '20 cases trouvées en 30 s', ok: (o) => (o.best.coords || 0) >= 20 },
+  { id: 'devine80', ic: '🎓', t: 'Élève du maître', d: '80 % ou plus dans « Devine le coup »', ok: (o) => (o.best.devine || 0) >= 80 },
+  { id: 'aveugle', ic: '🙈', t: 'À l\'aveugle', d: 'Battre Stockfish (niv. 3 ou +) sans voir les pièces', ok: (o) => (o.totals.blindwin || 0) >= 1 },
+  { id: 'brillant', ic: '💎', t: 'Brillant', d: 'Jouer un coup brillant dans une partie', ok: (o) => (o.totals.brillant || 0) >= 1 },
+  { id: 'precis90', ic: '✨', t: 'Précision 90', d: 'Une partie à 90 de précision ou plus', ok: (o) => (o.totals.precis90 || 0) >= 1 },
+  { id: 'club', ic: '♟️', t: 'Joueur de club', d: 'Saisir une partie jouée sur l\'échiquier', ok: (o) => (o.totals.otb || 0) >= 1 },
+  { id: 'repertoire', ic: '📘', t: 'Répertoire', d: '5 lignes dans « Mon répertoire »', ok: (o) => (o.best.myrep || 0) >= 5 },
+];
+const GOALS = (() => {
+  const K = 'objectifs';
+  function state() {
+    const o = lsGet(K, {});
+    o.totals ||= {}; o.best ||= {}; o.badges ||= {}; o.once ||= {}; o.exGoal ||= 3;
+    if (!o.today || o.today.day !== dayKey()) o.today = { day: dayKey(), puzzle: 0, ex: 0, train: 0 };
+    return o;
+  }
+  const defs = (o) => [
+    { k: 'puzzle', t: 'Problème du jour', n: 1 },
+    { k: 'ex', t: 'Exercices', n: o.exGoal },
+    { k: 'train', t: 'Activité', n: 1, d: 'finale, devine, coordonnées ou aveugle' },
+  ];
+  const streakOf = (o) => (o.lastFull === dayKey() || o.lastFull === yesterdayKey() ? o.streak || 0 : 0);
+  function check(o, silent) {
+    const fresh = [];
+    for (const b of BADGES) { if (!o.badges[b.id]) { let ok = false; try { ok = b.ok(o); } catch {} if (ok) { o.badges[b.id] = dayKey(); fresh.push(b); } } }
+    if (fresh.length && !silent) { toast(`🏅 Badge débloqué : <b>${esc(fresh.map((b) => b.t).join(', '))}</b>`, 5000); setTimeout(() => play('brilliant'), 300); }
+    return fresh;
+  }
+  function track(kind, val) {
+    const o = state(), t = o.today;
+    if (kind === 'puzzle') t.puzzle++;
+    else if (kind === 'ex') t.ex++;
+    else if (kind === 'course') t.ex += val || 0;
+    else if (['finale', 'devine', 'coords', 'blind'].includes(kind)) t.train++;
+    o.totals[kind] = (o.totals[kind] || 0) + 1;
+    if (typeof val === 'number' && ['course', 'coords', 'devine', 'myrep', 'anaCount'].includes(kind)) o.best[kind] = Math.max(o.best[kind] || 0, val);
+    const all = defs(o).every((g) => t[g.k] >= g.n);
+    let full = false;
+    if (all && o.lastFull !== dayKey()) { o.streak = o.lastFull === yesterdayKey() ? (o.streak || 0) + 1 : 1; o.lastFull = dayKey(); full = true; }
+    else if (!all && o.lastFull !== dayKey() && o.lastFull !== yesterdayKey()) o.streak = 0;
+    check(o);
+    lsSet(K, o);
+    if (full) { setTimeout(() => toast(`✓ Objectifs du jour atteints ! Série : ${o.streak} jour${o.streak > 1 ? 's' : ''} 🔥`, 5000), 600); }
+    TRAIN?.refreshHub?.();
+  }
+  function once(kind, id) { const o = state(); if (o.once[kind + ':' + id]) return; o.once[kind + ':' + id] = 1; lsSet(K, o); track(kind); }
+  function setBest(kind, val) { const o = state(); o.best[kind] = Math.max(o.best[kind] || 0, val); check(o); lsSet(K, o); }
+  function setExGoal(n) { const o = state(); o.exGoal = n; lsSet(K, o); }
+  return { state, defs, track, once, setBest, setExGoal, streakOf };
+})();
+function track(kind, val) { try { GOALS.track(kind, val); } catch (e) { console.error(e); } }
+// badges liés à l'analyse d'une partie (coup brillant, précision ≥ 90)
+RENDER_HOOKS.push(() => {
+  if (S.mode !== 'game' || !S.sum || !S.game?.userColor || !S.game.id) return;
+  const P = S.sum.players[S.game.userColor];
+  if (P.counts?.brillant > 0) GOALS.once('brillant', S.game.id);
+  if (P.accuracy >= 90 && S.plies.length >= 30) GOALS.once('precis90', S.game.id);
+});
+
+// ------------------------------------------------------------------ utilitaires partagés par les sections
+const tbProbe = async (fen) => {
+  const [b, , castling] = fen.split(' ');
+  if (b.replace(/[^a-zA-Z]/g, '').length > 7 || castling !== '-' || !navigator.onLine) return null;
+  try { const r = await fetch(`https://tablebase.lichess.ovh/standard?fen=${encodeURIComponent(fen)}`, { signal: AbortSignal.timeout(7000) }); return r.ok ? await r.json() : null; } catch { return null; }
+};
+const kingInCheck = (c) => { if (!c.inCheck()) return null; for (const row of c.board()) for (const p of row) if (p && p.type === 'k' && p.color === c.turn()) return p.square; return null; };
+function secBoard(el, onMove) { const b = new Board(el, { onMove, pieceUrl }); b.useImages = true; return b; }
+const repKey = (fen) => fen.split(' ').slice(0, 4).join(' ');
+
+// ------------------------------------------------------------------ finales essentielles
+const FIN = (() => {
+  const LIST = [
+    { id: 'kq', t: 'Mat avec la dame', d: 'Roi et dame contre roi : repoussez le roi adverse au bord, puis matez. Attention au pat !', fen: '8/8/8/4k3/8/8/8/3QK3 w - - 0 1', goal: 'mate' },
+    { id: 'kr', t: 'Mat avec la tour', d: 'Roi et tour contre roi : enfermez le roi dans une « boîte » de plus en plus petite.', fen: '8/8/8/4k3/8/8/8/R3K3 w - - 0 1', goal: 'mate' },
+    { id: 'opp', t: 'Le temps de réserve', d: 'Roi et pion : utilisez le coup de pion de réserve pour prendre l\'opposition et promouvoir.', fen: '8/8/4k3/8/4K3/8/4P3/8 w - - 0 1', goal: 'promote' },
+    { id: 'kp6', t: 'Roi devant son pion', d: 'Votre roi est sur la 6e rangée devant le pion : menez-le à la promotion.', fen: '4k3/8/4K3/4P3/8/8/8/8 w - - 0 1', goal: 'promote' },
+    { id: 'kpd', t: 'Défendre contre le pion', d: 'Avec les Noirs : gardez l\'opposition et annulez (tenez 15 coups, ou prenez le pion).', fen: '8/8/8/4k3/8/8/4P3/4K3 b - - 0 1', goal: 'draw' },
+    { id: 'lucena', t: 'Position de Lucena', d: 'Tour et pion contre tour : construisez le « pont » pour abriter votre roi et promouvoir.', fen: '1K6/1P1k4/8/8/8/8/r7/2R5 w - - 0 1', goal: 'promote' },
+    { id: 'philidor', t: 'Défense Philidor', d: 'Avec les Noirs : tour sur la 6e rangée, puis échecs par derrière quand le pion avance. Tenez 15 coups.', fen: '4k3/7r/8/4PK2/8/8/8/R7 b - - 0 1', goal: 'draw' },
+    { id: 'kbb', t: 'Mat avec les deux fous', d: 'Difficile : repoussez le roi vers un coin avec vos deux fous et votre roi.', fen: '8/8/8/4k3/8/8/8/2B1KB2 w - - 0 1', goal: 'mate' },
+  ];
+  const K = 'finales';
+  const done = () => lsGet(K, {});
+  let st = null, bd = null, box = null;
+  function mount(el) {
+    box = el; st = null;
+    const ok = done();
+    el.innerHTML = `<div class="secCard"><h2>Finales essentielles</h2><div class="muted small">Jouez contre Stockfish et la base de finales Lichess (défense parfaite). ${Object.keys(ok).length} / ${LIST.length} réussies.</div>
+      <ul class="secList">${LIST.map((f) => `<li data-f="${f.id}"><span class="t">${esc(f.t)}</span><span class="d">${esc(f.d)}</span><span class="s">${ok[f.id] ? '✓' : ''}</span></li>`).join('')}</ul></div>`;
+    el.querySelector('.secList').addEventListener('click', (e) => { const li = e.target.closest('li'); if (li) start(LIST.find((f) => f.id === li.dataset.f)); });
+  }
+  function start(f) {
+    const user = f.fen.split(' ')[1];
+    st = { f, fen: f.fen, hist: [f.fen], user, moves: 0, done: false, busy: false, last: null };
+    box.innerHTML = `<div class="secCard"><h2>${esc(f.t)}</h2><div class="muted small">${esc(f.d)}</div><div class="secBoard"></div><div class="secMsg"></div>
+      <div class="playBtns"><button data-a="undo">↶ Annuler</button><button data-a="restart">Recommencer</button><button data-a="list">Liste</button></div></div>`;
+    bd = secBoard(box.querySelector('.secBoard'), onMove);
+    bd.setOrientation(user);
+    box.querySelector('.playBtns').addEventListener('click', (e) => {
+      const a = e.target.closest('button')?.dataset.a;
+      if (a === 'list') mount(box); else if (a === 'restart') start(f);
+      else if (a === 'undo' && !st.busy && st.hist.length >= 3) { st.hist.length -= 2; st.fen = st.hist[st.hist.length - 1]; st.moves--; st.done = false; st.last = null; draw(); msg('Coup annulé.'); }
+    });
+    draw();
+    msg(f.goal === 'draw' ? `Vous avez les ${user === 'w' ? 'Blancs' : 'Noirs'} : tenez la nulle.` : f.goal === 'mate' ? 'À vous : matez le roi adverse.' : 'À vous : menez le pion à la promotion.');
+  }
+  function draw() { const c = new Chess(st.fen); bd.set(st.fen, { lastMove: st.last, check: kingInCheck(c), arrows: [] }); }
+  function msg(t, cls = '') { const m = box.querySelector('.secMsg'); if (m) { m.innerHTML = t; m.className = 'secMsg ' + cls; } }
+  function reps(fen) { const k = repKey(fen); return st.hist.filter((h) => repKey(h) === k).length; }
+  function success(t) {
+    st.done = true; msg('✓ ' + t, 'ok'); play('done');
+    const d = done(); if (!d[st.f.id]) { d[st.f.id] = dayKey(); lsSet(K, d); }
+    track('finale');
+  }
+  function fail(t) { st.done = true; msg('✗ ' + t + ' Touchez « Annuler » pour réessayer.', 'ko'); play('wrong'); }
+  const userView = (tb) => (tb && TB_MAP[tb.category] ? INVERT[TB_MAP[tb.category]] : null); // tb : trait au défenseur
+  async function onMove(uci) {
+    if (!st || st.done || st.busy) return;
+    const c = new Chess(st.fen), m = tryMove(c, uci);
+    if (!m) return;
+    st.fen = c.fen(); st.hist.push(st.fen); st.last = { from: m.from, to: m.to }; st.moves++;
+    draw();
+    const goal = st.f.goal;
+    if (c.isCheckmate()) return goal === 'mate' ? success(`Échec et mat en ${st.moves} coups !`) : success('Échec et mat !');
+    if (c.isStalemate()) return goal === 'draw' ? success('Pat : nulle obtenue !') : fail('Pat ! Le roi adverse n\'a plus de coup : c\'est nulle.');
+    if (c.isInsufficientMaterial()) return goal === 'draw' ? success('Plus assez de matériel pour mater : nulle !') : fail('Plus assez de matériel pour mater.');
+    if (reps(st.fen) >= 3) return goal === 'draw' ? success('Triple répétition : nulle !') : fail('Triple répétition : c\'est nulle.');
+    st.busy = true;
+    msg('…');
+    const tb = await tbProbe(st.fen);
+    const view = userView(tb);
+    if (goal !== 'draw' && view && view !== 'win') { st.busy = false; return fail('La position n\'est plus gagnante.'); }
+    if (goal === 'draw' && view === 'loss') { st.busy = false; return fail('La position est maintenant perdue.'); }
+    if (goal === 'promote' && m.promotion) { st.busy = false; return success(`Pion promu en ${st.moves} coups : la partie est gagnée !`); }
+    if (goal === 'draw' && st.moves >= 15) { st.busy = false; return success('15 coups tenus : la nulle est assurée !'); }
+    // réponse du défenseur : base de finales si possible, sinon Stockfish
+    let reply = tb?.moves?.[0]?.uci || null;
+    if (!reply) { try { reply = await getEngine().play(st.fen, { skill: 20, depth: 16, ms: 900 }); } catch {} }
+    st.busy = false;
+    if (!reply || st.done) return;
+    const c2 = new Chess(st.fen), m2 = tryMove(c2, reply);
+    if (!m2) return;
+    st.fen = c2.fen(); st.hist.push(st.fen); st.last = { from: m2.from, to: m2.to };
+    draw();
+    if (c2.isCheckmate()) return fail('Vous êtes mat.');
+    if (c2.isStalemate()) return goal === 'draw' ? success('Pat : nulle obtenue !') : fail('Pat : c\'est nulle.');
+    if (c2.isInsufficientMaterial()) return goal === 'draw' ? success('Nulle : plus assez de matériel !') : fail('Plus assez de matériel pour mater : c\'est nulle.');
+    if (reps(st.fen) >= 3) return goal === 'draw' ? success('Triple répétition : nulle !') : fail('Triple répétition : c\'est nulle.');
+    const left = goal === 'draw' ? ` · encore ${15 - st.moves} coup${15 - st.moves > 1 ? 's' : ''} à tenir` : '';
+    msg(view === 'win' && tb?.dtm ? `Toujours gagnant (mat en ${Math.ceil(Math.abs(tb.dtm) / 2)} au mieux)${left}` : view === 'draw' ? `Toujours nulle${left}` : `À vous${left}`);
+  }
+  return { mount, total: LIST.length, doneCount: () => Object.keys(done()).filter((k) => LIST.some((f) => f.id === k)).length, LIST };
+})();
+
+// ------------------------------------------------------------------ devine le coup (parties célèbres)
+const GUESS = (() => {
+  const GAMES = [
+    { id: 'opera', t: 'La partie de l\'Opéra', p: 'Morphy – duc de Brunswick et comte Isouard, Paris 1858', side: 'w', pgn: '1. e4 e5 2. Nf3 d6 3. d4 Bg4 4. dxe5 Bxf3 5. Qxf3 dxe5 6. Bc4 Nf6 7. Qb3 Qe7 8. Nc3 c6 9. Bg5 b5 10. Nxb5 cxb5 11. Bxb5+ Nbd7 12. O-O-O Rd8 13. Rxd7 Rxd7 14. Rd1 Qe6 15. Bxd7+ Nxd7 16. Qb8+ Nxb8 17. Rd8#' },
+    { id: 'reti', t: 'Le mat de Réti', p: 'Réti – Tartakower, Vienne 1910', side: 'w', pgn: '1. e4 c6 2. d4 d5 3. Nc3 dxe4 4. Nxe4 Nf6 5. Qd3 e5 6. dxe5 Qa5+ 7. Bd2 Qxe5 8. O-O-O Nxe4 9. Qd8+ Kxd8 10. Bg5+ Kc7 11. Bd8#' },
+    { id: 'lasker', t: 'La chasse au roi', p: 'Ed. Lasker – Thomas, Londres 1912', side: 'w', pgn: '1. d4 e6 2. Nf3 f5 3. Nc3 Nf6 4. Bg5 Be7 5. Bxf6 Bxf6 6. e4 fxe4 7. Nxe4 b6 8. Ne5 O-O 9. Bd3 Bb7 10. Qh5 Qe7 11. Qxh7+ Kxh7 12. Nxf6+ Kh6 13. Neg4+ Kg5 14. h4+ Kf4 15. g3+ Kf3 16. Be2+ Kg2 17. Rh2+ Kg1 18. Kd2#' },
+    { id: 'immortelle', t: 'L\'Immortelle', p: 'Anderssen – Kieseritzky, Londres 1851', side: 'w', pgn: '1. e4 e5 2. f4 exf4 3. Bc4 Qh4+ 4. Kf1 b5 5. Bxb5 Nf6 6. Nf3 Qh6 7. d3 Nh5 8. Nh4 Qg5 9. Nf5 c6 10. g4 Nf6 11. Rg1 cxb5 12. h4 Qg6 13. h5 Qg5 14. Qf3 Ng8 15. Bxf4 Qf6 16. Nc3 Bc5 17. Nd5 Qxb2 18. Bd6 Bxg1 19. e5 Qxa1+ 20. Ke2 Na6 21. Nxg7+ Kd8 22. Qf6+ Nxf6 23. Be7#' },
+    { id: 'evergreen', t: 'La Toujours Jeune', p: 'Anderssen – Dufresne, Berlin 1852', side: 'w', pgn: '1. e4 e5 2. Nf3 Nc6 3. Bc4 Bc5 4. b4 Bxb4 5. c3 Ba5 6. d4 exd4 7. O-O d3 8. Qb3 Qf6 9. e5 Qg6 10. Re1 Nge7 11. Ba3 b5 12. Qxb5 Rb8 13. Qa4 Bb6 14. Nbd2 Bb7 15. Ne4 Qf5 16. Bxd3 Qh5 17. Nf6+ gxf6 18. exf6 Rg8 19. Rad1 Qxf3 20. Rxe7+ Nxe7 21. Qxd7+ Kxd7 22. Bf5+ Ke8 23. Bd7+ Kf8 24. Bxe7#' },
+    { id: 'siecle', t: 'La partie du siècle', p: 'D. Byrne – Fischer (13 ans), New York 1956 — vous jouez Fischer', side: 'b', pgn: '1. Nf3 Nf6 2. c4 g6 3. Nc3 Bg7 4. d4 O-O 5. Bf4 d5 6. Qb3 dxc4 7. Qxc4 c6 8. e4 Nbd7 9. Rd1 Nb6 10. Qc5 Bg4 11. Bg5 Na4 12. Qa3 Nxc3 13. bxc3 Nxe4 14. Bxe7 Qb6 15. Bc4 Nxc3 16. Bc5 Rfe8+ 17. Kf1 Be6 18. Bxb6 Bxc4+ 19. Kg1 Ne2+ 20. Kf1 Nxd4+ 21. Kg1 Ne2+ 22. Kf1 Nc3+ 23. Kg1 axb6 24. Qb4 Ra4 25. Qxb6 Nxd1 26. h3 Rxa2 27. Kh2 Nxf2 28. Re1 Rxe1 29. Qd8+ Bf8 30. Nxe1 Bd5 31. Nf3 Ne4 32. Qb8 b5 33. h4 h5 34. Ne5 Kg7 35. Kg1 Bc5+ 36. Kf1 Ng3+ 37. Ke1 Bb4+ 38. Kd1 Bb3+ 39. Kc1 Ne2+ 40. Kb1 Nc3+ 41. Kc1 Rc2#' },
+  ];
+  const K = 'devine';
+  let box = null, st = null, bd = null;
+  function movesOf(g) { const c = new Chess(); c.loadPgn(g.pgn); return c.history({ verbose: true }).map((h) => ({ uci: h.from + h.to + (h.promotion || ''), san: h.san, color: h.color, before: h.before, after: h.after, from: h.from, to: h.to, moveNumber: Number(h.before.split(' ')[5]) })); }
+  function mount(el) {
+    box = el; st = null;
+    const best = lsGet(K, {});
+    el.innerHTML = `<div class="secCard"><h2>Devine le coup</h2><div class="muted small">Rejouez une partie célèbre en essayant de trouver chaque coup du vainqueur. Un coup aussi bon selon Stockfish rapporte aussi des points.</div>
+      <ul class="secList">${GAMES.map((g) => `<li data-g="${g.id}"><span class="t">${esc(g.t)}</span><span class="d">${esc(g.p)}</span><span class="s">${best[g.id] != null ? best[g.id] + ' %' : ''}</span></li>`).join('')}</ul></div>`;
+    el.querySelector('.secList').addEventListener('click', (e) => { const li = e.target.closest('li'); if (li) start(GAMES.find((g) => g.id === li.dataset.g)); });
+  }
+  function start(g) {
+    st = { g, mv: movesOf(g), i: 0, pts: 0, max: 0, busy: false, last: null, hint: false };
+    box.innerHTML = `<div class="secCard"><h2>${esc(g.t)}</h2><div class="muted small">${esc(g.p)}</div><div class="scoreBar"><span data-r="num"></span><span data-r="score"></span></div>
+      <div class="secBoard"></div><div class="secMsg"></div><div class="playBtns"><button data-a="hint">Indice (−3 pts)</button><button data-a="list">Liste</button></div></div>`;
+    bd = secBoard(box.querySelector('.secBoard'), onMove);
+    bd.setOrientation(g.side);
+    box.querySelector('.playBtns').addEventListener('click', (e) => {
+      const a = e.target.closest('button')?.dataset.a;
+      if (a === 'list') mount(box);
+      else if (a === 'hint' && st.i < st.mv.length && !st.hint && !st.busy) { st.hint = true; st.pts -= 3; bd.selected = st.mv[st.i].from; bd.render(); msg(`Indice : la pièce à jouer est en ${st.mv[st.i].from}.`); upd(); }
+    });
+    if (st.mv[0].color !== g.side) autoplay(); else { draw(); msg(`À vous : trouvez le coup des ${g.side === 'w' ? 'Blancs' : 'Noirs'}.`); }
+    upd();
+  }
+  function fen() { return st.i ? st.mv[st.i - 1].after : new Chess().fen(); }
+  function draw(arrow) { const c = new Chess(fen()); bd.set(fen(), { lastMove: st.last, check: kingInCheck(c), arrows: arrow ? [arrow] : [] }); }
+  function msg(t, cls = '') { const m = box.querySelector('.secMsg'); if (m) { m.innerHTML = t; m.className = 'secMsg ' + cls; } }
+  function upd() {
+    const n = st.mv.filter((m) => m.color === st.g.side).length, k = st.mv.slice(0, st.i).filter((m) => m.color === st.g.side).length;
+    box.querySelector('[data-r="num"]').textContent = `Coup ${Math.min(k + 1, n)} / ${n}`;
+    box.querySelector('[data-r="score"]').textContent = `${Math.max(0, st.pts)} pts${st.max ? ` (${Math.round((100 * Math.max(0, st.pts)) / st.max)} %)` : ''}`;
+  }
+  function advance() { const m = st.mv[st.i]; st.last = { from: m.from, to: m.to }; st.i++; st.hint = false; draw(); upd(); }
+  function autoplay() { setTimeout(() => { if (!st || st.i >= st.mv.length) return; advance(); if (st.i >= st.mv.length) return finish(); msg(`À vous : trouvez le coup des ${st.g.side === 'w' ? 'Blancs' : 'Noirs'}.`); }, 650); }
+  function finish() {
+    const pct = Math.round((100 * Math.max(0, st.pts)) / Math.max(1, st.max));
+    const best = lsGet(K, {}); best[st.g.id] = Math.max(best[st.g.id] || 0, pct); lsSet(K, best);
+    msg(`Partie terminée : <b>${pct} %</b> des points. ${pct >= 80 ? 'Digne du maître !' : pct >= 50 ? 'Bien joué !' : 'Rejouez-la pour faire mieux.'}`, 'ok');
+    play('done'); track('devine', pct);
+  }
+  async function onMove(uci) {
+    if (!st || st.busy || st.i >= st.mv.length) return;
+    const m = st.mv[st.i];
+    if (m.color !== st.g.side) return;
+    const c = new Chess(m.before), my = tryMove(c, uci);
+    if (!my) return;
+    st.max += 10;
+    if (uci === m.uci || uci.slice(0, 4) === m.uci.slice(0, 4)) {
+      st.pts += 10; play('correct');
+      advance(); msg(`✓ ${esc(sanFr(m.san))} : exactement le coup joué !`, 'ok');
+    } else {
+      st.busy = true;
+      bd.set(c.fen(), { lastMove: { from: my.from, to: my.to }, arrows: [] });
+      msg('Stockfish évalue votre coup…');
+      let gain = 0, note = '';
+      try {
+        const rec = await analyzePosition(m.before, uci, { useCloud: true, depth: Math.min(14, HD() + 2) });
+        const best = rec.lines?.[0]?.score, pl = rec.played?.score;
+        if (best && pl) {
+          const loss = winPct(best) - winPct(pl);
+          gain = loss < 2 ? 8 : loss < 5 ? 5 : loss < 10 ? 2 : 0;
+          note = gain >= 8 ? 'Excellent aussi selon Stockfish !' : gain >= 5 ? 'Bon coup, mais moins précis.' : gain ? 'Jouable, sans plus.' : 'Ce coup perd beaucoup.';
+        }
+      } catch {}
+      st.pts += gain; st.busy = false;
+      play(gain >= 5 ? 'correct' : 'wrong');
+      advance();
+      msg(`${esc(sanFr(my.san))} : ${note} (+${gain}) · Le maître a joué <b>${esc(sanFr(m.san))}</b>.`, gain >= 5 ? 'ok' : 'ko');
+    }
+    if (st.i >= st.mv.length) return finish();
+    autoplay();
+  }
+  return { mount, GAMES, movesOf };
+})();
+
+// ------------------------------------------------------------------ coordonnées
+const COORDS = (() => {
+  let box = null, timer = 0;
+  const K = 'coordonnees';
+  function mount(el) {
+    box = el; stop();
+    const best = lsGet(K, 0);
+    el.innerHTML = `<div class="secCard"><h2>Coordonnées</h2><div class="muted small">Touchez la case demandée le plus vite possible : 30 secondes. Record : <b>${best}</b>.</div>
+      <div class="secRow"><label>Côté <select data-r="side"><option value="w">Blancs en bas</option><option value="b">Noirs en bas</option><option value="r">Au hasard</option></select></label>
+      <label>Repères <select data-r="lab"><option value="0">Sans</option><option value="1">Avec lettres et chiffres</option></select></label></div>
+      <div class="coordTarget" data-r="target">–</div><div class="coordGrid" data-r="grid"></div>
+      <div class="scoreBar"><span data-r="time">30,0 s</span><span data-r="score">0</span></div>
+      <button class="primary" data-r="go">Démarrer</button></div>`;
+    el.querySelector('[data-r="go"]').addEventListener('click', go);
+    drawGrid('w', false);
+  }
+  function drawGrid(side, lab) {
+    const th = BOARD_THEMES.find((t) => t.id === PREFS.theme) || BOARD_THEMES[0];
+    let h = '';
+    for (let y = 0; y < 8; y++) for (let x = 0; x < 8; x++) {
+      const f = side === 'w' ? x : 7 - x, r = side === 'w' ? 7 - y : y;
+      const sq = 'abcdefgh'[f] + (r + 1), light = (f + r) % 2 === 1;
+      h += `<div data-sq="${sq}" style="background:${light ? th.light : th.dark};position:relative">${lab && y === 7 ? `<span class="coord file" style="color:${light ? th.dark : th.light}">${sq[0]}</span>` : ''}${lab && x === 0 ? `<span class="coord rank" style="color:${light ? th.dark : th.light}">${sq[1]}</span>` : ''}</div>`;
+    }
+    box.querySelector('[data-r="grid"]').innerHTML = h;
+  }
+  function go() {
+    stop();
+    let side = box.querySelector('[data-r="side"]').value; if (side === 'r') side = Math.random() < 0.5 ? 'w' : 'b';
+    drawGrid(side, box.querySelector('[data-r="lab"]').value === '1');
+    const st = { score: 0, end: performance.now() + 30000, target: null };
+    const next = () => { let t; do t = 'abcdefgh'[Math.floor(Math.random() * 8)] + (1 + Math.floor(Math.random() * 8)); while (t === st.target); st.target = t; box.querySelector('[data-r="target"]').textContent = t; };
+    next();
+    box.querySelector('[data-r="go"]').disabled = true;
+    const grid = box.querySelector('[data-r="grid"]');
+    grid.onpointerdown = (e) => {
+      const d = e.target.closest('[data-sq]'); if (!d || !timer) return;
+      const ok = d.dataset.sq === st.target;
+      d.classList.add(ok ? 'flashOk' : 'flashKo'); setTimeout(() => d.classList.remove('flashOk', 'flashKo'), 220);
+      if (ok) { st.score++; play('move'); next(); } else play('wrong');
+      box.querySelector('[data-r="score"]').textContent = st.score;
+    };
+    timer = setInterval(() => {
+      const left = st.end - performance.now();
+      box.querySelector('[data-r="time"]').textContent = numFr(Math.max(0, left / 1000).toFixed(1)) + ' s';
+      if (left <= 0) {
+        stop();
+        const best = Math.max(lsGet(K, 0), st.score); lsSet(K, best);
+        box.querySelector('[data-r="target"]').textContent = `${st.score} case${st.score > 1 ? 's' : ''} !`;
+        box.querySelector('[data-r="go"]').disabled = false; box.querySelector('[data-r="go"]').textContent = 'Rejouer';
+        play('done'); track('coords', st.score);
+      }
+    }, 100);
+  }
+  function stop() { clearInterval(timer); timer = 0; }
+  return { mount, leave: stop };
+})();
+
+// ------------------------------------------------------------------ échecs à l'aveugle
+const BLIND = (() => {
+  let box = null, st = null, bd = null;
+  function mount(el) {
+    box = el; st = null;
+    el.innerHTML = `<div class="secCard"><h2>Échecs à l'aveugle</h2><div class="muted small">Les pièces sont invisibles : jouez de mémoire en touchant les cases (départ puis arrivée). La liste des coups reste affichée.</div>
+      <div class="secRow"><label>Adversaire <select data-r="lvl">${PLAY_LEVELS.map((l, i) => `<option value="${i}" ${i === 1 ? 'selected' : ''}>Niveau ${l.label}</option>`).join('')}</select></label>
+      <label>Je joue <select data-r="col"><option value="w">les Blancs</option><option value="b">les Noirs</option></select></label></div>
+      <div class="secBoard blindOn"></div><div class="secMsg"></div><div class="blindMoves" data-r="moves"></div>
+      <div class="playBtns"><button data-a="peek">Voir les pièces 3 s</button><button data-a="new">Nouvelle partie</button></div></div>`;
+    document.body.classList.add('blindOn');
+    bd = secBoard(el.querySelector('.secBoard'), onMove);
+    el.querySelector('.playBtns').addEventListener('click', (e) => {
+      const a = e.target.closest('button')?.dataset.a;
+      if (a === 'new') start();
+      else if (a === 'peek' && st) { st.peeks++; const b = el.querySelector('.secBoard'); b.classList.remove('blindOn'); clearTimeout(st.pt); st.pt = setTimeout(() => b.classList.add('blindOn'), 3000); msg(`Pièces visibles 3 s (${st.peeks} coup${st.peeks > 1 ? 's' : ''} d'œil).`); }
+    });
+    start();
+  }
+  function start() {
+    const lvl = Number(box.querySelector('[data-r="lvl"]').value), col = box.querySelector('[data-r="col"]').value;
+    st = { lvl, col, moves: [], fen: new Chess().fen(), last: null, peeks: 0, busy: false, over: false };
+    bd.setOrientation(col);
+    draw(); list();
+    msg(col === 'w' ? 'À vous : jouez votre premier coup.' : 'Stockfish commence…');
+    if (col === 'b') engine();
+  }
+  function draw() { const c = new Chess(st.fen); bd.set(st.fen, { lastMove: st.last, check: kingInCheck(c), arrows: [] }); }
+  function msg(t, cls = '') { const m = box.querySelector('.secMsg'); if (m) { m.innerHTML = t; m.className = 'secMsg ' + cls; } }
+  function list() { box.querySelector('[data-r="moves"]').innerHTML = st.moves.length ? st.moves.map((m, i) => (m.color === 'w' ? `<span class="muted">${m.n}.</span> ` : i === 0 ? `<span class="muted">${m.n}…</span> ` : '') + (i === st.moves.length - 1 ? `<b>${esc(sanFr(m.san))}</b>` : esc(sanFr(m.san)))).join(' ') : '<span class="muted">Aucun coup.</span>'; }
+  function push(m, before) { st.moves.push({ san: m.san, color: m.color, n: Number(before.split(' ')[5]) }); st.last = { from: m.from, to: m.to }; }
+  function over(c) {
+    if (!c.isGameOver()) return false;
+    st.over = true;
+    const userWon = c.isCheckmate() && c.turn() !== st.col;
+    msg(c.isCheckmate() ? (userWon ? '✓ Échec et mat : vous gagnez à l\'aveugle !' : 'Échec et mat : Stockfish gagne.') : 'Partie nulle.', userWon ? 'ok' : '');
+    box.querySelector('.secBoard').classList.remove('blindOn');
+    if (userWon && st.lvl >= 2) track('blindwin');
+    track('blind');
+    play('end');
+    return true;
+  }
+  async function engine() {
+    st.busy = true;
+    const L = PLAY_LEVELS[st.lvl];
+    let mv = null;
+    try { mv = await getEngine().play(st.fen, { skill: L.skill, depth: L.depth, ms: L.ms }); } catch (e) { msg('Stockfish ne répond pas.', 'ko'); }
+    st.busy = false;
+    if (!mv || !st) return;
+    const before = st.fen, c = new Chess(before), m = tryMove(c, mv);
+    if (!m) return;
+    st.fen = c.fen(); push(m, before); draw(); list();
+    if (!over(c)) msg(`Stockfish a joué <b>${esc(sanFr(m.san))}</b>. À vous.`);
+  }
+  function onMove(uci) {
+    if (!st || st.busy || st.over) return;
+    const before = st.fen, c = new Chess(before);
+    if (c.turn() !== st.col) return;
+    const m = tryMove(c, uci);
+    if (!m) { msg('Coup illégal.', 'ko'); return; }
+    st.fen = c.fen(); push(m, before); draw(); list();
+    if (st.moves.length === 20) track('blind');
+    if (!over(c)) { msg('Stockfish réfléchit…'); engine(); }
+  }
+  return { mount, leave: () => { document.body.classList.remove('blindOn'); st = null; } };
+})();
+
+// ------------------------------------------------------------------ course de problèmes chronométrée
+const RUSH = (() => {
+  let box = null, st = null, bd = null, timer = 0;
+  const K = 'course';
+  async function exercises() {
+    const raw = await trainerEnv.loadEntries();
+    const out = [];
+    for (const { game, analysis } of raw) {
+      const plies = pliesFromAnalysis(game, analysis);
+      if (plies.length !== analysis.plies.length) continue;
+      const sum = summarize(plies, analysis.plies, S.book, game.time_class === 'daily' ? 'rapid' : game.time_class);
+      out.push(...exercisesFrom(game, plies, sum, analysis.plies, game.userColor || 'w'));
+    }
+    return out;
+  }
+  async function mount(el) {
+    box = el; stop();
+    el.innerHTML = '<div class="secCard"><h2>Course chrono</h2><div class="muted small">Préparation des exercices…</div></div>';
+    const list = await exercises();
+    const best = lsGet(K, 0);
+    el.innerHTML = `<div class="secCard"><h2>Course chrono</h2><div class="muted small">Trouvez le meilleur coup dans un maximum de positions tirées de vos erreurs. 3 minutes ; chaque erreur coûte 10 secondes. Record : <b>${best}</b>.</div>
+      <div class="scoreBar"><span data-r="time">3:00</span><span data-r="score">0 ✓ · 0 ✗</span></div>
+      <div class="secBoard"></div><div class="secMsg"></div>
+      <button class="primary" data-r="go" ${list.length < 5 ? 'disabled' : ''}>Démarrer (${list.length} positions)</button></div>`;
+    bd = secBoard(el.querySelector('.secBoard'), onMove);
+    if (list.length < 5) { msg('Il faut au moins 5 exercices : analysez quelques parties de plus (onglet Parties, « Analyser les … dernières »).', 'ko'); return; }
+    el.querySelector('[data-r="go"]').addEventListener('click', () => go(list));
+  }
+  function msg(t, cls = '') { const m = box.querySelector('.secMsg'); if (m) { m.innerHTML = t; m.className = 'secMsg ' + cls; } }
+  function go(list) {
+    stop();
+    const q = list.slice().sort(() => Math.random() - 0.5);
+    st = { q, k: 0, ok: 0, ko: 0, end: performance.now() + 180000 };
+    box.querySelector('[data-r="go"]').classList.add('hidden');
+    show();
+    timer = setInterval(tick, 200);
+  }
+  function show() {
+    const ex = st.q[st.k % st.q.length];
+    bd.setOrientation(ex.color);
+    bd.set(ex.fen, { arrows: [], check: kingInCheck(new Chess(ex.fen)) });
+    msg(`Trait aux ${ex.color === 'w' ? 'Blancs' : 'Noirs'} : trouvez le meilleur coup.`);
+  }
+  function tick() {
+    const left = Math.max(0, st.end - performance.now());
+    box.querySelector('[data-r="time"]').textContent = `${Math.floor(left / 60000)}:${String(Math.floor(left / 1000) % 60).padStart(2, '0')}`;
+    if (left <= 0) {
+      stop();
+      const best = Math.max(lsGet(K, 0), st.ok); lsSet(K, best);
+      msg(`Temps écoulé : <b>${st.ok}</b> bonne${st.ok > 1 ? 's' : ''} réponse${st.ok > 1 ? 's' : ''} (record ${best}).`, 'ok');
+      const b = box.querySelector('[data-r="go"]'); b.classList.remove('hidden'); b.textContent = 'Rejouer';
+      play('done'); track('course', st.ok);
+      st = null;
+    }
+  }
+  function onMove(uci) {
+    if (!st) return;
+    const ex = st.q[st.k % st.q.length];
+    const ok = ex.accept.some((a) => a === uci || a.slice(0, 4) === uci.slice(0, 4));
+    const c = new Chess(ex.fen), m = tryMove(c, uci);
+    if (!m) return;
+    if (ok) { st.ok++; play('correct'); }
+    else { st.ko++; st.end -= 10000; play('wrong'); const b = tryMove(new Chess(ex.fen), ex.best); msg(`✗ Il fallait ${b ? esc(sanFr(b.san)) : ex.best} (−10 s)`, 'ko'); }
+    box.querySelector('[data-r="score"]').textContent = `${st.ok} ✓ · ${st.ko} ✗`;
+    bd.set(c.fen(), { lastMove: { from: m.from, to: m.to }, arrows: ok ? [] : [{ from: ex.best.slice(0, 2), to: ex.best.slice(2, 4), color: '#4caf50' }] });
+    st.k++;
+    setTimeout(() => { if (st) show(); }, ok ? 350 : 1100);
+  }
+  function stop() { clearInterval(timer); timer = 0; }
+  return { mount, leave: () => { stop(); st = null; } };
+})();
+
+// ------------------------------------------------------------------ page « Entraînement » (hub)
+TRAIN = (() => {
+  const SECS = {
+    daily: { ic: 'puzzle', t: 'Problème du jour', d: 'Le problème quotidien de Lichess' },
+    ex: { ic: 'train', t: 'Exercices', d: 'Tirés de vos propres erreurs' },
+    course: { ic: 'bolt', t: 'Course chrono', d: '3 minutes, un max de bonnes réponses', mod: RUSH },
+    finales: { ic: 'king', t: 'Finales', d: 'Les finales essentielles', mod: FIN },
+    devine: { ic: 'eye', t: 'Devine le coup', d: 'Parties célèbres', mod: GUESS },
+    coords: { ic: 'grid', t: 'Coordonnées', d: 'Trouver la case en 30 s', mod: COORDS },
+    blind: { ic: 'eyeoff', t: 'À l\'aveugle', d: 'Jouer sans voir les pièces', mod: BLIND },
+    badges: { ic: 'medal', t: 'Badges', d: 'Vos récompenses' },
+  };
+  let cur = null;
+  const ring = (v, n) => { const p = Math.min(1, v / n), r = 17, L = 2 * Math.PI * r; return `<svg width="44" height="44" viewBox="0 0 44 44"><circle cx="22" cy="22" r="${r}" fill="none" stroke="var(--panel2)" stroke-width="5"/><circle cx="22" cy="22" r="${r}" fill="none" stroke="${p >= 1 ? '#5d9a2b' : '#e8890c'}" stroke-width="5" stroke-linecap="round" stroke-dasharray="${(L * p).toFixed(1)} ${L.toFixed(1)}" transform="rotate(-90 22 22)"/><text x="22" y="26.5" text-anchor="middle" font-size="12" font-weight="700" fill="currentColor">${p >= 1 ? '✓' : `${Math.min(v, n)}/${n}`}</text></svg>`; };
+  function hub() {
+    const o = GOALS.state(), t = o.today, sk = GOALS.streakOf(o);
+    const got = BADGES.filter((b) => o.badges[b.id]);
+    $('#goalsBox').innerHTML = `<div class="goals"><div class="gh"><h2>Objectifs du jour</h2><span class="streak" style="font-weight:800;color:#e8890c">${sk ? `🔥 ${sk} jour${sk > 1 ? 's' : ''}` : ''}</span></div>
+      <div class="gl">${GOALS.defs(o).map((g) => `<div class="goal ${t[g.k] >= g.n ? 'ok' : ''}">${ring(t[g.k], g.n)}<span>${esc(g.t)}${g.k === 'ex' ? ` <select data-r="exg" aria-label="Nombre d'exercices">${[3, 5, 10].map((n) => `<option ${n === o.exGoal ? 'selected' : ''}>${n}</option>`).join('')}</select>` : ''}</span>${g.d ? `<small class="muted">${esc(g.d)}</small>` : ''}</div>`).join('')}</div>
+      <div class="badgeRow">${[...got, ...BADGES.filter((b) => !o.badges[b.id])].slice(0, 12).map((b) => `<div class="bdg ${o.badges[b.id] ? 'on' : ''}" title="${esc(b.d)}"><i>${b.ic}</i>${esc(b.t)}</div>`).join('')}</div></div>`;
+    $('#goalsBox select[data-r="exg"]')?.addEventListener('change', (e) => { GOALS.setExGoal(Number(e.target.value)); hub(); });
+    $('#goalsBox .badgeRow').onclick = () => open('badges');
+    const fin = FIN.doneCount(), dv = lsGet('devine', {}), crd = lsGet('coordonnees', 0), crs = lsGet('course', 0);
+    const extra = { daily: t.puzzle ? '✓ fait' : '', finales: `${fin}/${FIN.total}`, devine: Object.keys(dv).length ? `${Math.max(...Object.values(dv))} %` : '', coords: crd ? `record ${crd}` : '', course: crs ? `record ${crs}` : '', badges: `${got.length}/${BADGES.length}` };
+    $('#hubGrid').innerHTML = Object.entries(SECS).map(([k, s]) => `<button data-sec="${k}">${uiIcon(s.ic, 24)}<b>${esc(s.t)}</b><span>${esc(s.d)}</span>${extra[k] ? `<em class="tag">${esc(extra[k])}</em>` : ''}</button>`).join('');
+    store.keys('ana:').then((k) => { if (k.length) GOALS.setBest('anaCount', k.length); }).catch(() => {});
+  }
+  function badgesPage(el) {
+    const o = GOALS.state();
+    el.innerHTML = `<div class="secCard"><h2>Badges</h2><div class="muted small">${BADGES.filter((b) => o.badges[b.id]).length} / ${BADGES.length} obtenus.</div>
+      <div class="badgeGrid">${BADGES.map((b) => `<div class="bdg ${o.badges[b.id] ? 'on' : ''}"><i>${b.ic}</i><b>${esc(b.t)}</b><small>${esc(b.d)}${o.badges[b.id] ? ` · ${new Date(o.badges[b.id]).toLocaleDateString('fr-FR')}` : ''}</small></div>`).join('')}</div></div>`;
+  }
+  function open(sec) {
+    leave();
+    cur = sec;
+    $('#trHub').classList.add('hidden'); $('#trSec').classList.remove('hidden');
+    for (const el of document.querySelectorAll('#trSec .sec')) el.classList.toggle('hidden', el.dataset.sec !== (sec === 'daily' || sec === 'ex' ? sec : 'other'));
+    if (sec === 'daily') DAILY.show();
+    else if (sec === 'ex') {
+      if (!S.user && !S.localGames.length) toast('Chargez d\'abord vos parties (onglet Parties).');
+      trainer ||= mountExercises($('#trainMount'), trainerEnv); trainer.refresh();
+    } else if (sec === 'badges') badgesPage($('#secBox'));
+    else SECS[sec].mod.mount($('#secBox'));
+    window.scrollTo(0, 0);
+  }
+  function leave() { if (cur && SECS[cur]?.mod?.leave) SECS[cur].mod.leave(); cur = null; }
+  function back() { leave(); $('#trSec').classList.add('hidden'); $('#trHub').classList.remove('hidden'); hub(); window.scrollTo(0, 0); }
+  $('#hubGrid').addEventListener('click', (e) => { const b = e.target.closest('button[data-sec]'); if (b) open(b.dataset.sec); });
+  $('#trBack').addEventListener('click', back);
+  return {
+    show() { if (!cur) hub(); },
+    refreshHub() { if (!cur && document.body.dataset.view === 'train') hub(); },
+    open, back, leaveView: leave,
+  };
+})();
+// quitter l'onglet arrête les chronos de l'entraînement
+document.querySelector('.tabbar').addEventListener('click', (e) => { const b = e.target.closest('button'); if (b && b.dataset.view !== 'train') { BLIND.leave(); COORDS.leave(); RUSH.leave(); } }, true);
+
+// ------------------------------------------------------------------ gestion du temps sur une partie
+const TIMEV = { key: null, ck: null };
+RENDER_HOOKS.push(() => {
+  const el = $('#timeBox');
+  if (S.mode !== 'game' || !S.game?.pgn || !S.plies.length) { el.innerHTML = ''; return; }
+  if (TIMEV.key !== S.game.id) { TIMEV.key = S.game.id; TIMEV.ck = clocksFromPgn(S.game.pgn); }
+  const ck = TIMEV.ck;
+  if (!ck || ck.clocks.length < S.plies.length - 1) { el.innerHTML = ''; return; }
+  const t = moveTimes(ck), n = S.plies.length;
+  const W = 600, H = 150, mid = H / 2, max = Math.max(5, ...t), bw = Math.max(1, (W - 4) / n);
+  const sc = (s) => Math.sqrt(s / max) * (mid - 6);
+  let svg = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Temps par coup"><rect x="0" y="0" width="${W}" height="${H}" rx="8" fill="var(--panel2)"/><line x1="0" x2="${W}" y1="${mid}" y2="${mid}" stroke="var(--border)"/>`;
+  for (let i = 0; i < n; i++) {
+    if (t[i] == null) continue;
+    const r = S.sum?.results[i], k = r?.cls && CLASSES[r.cls];
+    const col = k && !['meilleur', 'excellent', 'bon', 'theorie'].includes(r.cls) ? k.color : (S.plies[i].color === 'w' ? '#c9c5bf' : '#6f6a64');
+    const h = sc(t[i]), x = 2 + i * bw;
+    svg += `<rect x="${x.toFixed(1)}" y="${(S.plies[i].color === 'w' ? mid - h : mid).toFixed(1)}" width="${Math.max(1, bw - 1).toFixed(1)}" height="${Math.max(1, h).toFixed(1)}" fill="${col}"/>`;
+  }
+  const curI = (S.variation ? S.variation.base : S.idx) - 1;
+  if (curI >= 0) svg += `<rect x="${(2 + curI * bw).toFixed(1)}" y="0" width="${Math.max(2, bw - 1).toFixed(1)}" height="${H}" fill="#3b82f6" opacity=".25"/>`;
+  svg += `<text x="6" y="14" font-size="11" fill="var(--muted)">Blancs</text><text x="6" y="${H - 6}" font-size="11" fill="var(--muted)">Noirs</text></svg>`;
+  const me = S.game.userColor || 'w';
+  const mine = S.plies.map((p, i) => i).filter((i) => S.plies[i].color === me && t[i] != null);
+  const avg = mine.length ? mine.reduce((a, i) => a + t[i], 0) / mine.length : 0;
+  const longest = mine.slice().sort((a, b) => t[b] - t[a])[0];
+  const low = Math.max(10, Math.min(60, ck.base * 0.1));
+  const lowMoves = mine.filter((i) => (i >= 2 ? ck.clocks[i - 2] : ck.base) < low);
+  const isErr = (i) => ['erreur', 'gaffe', 'manquee'].includes(S.sum?.results[i]?.cls);
+  const quick = mine.filter((i) => t[i] < 2 && i > 16);
+  const lastMine = mine[mine.length - 1];
+  const lines = [];
+  if (longest != null) lines.push(`Plus longue réflexion : <a href="#" data-ti="${longest}">${esc(moveLabel(S.plies[longest]))}</a> (${fmtSecs(t[longest])}${S.sum?.results[longest]?.cls ? ', ' + CLASSES[S.sum.results[longest].cls].label.toLowerCase() : ''}).`);
+  if (S.sum && lowMoves.length) { const e = lowMoves.filter(isErr).length; lines.push(`En zeitnot (moins de ${fmtSecs(low)}) : ${lowMoves.length} coup${lowMoves.length > 1 ? 's' : ''}, dont ${e} erreur${e > 1 ? 's' : ''}.`); }
+  if (S.sum && quick.length >= 4) { const e = quick.filter(isErr).length; if (e) lines.push(`${quick.length} coups joués en moins de 2 s après l'ouverture, dont ${e} erreur${e > 1 ? 's' : ''}.`); }
+  el.innerHTML = `<div class="timeCard"><h3>Gestion du temps</h3>${svg}
+    <div class="tstats"><div><b>${fmtSecs(avg)}</b>par coup (vous)</div><div><b>${ck.base % 60 ? fmtSecs(ck.base) : ck.base / 60 + ' min'}${ck.inc ? ' + ' + ck.inc + ' s' : ''}</b>cadence</div><div><b>${lastMine != null ? fmtSecs(ck.clocks[lastMine]) : '–'}</b>restant à la fin</div></div>
+    ${lines.length ? `<p>${lines.join('<br>')}</p>` : ''}</div>`;
+  el.querySelector('svg').onclick = (e) => { const r = e.currentTarget.getBoundingClientRect(); const i = Math.floor(((e.clientX - r.left) / r.width * W - 2) / bw); if (i >= 0 && i < n) { S.variation = null; go(i + 1); } };
+  el.querySelectorAll('[data-ti]').forEach((a) => a.onclick = (e) => { e.preventDefault(); S.variation = null; go(Number(a.dataset.ti) + 1); window.scrollTo({ top: 0, behavior: 'smooth' }); });
+});
+
+// ------------------------------------------------------------------ résumé de la partie (moments clés)
+const KEYV = { for: null, html: '' };
+RENDER_HOOKS.push(() => {
+  const el = $('#keyBox');
+  if (S.mode !== 'game' || !S.sum || !S.analysis) { el.innerHTML = ''; KEYV.for = null; return; }
+  if (KEYV.for !== S.analysis) { KEYV.for = S.analysis; KEYV.html = keyMoments(); el.innerHTML = KEYV.html; el.querySelectorAll('li[data-k]').forEach((li) => li.onclick = () => { S.variation = null; go(Number(li.dataset.k) + 1); window.scrollTo({ top: 0, behavior: 'smooth' }); }); }
+});
+function keyMoments() {
+  const g = S.game, sum = S.sum, ser = sum.series, plies = S.plies, me = g.userColor;
+  const who = (col) => (me ? (col === me ? 'vous' : 'votre adversaire') : col === 'w' ? 'les Blancs' : 'les Noirs');
+  const Who = (col) => { const w = who(col); return w[0].toUpperCase() + w.slice(1); };
+  const pov = (i, col) => Math.round(col === 'w' ? ser[i] : 100 - ser[i]);
+  const cands = [];
+  plies.forEach((p, i) => {
+    const r = sum.results[i]; if (!r?.cls) return;
+    const d = pov(i + 1, p.color) - pov(i, p.color);
+    const special = r.cls === 'brillant' || r.cls === 'tresbon';
+    if (special || ((r.cls === 'gaffe' || r.cls === 'erreur' || r.cls === 'manquee') && d <= -10)) cands.push({ i, p, r, d, w: special ? 30 + Math.abs(d) : Math.abs(d) });
+  });
+  const picked = cands.sort((a, b) => b.w - a.w).slice(0, 5).sort((a, b) => a.i - b.i);
+  const bestSan = (i) => { const l = S.analysis.plies[i]?.lines?.[0]; if (!l) return null; const m = tryMove(new Chess(plies[i].fenBefore), l.pv[0]); return m ? sanFr(m.san) : null; };
+  const out = [];
+  // ouverture
+  const exit = sum.results.findIndex((r) => r?.cls !== 'theorie');
+  const op = openingName();
+  if (op && exit > 0) out.push(`<p>Ouverture : <b>${esc(openingFr(op))}</b>. ${Who(plies[exit].color)} ${me && plies[exit].color === me ? 'êtes sorti' : 'est sorti'} de la théorie au coup ${plies[exit].moveNumber}.</p>`);
+  else if (op) out.push(`<p>Ouverture : <b>${esc(openingFr(op))}</b>.</p>`);
+  let items = '';
+  for (const k of picked) {
+    const a = pov(k.i, k.p.color), b = pov(k.i + 1, k.p.color), lbl = CLASSES[k.r.cls].label.toLowerCase();
+    let txt;
+    if (k.r.cls === 'brillant' || k.r.cls === 'tresbon') txt = `<b>${esc(moveLabel(k.p))}</b> : ${lbl} de la part de ${who(k.p.color)}${b - a >= 5 ? `, les chances passent de ${a} % à ${b} %` : ''}.`;
+    else { const bs = bestSan(k.i); txt = `<b>${esc(moveLabel(k.p))}</b> (${lbl}) : ${who(k.p.color)} ${me && k.p.color === me ? 'passez' : 'passe'} de ${a} % à ${b} % de chances de gain.${bs ? ` Il fallait jouer <b>${esc(bs)}</b>.` : ''}`; }
+    items += `<li data-k="${k.i}"><span class="symi">${classIcon(k.r.cls, 20)}</span><span>${txt}</span></li>`;
+  }
+  if (items) out.push(`<ol>${items}</ol>`);
+  else out.push('<p>Aucun tournant majeur : une partie équilibrée, sans grosse erreur.</p>');
+  // phase décisive pour le joueur
+  if (me) {
+    const ph = { ouverture: 0, milieu: 0, finale: 0 }, { mid, end } = sum.phases;
+    plies.forEach((p, i) => { if (p.color !== me) return; const d = pov(i + 1, me) - pov(i, me); if (d < 0) ph[i < mid ? 'ouverture' : i < end ? 'milieu' : 'finale'] -= d; });
+    const worst = Object.entries(ph).sort((a, b) => b[1] - a[1])[0];
+    const lbl = { ouverture: 'dans l\'ouverture', milieu: 'au milieu de jeu', finale: 'en finale' };
+    if (worst[1] >= 15) out.push(`<p>C'est <b>${lbl[worst[0]]}</b> que vous avez perdu le plus de terrain (${Math.round(worst[1])} points de chances de gain au total).</p>`);
+    const P = sum.players[me], O = sum.players[me === 'w' ? 'b' : 'w'];
+    if (P.accuracy != null) out.push(`<p>Votre précision : <b>${numFr(P.accuracy.toFixed(1))}</b> (adversaire ${numFr(O.accuracy?.toFixed(1) ?? '–')}) · Elo estimé sur cette partie : ${fmtElo(P.elo)}.</p>`);
+  }
+  return `<div class="keyCard"><h3>Résumé de la partie</h3>${out.join('')}<div class="muted small">Touchez un moment clé pour aller à la position.</div></div>`;
+}
+
+// ------------------------------------------------------------------ reprendre la partie ici contre Stockfish
+RENDER_HOOKS.push(() => {
+  const b = $('#resumeBtn');
+  const show = S.mode === 'game' && S.plies.length > 0 && !new Chess(curFen()).isGameOver();
+  b.classList.toggle('hidden', !show);
+});
+$('#resumeBtn').addEventListener('click', () => {
+  if (S.analyzing) return toast('Attendez la fin de l\'analyse.');
+  const fen = curFen(), turn = fen.split(' ')[1];
+  S.toolMode = 'free';
+  showView('tools');
+  S.startFen = fen; S.plies = []; S.game = null; S.analysis = null; S.sum = null; S.idx = 0; S.otb = null;
+  S.variation = { base: 0, moves: [], vidx: 0 };
+  if (!PLAY.level) PLAY.level = Math.min(PLAY_LEVELS.length, 5);
+  PLAY.color = turn; savePlay();
+  $('#playLevel').value = String(PLAY.level); $('#playColor').value = PLAY.color;
+  board.setOrientation(turn);
+  render();
+  toast(`Vous jouez les ${turn === 'w' ? 'Blancs' : 'Noirs'} contre Stockfish niveau ${PLAY_LEVELS[PLAY.level - 1].label}, à partir de cette position. « Analyser la partie » à la fin.`, 6000);
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+});
+
+// ------------------------------------------------------------------ mon répertoire personnel
+const MYREP = (() => {
+  const K = 'monRepertoire';
+  let data = lsGet(K, { w: [], b: [] });
+  data.w ||= []; data.b ||= [];
+  const st = { color: 'w', quiz: null, maps: {} };
+  const save = () => { lsSet(K, data); st.maps = {}; track('myrep', data.w.length + data.b.length); };
+  function mapFor(col) {
+    if (st.maps[col]) return st.maps[col];
+    const m = new Map();
+    for (const l of data[col]) { const c = new Chess(); for (const san of l.san) { const before = c.fen(); let mv; try { mv = c.move(san); } catch { mv = null; } if (!mv) break; if (mv.color === col) m.set(epd(before), { uci: mv.from + mv.to + (mv.promotion || ''), san: mv.san }); } }
+    return (st.maps[col] = m);
+  }
+  function pushUci(uci) {
+    const v = S.variation || (S.variation = { base: 0, moves: [], vidx: 0 });
+    v.moves.length = v.vidx;
+    const fenBefore = curFen(), c = new Chess(fenBefore), m = tryMove(c, uci);
+    if (!m) return null;
+    const pm = v.moves[v.moves.length - 1];
+    v.moves.push({ san: m.san, uci: m.from + m.to + (m.promotion || ''), color: m.color, fenBefore, fenAfter: c.fen(), moveNumber: Number(fenBefore.split(' ')[5]), captured: m.captured, from: m.from, to: m.to, rating: null, rec: null, r: null, pending: false, prevCapTo: pm && pm.captured ? pm.to : null });
+    v.vidx = v.moves.length;
+    return m;
+  }
+  function loadSans(sans) {
+    S.startFen = null; S.variation = { base: 0, moves: [], vidx: 0 };
+    for (const san of sans) { let m; try { m = new Chess(curFen()).move(san); } catch { m = null; } if (!m) break; pushUci(m.from + m.to + (m.promotion || '')); }
+  }
+  function lineName(sans) {
+    const c = new Chess(); let name = '';
+    for (const san of sans) { try { c.move(san); } catch { break; } const n = S.names[epd(c.fen())]; if (n) name = n; }
+    return name ? openingFr(name) : '';
+  }
+  function move(uci) {
+    if (st.quiz) return quizMove(uci);
+    if (!pushUci(uci)) return;
+    render();
+  }
+  function saveLine() {
+    const v = S.variation, moves = v ? v.moves.slice(0, v.vidx) : [];
+    if (!moves.some((m) => m.color === st.color)) return toast(`Jouez au moins un coup des ${st.color === 'w' ? 'Blancs' : 'Noirs'} avant d'enregistrer.`);
+    const sans = moves.map((m) => m.san);
+    const map = mapFor(st.color);
+    const conflict = moves.find((m) => m.color === st.color && map.has(epd(m.fenBefore)) && map.get(epd(m.fenBefore)).uci !== m.uci);
+    const list = data[st.color];
+    if (list.some((l) => l.san.length >= sans.length && sans.every((s, i) => l.san[i] === s))) return toast('Cette ligne est déjà dans votre répertoire.');
+    data[st.color] = list.filter((l) => !(l.san.length < sans.length && l.san.every((s, i) => sans[i] === s)));
+    data[st.color].push({ id: Date.now().toString(36), san: sans, name: lineName(sans) });
+    save();
+    toast(conflict ? `Ligne enregistrée. Attention : au coup ${moveLabel(conflict)}, votre répertoire prévoyait ${sanFr(map.get(epd(conflict.fenBefore)).san)} — c'est maintenant ${sanFr(conflict.san)}.` : 'Ligne ajoutée à votre répertoire ✓', 6000);
+    renderPanel();
+  }
+  function startQuiz() {
+    if (st.quiz) { st.quiz = null; renderPanel(); render(); return; }
+    const list = data[st.color];
+    if (!list.length) return toast('Enregistrez d\'abord une ligne.');
+    const line = list[Math.floor(Math.random() * list.length)];
+    st.quiz = { line, i: 0 };
+    S.startFen = null; S.variation = { base: 0, moves: [], vidx: 0 };
+    board.setOrientation(st.color);
+    render(); renderPanel();
+    toast(`Entraînement : ${line.name || 'ligne de votre répertoire'}. Jouez vos coups.`);
+    autoOpp();
+  }
+  function autoOpp() {
+    const q = st.quiz; if (!q) return;
+    if (q.i >= q.line.san.length) { toast('✓ Ligne maîtrisée !'); play('done'); track('ex'); st.quiz = null; renderPanel(); return; }
+    const c = new Chess(curFen()); let m; try { m = c.move(q.line.san[q.i]); } catch { m = null; }
+    if (!m) { st.quiz = null; renderPanel(); return; }
+    if (m.color !== st.color) setTimeout(() => { if (st.quiz !== q) return; pushUci(m.from + m.to + (m.promotion || '')); q.i++; render(); autoOpp(); }, 450);
+  }
+  function quizMove(uci) {
+    const q = st.quiz, c = new Chess(curFen());
+    let exp; try { exp = c.move(q.line.san[q.i]); } catch { exp = null; }
+    if (!exp) return;
+    const expUci = exp.from + exp.to + (exp.promotion || '');
+    if (uci === expUci || uci.slice(0, 4) === expUci.slice(0, 4)) { pushUci(expUci); q.i++; play('correct'); render(); autoOpp(); }
+    else { play('wrong'); render(); toast(`✗ Pas le coup de votre répertoire. Indice : la pièce est en ${exp.from}.`); }
+  }
+  function renderPanel() {
+    const on = S.mode === 'myrep';
+    $('#myRepPanel').classList.toggle('hidden', !on);
+    if (!on) return;
+    for (const b of document.querySelectorAll('#myRepPanel [data-mc]')) b.classList.toggle('on', b.dataset.mc === st.color);
+    const list = data[st.color];
+    $('#myRepList').innerHTML = list.length ? list.map((l) => `<li data-id="${l.id}"><span class="nm">${esc(l.name || 'Ligne personnelle')}</span><span class="ln">${esc(l.san.map((s, i) => (i % 2 === 0 ? `${i / 2 + 1}.${sanFr(s)}` : sanFr(s))).join(' '))}</span><button class="del" data-del="${l.id}" aria-label="Supprimer">✕</button></li>`).join('')
+      : `<li class="empty">Aucune ligne pour les ${st.color === 'w' ? 'Blancs' : 'Noirs'}. Jouez les coups des deux camps sur l'échiquier, puis « Enregistrer la ligne ».</li>`;
+    const fen = curFen(), mine = fen.split(' ')[1] === st.color, hit = mapFor(st.color).get(epd(fen));
+    $('#myRepInfo').innerHTML = st.quiz ? `Entraînement en cours : ${esc(st.quiz.line.name || 'ligne personnelle')}.` : `${list.length} ligne${list.length > 1 ? 's' : ''}.${mine && hit ? ` Votre coup ici : <b>${esc(sanFr(hit.san))}</b> (flèche violette).` : ''}`;
+    $('#myRepQuiz').textContent = st.quiz ? 'Arrêter' : 'M\'entraîner';
+  }
+  $('#myRepPanel .repColor').addEventListener('click', (e) => { const b = e.target.closest('[data-mc]'); if (!b) return; st.color = b.dataset.mc; st.quiz = null; S.startFen = null; S.variation = { base: 0, moves: [], vidx: 0 }; board.setOrientation(st.color); render(); });
+  $('#myRepList').addEventListener('click', (e) => {
+    const d = e.target.closest('[data-del]');
+    if (d) { e.stopPropagation(); const l = data[st.color].find((x) => x.id === d.dataset.del); if (!l) return; if (d.dataset.armed) { data[st.color] = data[st.color].filter((x) => x.id !== l.id); save(); renderPanel(); render(); } else { d.dataset.armed = '1'; d.textContent = 'Supprimer ?'; setTimeout(() => { if (d.isConnected) { delete d.dataset.armed; d.textContent = '✕'; } }, 3000); } return; }
+    const li = e.target.closest('li[data-id]'); if (!li) return;
+    const l = data[st.color].find((x) => x.id === li.dataset.id); if (!l) return;
+    st.quiz = null; loadSans(l.san); render(); window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+  $('#myRepNew').addEventListener('click', () => { st.quiz = null; S.startFen = null; S.variation = { base: 0, moves: [], vidx: 0 }; render(); });
+  $('#myRepUndo').addEventListener('click', () => { const v = S.variation; if (!v?.vidx || st.quiz) return; v.moves.length = v.vidx; v.moves.pop(); v.vidx = v.moves.length; render(); });
+  $('#myRepSave').addEventListener('click', saveLine);
+  $('#myRepQuiz').addEventListener('click', startQuiz);
+  RENDER_HOOKS.push(renderPanel);
+  ARROW_HOOKS.push((fen) => {
+    if (S.mode !== 'myrep' || st.quiz || fen.split(' ')[1] !== st.color) return [];
+    const hit = mapFor(st.color).get(epd(fen));
+    return hit ? [{ from: hit.uci.slice(0, 2), to: hit.uci.slice(2, 4), color: '#7a5ac8', opacity: 0.8 }] : [];
+  });
+  // sortie de répertoire dans une partie analysée
+  const devCache = { id: null, html: '', ply: null };
+  RENDER_HOOKS.push(() => {
+    const el = $('#repDev');
+    const g = S.game;
+    if (S.mode !== 'game' || !g?.userColor || !S.plies.length || !data[g.userColor].length) { el.classList.add('hidden'); return; }
+    if (devCache.id !== g.id + '|' + data[g.userColor].length) {
+      devCache.id = g.id + '|' + data[g.userColor].length;
+      const map = mapFor(g.userColor);
+      let followed = 0, dev = null;
+      for (let i = 0; i < S.plies.length; i++) {
+        const p = S.plies[i];
+        if (p.color !== g.userColor) continue;
+        const hit = map.get(epd(p.fenBefore));
+        if (!hit) break;
+        if (hit.uci === p.uci || hit.uci.slice(0, 4) === p.uci.slice(0, 4)) followed++;
+        else { dev = { i, hit }; break; }
+      }
+      devCache.ply = dev ? dev.i : null;
+      devCache.html = dev ? `★ <b>Sortie de votre répertoire</b> au coup ${esc(moveLabel(S.plies[dev.i]))} : votre répertoire prévoit <b>${esc(sanFr(dev.hit.san))}</b>.`
+        : followed ? `★ Vous avez suivi votre répertoire pendant ${followed} coup${followed > 1 ? 's' : ''} ✓` : '';
+    }
+    el.innerHTML = devCache.html;
+    el.classList.toggle('hidden', !devCache.html);
+    el.onclick = () => { if (devCache.ply != null) { S.variation = null; go(devCache.ply + 1); } };
+  });
+  return { move, get color() { return st.color; }, mapFor, data: () => data };
+})();
+
+// ------------------------------------------------------------------ recherche avancée dans les parties
+const ADV = { op: '', res: '', color: '', min: 0, max: 0, cls: '', src: '', opIdx: new Map(), clsIdx: new Map(), job: 0 };
+const normTxt = (s) => String(s || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
+function moveCountOf(g) {
+  if (g._n != null) return g._n;
+  const body = String(g.pgn || '').replace(/\{[^}]*\}/g, ' ').replace(/^\s*\[[^\]]*\]\s*$/gm, '');
+  let n = 0; for (const m of body.matchAll(/(\d+)\.(?!\d)/g)) n = Math.max(n, Number(m[1]));
+  return (g._n = n);
+}
+function advMatch(g) {
+  if (ADV.res && outcome(g)[0] !== ADV.res) return false;
+  if (ADV.color && g.userColor !== ADV.color) return false;
+  if (ADV.src && (g.source || 'chesscom') !== ADV.src) return false;
+  if (ADV.min || ADV.max) { const n = moveCountOf(g); if (ADV.min && n < ADV.min) return false; if (ADV.max && n > ADV.max) return false; }
+  if (ADV.op) { const o = ADV.opIdx.get(g.id); if (o == null || !o.includes(normTxt(ADV.op))) return false; }
+  if (ADV.cls) { const s = ADV.clsIdx.get(g.id); if (!s || !s.has(ADV.cls)) return false; }
+  return true;
+}
+function openingOfGame(g) {
+  const h = String(g.pgn || '');
+  let txt = '';
+  const op = h.match(/\[Opening\s+"([^"]+)"\]/); if (op) txt += ' ' + op[1] + ' ' + openingFr(op[1]);
+  const eu = h.match(/\[ECOUrl\s+"[^"]*\/openings\/([^"]+)"\]/); if (eu) txt += ' ' + eu[1].replace(/-/g, ' ');
+  const body = h.replace(/^\s*\[[^\]]*\]\s*$/gm, '').replace(/\{[^}]*\}/g, ' ').replace(/\([^()]*\)/g, ' ').replace(/\$\d+/g, ' ').replace(/\d+\.(\.\.)?/g, ' ');
+  const c = new Chess(); let name = '';
+  for (const t of body.split(/\s+/).filter((x) => x && !/^(1-0|0-1|1\/2-1\/2|\*)$/.test(x)).slice(0, 24)) { let m; try { m = c.move(t); } catch { m = null; } if (!m) break; const n = S.names[epd(c.fen())]; if (n) name = n; }
+  if (name) txt += ' ' + name + ' ' + openingFr(name);
+  return normTxt(txt);
+}
+async function advPrepare() {
+  const job = ++ADV.job, status = $('#advStatus');
+  const games = S.games;
+  if (ADV.op) {
+    const todo = games.filter((g) => !ADV.opIdx.has(g.id));
+    for (let k = 0; k < todo.length; k++) {
+      if (job !== ADV.job) return;
+      ADV.opIdx.set(todo[k].id, openingOfGame(todo[k]));
+      if (k % 60 === 59) { status.textContent = `Recherche des ouvertures… ${k + 1} / ${todo.length}`; await sleep(0); }
+    }
+  }
+  if (ADV.cls) {
+    const todo = games.filter((g) => g.analyzed && !ADV.clsIdx.has(g.id));
+    for (let k = 0; k < todo.length; k++) {
+      if (job !== ADV.job) return;
+      const g = todo[k];
+      try {
+        const a = await store.get('ana:' + g.id);
+        const plies = pliesFromAnalysis(g, a);
+        const sum = summarize(plies, a.plies, S.book, g.time_class === 'daily' ? 'rapid' : g.time_class);
+        ADV.clsIdx.set(g.id, new Set(plies.map((p, i) => (p.color === (g.userColor || 'w') ? sum.results[i]?.cls : null)).filter(Boolean)));
+      } catch { ADV.clsIdx.set(g.id, new Set()); }
+      if (k % 5 === 4) { status.textContent = `Lecture des analyses… ${k + 1} / ${todo.length}`; await sleep(0); }
+    }
+  }
+  if (job !== ADV.job) return;
+  const active = [ADV.op, ADV.res, ADV.color, ADV.min, ADV.max, ADV.cls, ADV.src].filter(Boolean).length;
+  S.shown = 40; renderGames();
+  status.textContent = active ? `${filtered().length} partie(s) trouvée(s)${ADV.cls ? ' (parmi les parties analysées)' : ''}.` : '';
+}
+(() => {
+  let t = 0;
+  const read = () => {
+    ADV.op = $('#advOpening').value.trim(); ADV.res = $('#advRes').value; ADV.color = $('#advColor').value;
+    ADV.min = parseInt($('#advMin').value, 10) || 0; ADV.max = parseInt($('#advMax').value, 10) || 0;
+    ADV.cls = $('#advCls').value; ADV.src = $('#advSrc').value;
+    clearTimeout(t); t = setTimeout(advPrepare, 300);
+  };
+  for (const id of ['#advOpening', '#advMin', '#advMax']) $(id).addEventListener('input', read);
+  for (const id of ['#advRes', '#advColor', '#advCls', '#advSrc']) $(id).addEventListener('change', read);
+  $('#advToggle').addEventListener('click', () => $('#advBox').classList.toggle('hidden'));
+  $('#advClear').addEventListener('click', () => { for (const id of ['#advOpening', '#advMin', '#advMax']) $(id).value = ''; for (const id of ['#advRes', '#advColor', '#advCls', '#advSrc']) $(id).value = ''; read(); });
+  $('#advToggle').innerHTML = uiIcon('search', 16) + ' Recherche avancée';
 })();
 
 </script>
