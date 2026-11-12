@@ -110,10 +110,39 @@ h3 { font-size: 12px; margin: 16px 0 6px; color: var(--muted); text-transform: u
 .moves .var .mv { display: inline-flex; }
 
 .tabbar { position: fixed; left: 0; right: 0; bottom: 0; display: flex; background: var(--panel); border-top: 1px solid var(--border); padding-bottom: env(safe-area-inset-bottom); z-index: 50; }
-.tabbar button { flex: 1; border: 0; background: transparent; border-radius: 0; padding: 10px 0 12px; font-size: 13px; color: var(--muted); }
+.tabbar button { flex: 1; border: 0; background: transparent; border-radius: 0; padding: 10px 0 12px; font-size: 12px; color: var(--muted); }
 .tabbar button.on { color: var(--accent); font-weight: 700; }
 #toast { position: fixed; bottom: calc(80px + env(safe-area-inset-bottom)); left: 16px; right: 16px; background: #111; color: #fff; padding: 12px 14px; border-radius: 12px; z-index: 2000; box-shadow: 0 4px 16px rgba(0, 0, 0, .4); font-size: 14px; }
 #toast a { color: #f0a37f; }
+.repColor { display: flex; gap: 4px; margin: 4px 0 8px; background: var(--panel2); border-radius: 10px; padding: 3px; }
+.repColor button { flex: 1; border: 0; background: transparent; color: var(--muted); padding: 8px; }
+.repColor button.on { background: var(--panel); color: var(--text); font-weight: 650; }
+#repSearch { width: 100%; }
+.repList { list-style: none; margin: 6px 0; padding: 0; max-height: 34vh; overflow-y: auto; background: var(--panel); border-radius: 12px; }
+.repList li { padding: 9px 10px; border-bottom: 1px solid var(--border); display: grid; grid-template-columns: 40px 1fr; gap: 0 8px; }
+.repList li:last-child { border-bottom: 0; }
+.repList li.active { background: var(--panel2); }
+.repList li.empty { display: block; color: var(--muted); }
+.repList .eco { color: var(--muted); font-size: 12px; padding-top: 2px; }
+.repList .nm { font-weight: 600; font-size: 14px; }
+.repList .ln { grid-column: 2; font-size: 12px; color: var(--muted); }
+#repPanel { margin-bottom: 8px; }
+h3:has(+ #evalGraph[hidden]) { display: none; }
+.hintBar { display: flex; align-items: center; gap: 10px; margin-top: 10px; font-size: 14px; }
+.hintBar label { display: flex; align-items: center; gap: 6px; flex: 1; }
+.hintBar input[type=checkbox] { width: 20px; height: 20px; accent-color: var(--accent); }
+.hintBar select { padding: 6px 8px; font-size: 14px; }
+#hintText { margin-top: 4px; min-height: 18px; }
+#hintText b { color: #3b82f6; }
+#freeBar { margin-top: 8px; background: rgba(59, 130, 246, .14); padding: 8px 10px; border-radius: 10px; font-size: 13px; display: flex; gap: 8px; align-items: center; justify-content: space-between; }
+#freeBar button { padding: 6px 10px; font-size: 13px; }
+.graphBox { border-radius: 8px; overflow: hidden; touch-action: none; }
+.graphBox svg { display: block; width: 100%; }
+.g-axis { font-size: 11px; fill: var(--muted); }
+.g-band { fill: var(--panel2); }
+.g-lab { font-size: 10px; font-weight: 700; }
+.g-lab-w { fill: #ececec; paint-order: stroke; stroke: #403d39; stroke-width: 3px; }
+.g-lab-b { fill: #403d39; paint-order: stroke; stroke: #ececec; stroke-width: 3px; }
 @media (min-width: 700px) { .view { max-width: 560px; margin: 0 auto; } }
 </style>
 
@@ -163,6 +192,13 @@ h3 { font-size: 12px; margin: 16px 0 6px; color: var(--muted); text-transform: u
 </section>
 
 <section id="boardView" class="view">
+  <div id="repPanel" class="hidden">
+    <div class="repColor"><button data-color="w" class="on">⚪ Blancs</button><button data-color="b">⚫ Noirs</button></div>
+    <input id="repSearch" placeholder="Rechercher (nom ou code ECO)…" autocapitalize="none" spellcheck="false">
+    <div id="repCount" class="muted small"></div>
+    <ul id="repList" class="repList"></ul>
+    <div class="muted small">Lignes principales seulement, 8 coups maximum. Touchez une ouverture puis avancez avec ▶.</div>
+  </div>
   <div id="playerTop" class="player"></div>
   <div id="evalBar"><div class="fill"></div><span class="txt"></span></div>
   <div id="board"></div>
@@ -175,6 +211,14 @@ h3 { font-size: 12px; margin: 16px 0 6px; color: var(--muted); text-transform: u
     <button data-nav="flip" aria-label="Retourner">⇅</button>
   </div>
   <div id="opening" class="muted"></div>
+  <div class="hintBar">
+    <label><input type="checkbox" id="hintOn"> Meilleur coup</label>
+    <select id="hintDepth" aria-label="Profondeur du conseil">
+      <option value="8">prof. 8</option><option value="10">prof. 10</option><option value="12">prof. 12</option><option value="14">prof. 14</option><option value="16">prof. 16</option>
+    </select>
+  </div>
+  <div id="hintText" class="small"></div>
+  <div id="freeBar" class="hidden"><span>Échiquier libre : jouez les deux camps depuis le début, chaque coup est noté.</span><button id="restartFree">Recommencer</button></div>
   <div id="variationBar" class="hidden"><span>Variante libre, notée par Stockfish</span><button id="exitVar">Revenir à la partie</button></div>
   <div id="analyzeBox" class="hidden">
     <button id="analyzeBtn" class="primary">Analyser cette partie</button>
@@ -182,6 +226,8 @@ h3 { font-size: 12px; margin: 16px 0 6px; color: var(--muted); text-transform: u
     <button id="cancelBtn" class="hidden ghostBtn">Mettre en pause</button>
     <div class="muted small" style="margin-top:6px">Gardez l'écran allumé et la page ouverte pendant l'analyse. Si elle s'interrompt, elle reprend là où elle s'est arrêtée.</div>
   </div>
+  <h3>Évaluation de la partie</h3>
+  <div id="evalGraph" class="graphBox" hidden></div>
   <div id="detail"></div>
   <div id="summary"></div>
   <div id="lines"></div>
@@ -192,6 +238,8 @@ h3 { font-size: 12px; margin: 16px 0 6px; color: var(--muted); text-transform: u
 <nav class="tabbar">
   <button data-view="games">♟︎ Parties</button>
   <button data-view="board">♞ Analyse</button>
+  <button data-view="free">♙ Libre</button>
+  <button data-view="rep">📖 Répertoire</button>
 </nav>
 <div id="toast" class="hidden"></div>
 <script type="module">
@@ -793,7 +841,53 @@ function summarize(plies, records, book, timeClass = null) {
     const rating = idx.length ? plies[idx[0]].rating : null;
     players[color] = { accuracy, acpl, elo: estimateElo(acpl, accuracy, nonBook.length, rating, timeClass), counts };
   }
-  return { results, players };
+  return { results, players, series: evalSeries(plies, records), phases: gamePhases(plies, results) };
+}
+
+// Chances de gain des Blancs (0-100) pour chaque position : 0 = départ, i = après le demi-coup i
+function evalSeries(plies, records) {
+  const out = [];
+  const TBW = { win: 100, draw: 50, loss: 0 };
+  const white = (score, persp) => (persp === 'w' ? winPct(score) : 100 - winPct(score));
+  const r0 = records[0];
+  out.push(r0?.lines?.[0] ? (r0.tb ? (plies[0].color === 'w' ? TBW[r0.tb.root] : 100 - TBW[r0.tb.root]) : white(r0.lines[0].score, plies[0].color)) : 50);
+  for (let i = 0; i < plies.length; i++) {
+    const p = plies[i], r = records[i];
+    const c = new Chess(p.fenAfter);
+    if (c.isCheckmate()) { out.push(c.turn() === 'w' ? 0 : 100); continue; }
+    if (c.isStalemate() || c.isInsufficientMaterial()) { out.push(50); continue; }
+    if (!r?.lines?.length) { out.push(out[out.length - 1]); continue; }
+    if (r.tb?.played) { const v = TBW[r.tb.played]; out.push(p.color === 'w' ? v : 100 - v); continue; }
+    const isBest = r.lines[0].pv[0] === p.uci;
+    out.push(white(isBest || !r.played ? r.lines[0].score : r.played.score, p.color));
+  }
+  return out;
+}
+
+// Phases de la partie (indices de demi-coups) : ouverture → milieu de jeu → finale
+function gamePhases(plies, results) {
+  const n = plies.length;
+  let mid = null, end = null;
+  const stats = (fen) => {
+    const c = new Chess(fen);
+    let pieces = 0, queens = 0, material = 0, dev = { w: 0, b: 0 };
+    const home = { w: ['b1', 'g1', 'c1', 'f1'], b: ['b8', 'g8', 'c8', 'f8'] };
+    for (const row of c.board()) for (const q of row) {
+      if (!q || q.type === 'k' || q.type === 'p') continue;
+      pieces++; material += VALUE[q.type]; if (q.type === 'q') queens++;
+    }
+    for (const col of ['w', 'b']) for (const sq of home[col]) { const q = c.get(sq); if (!q || q.color !== col || !'nb'.includes(q.type)) dev[col]++; }
+    return { pieces, queens, material, dev };
+  };
+  for (let i = 0; i < n; i++) {
+    const st = stats(plies[i].fenAfter);
+    const book = results?.[i]?.cls === 'theorie';
+    if (mid === null && !book && (i >= 19 || (st.dev.w >= 3 && st.dev.b >= 3) || st.pieces <= 10)) mid = i + 1;
+    if (end === null && (st.pieces <= 6 || (st.queens === 0 && st.material <= 26))) { end = i + 1; if (mid === null) mid = end; break; }
+  }
+  if (mid === null) mid = n;
+  if (end === null) end = n;
+  return { mid: Math.min(mid, n), end: Math.min(end, n), n };
 }
 
 // ------------------------------------------------------------------ commentaires
@@ -1091,6 +1185,110 @@ class Board {
 
 return { Board };
 })();
+const { renderEvalGraph } = (() => {
+// Graphique de l'évaluation au fil de la partie (chances de gain des Blancs)
+// Ordonnées : Blancs en haut, Noirs en bas. Abscisses : ouverture, milieu de jeu, finale.
+function renderEvalGraph(el, { series, phases, marks = [], current = 0, onSeek }) {
+  if (!series || series.length < 2) { el.innerHTML = ''; el.hidden = true; return; }
+  el.hidden = false;
+  const W = Math.max(240, Math.round(el.clientWidth || 360));
+  const PH = 120, AX = 20, H = PH + AX;
+  const n = series.length - 1;
+  const x = (i) => (i / n) * W;
+  const key = W + '|' + series.join(',') + '|' + marks.map((m) => m.i + m.color).join(',') + '|' + (phases?.mid) + '|' + (phases?.end);
+  if (el._key === key && el._cursor) {
+    const cx0 = x(Math.max(0, Math.min(n, current)));
+    el._cursor.setAttribute('x1', cx0); el._cursor.setAttribute('x2', cx0);
+    return;
+  }
+  el._key = key;
+  const y = (wp) => (1 - Math.max(0, Math.min(100, wp)) / 100) * PH;
+  let d = `M0,${PH} `;
+  series.forEach((wp, i) => { d += `L${x(i).toFixed(1)},${y(wp).toFixed(1)} `; });
+  d += `L${W},${PH} Z`;
+  let line = '';
+  series.forEach((wp, i) => { line += `${i ? 'L' : 'M'}${x(i).toFixed(1)},${y(wp).toFixed(1)} `; });
+
+  const segs = [
+    { a: 0, b: phases?.mid ?? n, label: 'Ouverture' },
+    { a: phases?.mid ?? n, b: phases?.end ?? n, label: 'Milieu de jeu' },
+    { a: phases?.end ?? n, b: n, label: 'Finale' },
+  ];
+  let svg = `<svg class="evalGraph" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" role="img" aria-label="Évolution de l'évaluation pendant la partie">`;
+  svg += `<rect x="0" y="0" width="${W}" height="${PH}" fill="#403d39"/>`;
+  svg += `<path d="${d}" fill="#ececec"/>`;
+  svg += `<path d="${line}" fill="none" stroke="#9a968f" stroke-width="1"/>`;
+  svg += `<line x1="0" x2="${W}" y1="${PH / 2}" y2="${PH / 2}" stroke="#8a867f" stroke-width="1" stroke-dasharray="3 3"/>`;
+  segs.forEach((s, k) => {
+    if (s.b <= s.a) return;
+    const xa = x(s.a), xb = x(s.b);
+    if (k > 0) svg += `<line x1="${xa}" x2="${xa}" y1="0" y2="${PH}" stroke="#d9a441" stroke-width="1.5" stroke-dasharray="4 3"/>`;
+    if (k % 2 === 1) svg += `<rect x="${xa}" y="${PH}" width="${xb - xa}" height="${AX}" class="g-band"/>`;
+    const w = xb - xa;
+    const label = w >= 84 ? s.label : w >= 44 ? s.label.split(' ')[0] : '';
+    if (label) svg += `<text x="${(xa + xb) / 2}" y="${PH + 14}" text-anchor="middle" class="g-axis">${label}</text>`;
+  });
+  for (const m of marks) {
+    if (m.i < 0 || m.i > n) continue;
+    svg += `<circle cx="${x(m.i).toFixed(1)}" cy="${y(series[m.i]).toFixed(1)}" r="4" fill="${m.color}" stroke="#fff" stroke-width="1.2"/>`;
+  }
+  const cx = x(Math.max(0, Math.min(n, current)));
+  svg += `<line class="g-cursor" x1="${cx}" x2="${cx}" y1="0" y2="${PH}" stroke="#5aa0e6" stroke-width="2"/>`;
+  svg += `<text x="5" y="13" class="g-lab g-lab-w">Blancs</text><text x="5" y="${PH - 5}" class="g-lab g-lab-b">Noirs</text>`;
+  svg += '</svg>';
+  el.innerHTML = svg;
+  const s = el.querySelector('svg');
+  el._cursor = s.querySelector('.g-cursor');
+  const seek = (ev) => {
+    const r = s.getBoundingClientRect();
+    const i = Math.round(((ev.clientX - r.left) / r.width) * n);
+    onSeek?.(Math.max(0, Math.min(n, i)));
+  };
+  let down = false;
+  s.addEventListener('pointerdown', (ev) => { down = true; s.setPointerCapture?.(ev.pointerId); seek(ev); });
+  s.addEventListener('pointermove', (ev) => { if (down) seek(ev); });
+  s.addEventListener('pointerup', () => { down = false; });
+  s.addEventListener('pointercancel', () => { down = false; });
+}
+
+return { renderEvalGraph };
+})();
+const { buildRepertoire, repertoirePlies } = (() => {
+// Répertoire d'ouvertures : lignes principales (sans variantes) de lichess-org/chess-openings, 8 coups maximum.
+
+const REP_MAX_PLIES = 16; // 8 coups (blancs + noirs)
+
+// Une ouverture appartient au camp qui joue le dernier coup de sa ligne principale
+// (ex. 1.e4 c5 = Défense sicilienne → Noirs ; 1.e4 e5 2.Cf3 Cc6 3.Fc4 = Partie italienne → Blancs).
+function buildRepertoire(tsvTexts) {
+  const byName = new Map();
+  for (const txt of tsvTexts) {
+    for (const row of String(txt).split('\n').slice(1)) {
+      const [eco, name, pgn] = row.split('\t');
+      if (!pgn || !name || name.includes(':')) continue; // « Nom: variante » = variante → ignorée
+      let h;
+      try { const c = new Chess(); c.loadPgn(pgn); h = c.history({ verbose: true }); } catch { continue; }
+      if (!h.length || h.length > REP_MAX_PLIES) continue;
+      const prev = byName.get(name);
+      if (prev && prev.san.length <= h.length) continue; // même nom sous plusieurs codes : on garde la ligne de base
+      byName.set(name, { eco, name, color: h[h.length - 1].color, san: h.map((x) => x.san), uci: h.map((x) => x.lan) });
+    }
+  }
+  return [...byName.values()].sort((a, b) => a.eco.localeCompare(b.eco) || a.name.localeCompare(b.name));
+}
+
+// Transforme une ouverture du répertoire en demi-coups jouables sur l'échiquier
+function repertoirePlies(item) {
+  const c = new Chess();
+  return item.uci.map((u) => {
+    const before = c.fen();
+    const m = c.move({ from: u.slice(0, 2), to: u.slice(2, 4), promotion: u[4] });
+    return { san: m.san, uci: m.lan, color: m.color, fenBefore: before, fenAfter: c.fen(), moveNumber: Number(before.split(' ')[5]), captured: m.captured, from: m.from, to: m.to, rating: null };
+  });
+}
+
+return { buildRepertoire, repertoirePlies };
+})();
 const PIECE_URLS = {"wK": "data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2045%2045%22%3E%3Cg%20fill%3D%22none%22%20fill-rule%3D%22evenodd%22%20stroke%3D%22%23000%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%20stroke-width%3D%221.5%22%3E%3Cpath%20stroke-linejoin%3D%22miter%22%20d%3D%22M22.5%2011.63V6M20%208h5%22/%3E%3Cpath%20fill%3D%22%23fff%22%20stroke-linecap%3D%22butt%22%20stroke-linejoin%3D%22miter%22%20d%3D%22M22.5%2025s4.5-7.5%203-10.5c0%200-1-2.5-3-2.5s-3%202.5-3%202.5c-1.5%203%203%2010.5%203%2010.5%22/%3E%3Cpath%20fill%3D%22%23fff%22%20d%3D%22M11.5%2037c5.5%203.5%2015.5%203.5%2021%200v-7s9-4.5%206-10.5c-4-6.5-13.5-3.5-16%204V27v-3.5c-3.5-7.5-13-10.5-16-4-3%206%205%2010%205%2010z%22/%3E%3Cpath%20d%3D%22M11.5%2030c5.5-3%2015.5-3%2021%200m-21%203.5c5.5-3%2015.5-3%2021%200m-21%203.5c5.5-3%2015.5-3%2021%200%22/%3E%3C/g%3E%3C/svg%3E", "wQ": "data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2045%2045%22%3E%3Cg%20fill%3D%22%23fff%22%20fill-rule%3D%22evenodd%22%20stroke%3D%22%23000%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%20stroke-width%3D%221.5%22%3E%3Cpath%20d%3D%22M8%2012a2%202%200%201%201-4%200%202%202%200%201%201%204%200m16.5-4.5a2%202%200%201%201-4%200%202%202%200%201%201%204%200M41%2012a2%202%200%201%201-4%200%202%202%200%201%201%204%200M16%208.5a2%202%200%201%201-4%200%202%202%200%201%201%204%200M33%209a2%202%200%201%201-4%200%202%202%200%201%201%204%200%22/%3E%3Cpath%20stroke-linecap%3D%22butt%22%20d%3D%22M9%2026c8.5-1.5%2021-1.5%2027%200l2-12-7%2011V11l-5.5%2013.5-3-15-3%2015-5.5-14V25L7%2014z%22/%3E%3Cpath%20stroke-linecap%3D%22butt%22%20d%3D%22M9%2026c0%202%201.5%202%202.5%204%201%201.5%201%201%20.5%203.5-1.5%201-1.5%202.5-1.5%202.5-1.5%201.5.5%202.5.5%202.5%206.5%201%2016.5%201%2023%200%200%200%201.5-1%200-2.5%200%200%20.5-1.5-1-2.5-.5-2.5-.5-2%20.5-3.5%201-2%202.5-2%202.5-4-8.5-1.5-18.5-1.5-27%200z%22/%3E%3Cpath%20fill%3D%22none%22%20d%3D%22M11.5%2030c3.5-1%2018.5-1%2022%200M12%2033.5c6-1%2015-1%2021%200%22/%3E%3C/g%3E%3C/svg%3E", "wR": "data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2045%2045%22%3E%3Cg%20fill%3D%22%23fff%22%20fill-rule%3D%22evenodd%22%20stroke%3D%22%23000%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%20stroke-width%3D%221.5%22%3E%3Cpath%20stroke-linecap%3D%22butt%22%20d%3D%22M9%2039h27v-3H9zm3-3v-4h21v4zm-1-22V9h4v2h5V9h5v2h5V9h4v5%22/%3E%3Cpath%20d%3D%22m34%2014-3%203H14l-3-3%22/%3E%3Cpath%20stroke-linecap%3D%22butt%22%20stroke-linejoin%3D%22miter%22%20d%3D%22M31%2017v12.5H14V17%22/%3E%3Cpath%20d%3D%22m31%2029.5%201.5%202.5h-20l1.5-2.5%22/%3E%3Cpath%20fill%3D%22none%22%20stroke-linejoin%3D%22miter%22%20d%3D%22M11%2014h23%22/%3E%3C/g%3E%3C/svg%3E", "wB": "data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2045%2045%22%3E%3Cg%20fill%3D%22none%22%20fill-rule%3D%22evenodd%22%20stroke%3D%22%23000%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%20stroke-width%3D%221.5%22%3E%3Cg%20fill%3D%22%23fff%22%20stroke-linecap%3D%22butt%22%3E%3Cpath%20d%3D%22M9%2036c3.39-.97%2010.11.43%2013.5-2%203.39%202.43%2010.11%201.03%2013.5%202%200%200%201.65.54%203%202-.68.97-1.65.99-3%20.5-3.39-.97-10.11.46-13.5-1-3.39%201.46-10.11.03-13.5%201-1.35.49-2.32.47-3-.5%201.35-1.94%203-2%203-2z%22/%3E%3Cpath%20d%3D%22M15%2032c2.5%202.5%2012.5%202.5%2015%200%20.5-1.5%200-2%200-2%200-2.5-2.5-4-2.5-4%205.5-1.5%206-11.5-5-15.5-11%204-10.5%2014-5%2015.5%200%200-2.5%201.5-2.5%204%200%200-.5.5%200%202z%22/%3E%3Cpath%20d%3D%22M25%208a2.5%202.5%200%201%201-5%200%202.5%202.5%200%201%201%205%200z%22/%3E%3C/g%3E%3Cpath%20stroke-linejoin%3D%22miter%22%20d%3D%22M17.5%2026h10M15%2030h15m-7.5-14.5v5M20%2018h5%22/%3E%3C/g%3E%3C/svg%3E", "wN": "data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2045%2045%22%3E%3Cg%20fill%3D%22none%22%20fill-rule%3D%22evenodd%22%20stroke%3D%22%23000%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%20stroke-width%3D%221.5%22%3E%3Cpath%20fill%3D%22%23fff%22%20d%3D%22M22%2010c10.5%201%2016.5%208%2016%2029H15c0-9%2010-6.5%208-21%22/%3E%3Cpath%20fill%3D%22%23fff%22%20d%3D%22M24%2018c.38%202.91-5.55%207.37-8%209-3%202-2.82%204.34-5%204-1.042-.94%201.41-3.04%200-3-1%200%20.19%201.23-1%202-1%200-4.003%201-4-4%200-2%206-12%206-12s1.89-1.9%202-3.5c-.73-.994-.5-2-.5-3%201-1%203%202.5%203%202.5h2s.78-1.992%202.5-3c1%200%201%203%201%203%22/%3E%3Cpath%20fill%3D%22%23000%22%20d%3D%22M9.5%2025.5a.5.5%200%201%201-1%200%20.5.5%200%201%201%201%200m5.433-9.75a.5%201.5%2030%201%201-.866-.5.5%201.5%2030%201%201%20.866.5%22/%3E%3C/g%3E%3C/svg%3E", "wP": "data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2045%2045%22%3E%3Cpath%20fill%3D%22%23fff%22%20stroke%3D%22%23000%22%20stroke-linecap%3D%22round%22%20stroke-width%3D%221.5%22%20d%3D%22M22.5%209c-2.21%200-4%201.79-4%204%200%20.89.29%201.71.78%202.38C17.33%2016.5%2016%2018.59%2016%2021c0%202.03.94%203.84%202.41%205.03-3%201.06-7.41%205.55-7.41%2013.47h23c0-7.92-4.41-12.41-7.41-13.47%201.47-1.19%202.41-3%202.41-5.03%200-2.41-1.33-4.5-3.28-5.62.49-.67.78-1.49.78-2.38%200-2.21-1.79-4-4-4z%22/%3E%3C/svg%3E", "bK": "data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2045%2045%22%3E%3Cg%20fill%3D%22none%22%20fill-rule%3D%22evenodd%22%20stroke%3D%22%23000%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%20stroke-width%3D%221.5%22%3E%3Cpath%20stroke-linejoin%3D%22miter%22%20d%3D%22M22.5%2011.6V6%22/%3E%3Cpath%20fill%3D%22%23000%22%20stroke-linecap%3D%22butt%22%20stroke-linejoin%3D%22miter%22%20d%3D%22M22.5%2025s4.5-7.5%203-10.5c0%200-1-2.5-3-2.5s-3%202.5-3%202.5c-1.5%203%203%2010.5%203%2010.5%22/%3E%3Cpath%20fill%3D%22%23000%22%20d%3D%22M11.5%2037a22.3%2022.3%200%200%200%2021%200v-7s9-4.5%206-10.5c-4-6.5-13.5-3.5-16%204V27v-3.5c-3.5-7.5-13-10.5-16-4-3%206%205%2010%205%2010z%22/%3E%3Cpath%20stroke-linejoin%3D%22miter%22%20d%3D%22M20%208h5%22/%3E%3Cpath%20stroke%3D%22%23ececec%22%20d%3D%22M32%2029.5s8.5-4%206-9.7C34.1%2014%2025%2018%2022.5%2024.6v2.1-2.1C20%2018%209.9%2014%207%2019.9c-2.5%205.6%204.8%209%204.8%209%22/%3E%3Cpath%20stroke%3D%22%23ececec%22%20d%3D%22M11.5%2030c5.5-3%2015.5-3%2021%200m-21%203.5c5.5-3%2015.5-3%2021%200m-21%203.5c5.5-3%2015.5-3%2021%200%22/%3E%3C/g%3E%3C/svg%3E", "bQ": "data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2045%2045%22%3E%3Cg%20fill-rule%3D%22evenodd%22%20stroke%3D%22%23000%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%20stroke-width%3D%221.5%22%3E%3Cg%20stroke%3D%22none%22%3E%3Ccircle%20cx%3D%226%22%20cy%3D%2212%22%20r%3D%222.75%22/%3E%3Ccircle%20cx%3D%2214%22%20cy%3D%229%22%20r%3D%222.75%22/%3E%3Ccircle%20cx%3D%2222.5%22%20cy%3D%228%22%20r%3D%222.75%22/%3E%3Ccircle%20cx%3D%2231%22%20cy%3D%229%22%20r%3D%222.75%22/%3E%3Ccircle%20cx%3D%2239%22%20cy%3D%2212%22%20r%3D%222.75%22/%3E%3C/g%3E%3Cpath%20stroke-linecap%3D%22butt%22%20d%3D%22M9%2026c8.5-1.5%2021-1.5%2027%200l2.5-12.5L31%2025l-.3-14.1-5.2%2013.6-3-14.5-3%2014.5-5.2-13.6L14%2025%206.5%2013.5z%22/%3E%3Cpath%20stroke-linecap%3D%22butt%22%20d%3D%22M9%2026c0%202%201.5%202%202.5%204%201%201.5%201%201%20.5%203.5-1.5%201-1.5%202.5-1.5%202.5-1.5%201.5.5%202.5.5%202.5%206.5%201%2016.5%201%2023%200%200%200%201.5-1%200-2.5%200%200%20.5-1.5-1-2.5-.5-2.5-.5-2%20.5-3.5%201-2%202.5-2%202.5-4-8.5-1.5-18.5-1.5-27%200z%22/%3E%3Cpath%20fill%3D%22none%22%20stroke-linecap%3D%22butt%22%20d%3D%22M11%2038.5a35%2035%201%200%200%2023%200%22/%3E%3Cpath%20fill%3D%22none%22%20stroke%3D%22%23ececec%22%20d%3D%22M11%2029a35%2035%201%200%201%2023%200m-21.5%202.5h20m-21%203a35%2035%201%200%200%2022%200m-23%203a35%2035%201%200%200%2024%200%22/%3E%3C/g%3E%3C/svg%3E", "bR": "data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2045%2045%22%3E%3Cg%20fill-rule%3D%22evenodd%22%20stroke%3D%22%23000%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%20stroke-width%3D%221.5%22%3E%3Cpath%20stroke-linecap%3D%22butt%22%20d%3D%22M9%2039h27v-3H9zm3.5-7%201.5-2.5h17l1.5%202.5zm-.5%204v-4h21v4z%22/%3E%3Cpath%20stroke-linecap%3D%22butt%22%20stroke-linejoin%3D%22miter%22%20d%3D%22M14%2029.5v-13h17v13z%22/%3E%3Cpath%20stroke-linecap%3D%22butt%22%20d%3D%22M14%2016.5%2011%2014h23l-3%202.5zM11%2014V9h4v2h5V9h5v2h5V9h4v5z%22/%3E%3Cpath%20fill%3D%22none%22%20stroke%3D%22%23ececec%22%20stroke-linejoin%3D%22miter%22%20stroke-width%3D%221%22%20d%3D%22M12%2035.5h21m-20-4h19m-18-2h17m-17-13h17M11%2014h23%22/%3E%3C/g%3E%3C/svg%3E", "bB": "data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2045%2045%22%3E%3Cg%20fill%3D%22none%22%20fill-rule%3D%22evenodd%22%20stroke%3D%22%23000%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%20stroke-width%3D%221.5%22%3E%3Cg%20fill%3D%22%23000%22%20stroke-linecap%3D%22butt%22%3E%3Cpath%20d%3D%22M9%2036c3.4-1%2010.1.4%2013.5-2%203.4%202.4%2010.1%201%2013.5%202%200%200%201.6.5%203%202-.7%201-1.6%201-3%20.5-3.4-1-10.1.5-13.5-1-3.4%201.5-10.1%200-13.5%201-1.4.5-2.3.5-3-.5%201.4-2%203-2%203-2z%22/%3E%3Cpath%20d%3D%22M15%2032c2.5%202.5%2012.5%202.5%2015%200%20.5-1.5%200-2%200-2%200-2.5-2.5-4-2.5-4%205.5-1.5%206-11.5-5-15.5-11%204-10.5%2014-5%2015.5%200%200-2.5%201.5-2.5%204%200%200-.5.5%200%202z%22/%3E%3Cpath%20d%3D%22M25%208a2.5%202.5%200%201%201-5%200%202.5%202.5%200%201%201%205%200z%22/%3E%3C/g%3E%3Cpath%20stroke%3D%22%23ececec%22%20stroke-linejoin%3D%22miter%22%20d%3D%22M17.5%2026h10M15%2030h15m-7.5-14.5v5M20%2018h5%22/%3E%3C/g%3E%3C/svg%3E", "bN": "data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2045%2045%22%3E%3Cg%20fill%3D%22none%22%20fill-rule%3D%22evenodd%22%20stroke%3D%22%23000%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%20stroke-width%3D%221.5%22%3E%3Cpath%20fill%3D%22%23000%22%20d%3D%22M22%2010c10.5%201%2016.5%208%2016%2029H15c0-9%2010-6.5%208-21%22/%3E%3Cpath%20fill%3D%22%23000%22%20d%3D%22M24%2018c.38%202.91-5.55%207.37-8%209-3%202-2.82%204.34-5%204-1.04-.94%201.41-3.04%200-3-1%200%20.19%201.23-1%202-1%200-4%201-4-4%200-2%206-12%206-12s1.89-1.9%202-3.5c-.73-1-.5-2-.5-3%201-1%203%202.5%203%202.5h2s.78-2%202.5-3c1%200%201%203%201%203%22/%3E%3Cpath%20fill%3D%22%23ececec%22%20stroke%3D%22%23ececec%22%20d%3D%22M9.5%2025.5a.5.5%200%201%201-1%200%20.5.5%200%201%201%201%200m5.43-9.75a.5%201.5%2030%201%201-.86-.5.5%201.5%2030%201%201%20.86.5%22/%3E%3Cpath%20fill%3D%22%23ececec%22%20stroke%3D%22none%22%20d%3D%22m24.55%2010.4-.45%201.45.5.15c3.15%201%205.65%202.49%207.9%206.75S35.75%2029.06%2035.25%2039l-.05.5h2.25l.05-.5c.5-10.06-.88-16.85-3.25-21.34s-5.79-6.64-9.19-7.16z%22/%3E%3C/g%3E%3C/svg%3E", "bP": "data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2045%2045%22%3E%3Cpath%20stroke%3D%22%23000%22%20stroke-linecap%3D%22round%22%20stroke-width%3D%221.5%22%20d%3D%22M22.5%209a4%204%200%200%200-3.22%206.38%206.48%206.48%200%200%200-.87%2010.65c-3%201.06-7.41%205.55-7.41%2013.47h23c0-7.92-4.41-12.41-7.41-13.47a6.46%206.46%200%200%200-.87-10.65A4.01%204.01%200%200%200%2022.5%209z%22/%3E%3C/svg%3E"};
 setEloCalibration({"note": "Calibr\u00e9 le 12/11/2026 sur 10 parties class\u00e9es de Gotask (20 joueurs), Stockfish 19 lite (web), profondeur 18.", "a": -810, "b": 1, "k": 40, "spread": 1900, "byClass": {"rapid": {"a": -680}, "daily": {"a": -680}, "blitz": {"a": -1010}, "bullet": {"a": -1010}}});
 // ===================== Version iPhone : tout tourne dans la page =====================
@@ -1150,7 +1348,7 @@ const store = (() => {
     },
   };
 })();
-const settings = { depth: 18, flavor: 'lite' };
+const settings = { depth: 18, flavor: 'lite', hintOn: false, hintDepth: 12 };
 try { Object.assign(settings, JSON.parse(localStorage.getItem('reglages') || '{}')); } catch {}
 const saveSettings = () => { try { localStorage.setItem('reglages', JSON.stringify(settings)); } catch {} };
 
@@ -1264,8 +1462,7 @@ async function tablebase(fen, uci) {
   } catch { return null; }
 }
 
-async function analyzePosition(fen, uci, { useCloud = true, newGame = false } = {}) {
-  const depth = settings.depth;
+async function analyzePosition(fen, uci, { useCloud = true, newGame = false, depth = settings.depth } = {}) {
   const rec = { fen, uci, source: 'local', depth, lines: [], played: null, tb: null };
   const eng = getEngine();
   let res = null;
@@ -1338,9 +1535,9 @@ async function loadGames(user, progress) {
 
 // ------------------------------------------------------------------ ouvertures (lichess-org/chess-openings)
 async function loadOpenings() {
-  const cached = await store.get('openings:v1');
+  const cached = await store.get('openings:v2');
   if (cached) return cached;
-  const names = {}, book = [];
+  const names = {}, book = [], texts = [];
   const seen = new Set();
   for (const l of 'abcde') {
     let txt = null;
@@ -1348,6 +1545,7 @@ async function loadOpenings() {
       try { const r = await fetch(u); if (r.ok) { txt = await r.text(); break; } } catch {}
     }
     if (!txt) throw new Error('base d\'ouvertures inaccessible');
+    texts.push(txt);
     for (const row of txt.split('\n').slice(1)) {
       const [eco, name, pgn] = row.split('\t');
       if (!pgn) continue;
@@ -1360,13 +1558,14 @@ async function loadOpenings() {
     }
     await sleep(0);
   }
-  const data = { names, book };
-  await store.set('openings:v1', data);
+  const data = { names, book, rep: buildRepertoire(texts) };
+  await store.set('openings:v2', data);
   return data;
 }
 
 // ===================== Interface iPhone =====================
-const S = { user: '', games: [], shown: 40, game: null, plies: [], startFen: null, analysis: null, sum: null, idx: 0, variation: null, book: new Set(), names: {}, analyzing: null };
+const S = { user: '', games: [], shown: 40, game: null, plies: [], startFen: null, analysis: null, sum: null, idx: 0, variation: null, book: new Set(), names: {}, analyzing: null, mode: 'game', saved: null, freeVar: null };
+const hintCache = new Map();
 const board = new Board($('#board'), { onMove: onBoardMove, pieceUrl: (code) => PIECE_URLS[code] });
 board.useImages = true;
 
@@ -1376,15 +1575,69 @@ board.useImages = true;
   $('#flavorSel').value = settings.flavor;
   board.set(new Chess().fen());
   showView('games');
-  loadOpenings().then((j) => { S.names = j.names; S.book = new Set(j.book); if (S.game) { recompute(); render(); } })
+  loadOpenings().then((j) => { S.names = j.names; S.book = new Set(j.book); S.rep = j.rep || []; if (S.game) recompute(); render(); })
     .catch(() => { $('#opening').textContent = ''; });
 })();
 
 function showView(v) {
-  document.body.dataset.view = v;
+  document.body.dataset.view = v === 'games' ? 'games' : 'board';
   for (const b of document.querySelectorAll('.tabbar button')) b.classList.toggle('on', b.dataset.view === v);
-  if (v === 'board') render();
+  if (v === 'free') setMode('free');
+  else if (v === 'rep') setMode('rep');
+  else if (v === 'board') setMode('game');
 }
+S.store = {};
+function snapshot() {
+  return { game: S.game, plies: S.plies, startFen: S.startFen, analysis: S.analysis, idx: S.idx, variation: S.variation, orient: board.orientation, partial: S.partial, repSel: S.repSel };
+}
+function restore(sv) {
+  Object.assign(S, { game: sv.game || null, plies: sv.plies || [], startFen: sv.startFen || null, analysis: sv.analysis || null, idx: sv.idx || 0, variation: sv.variation || null, partial: sv.partial || null, repSel: sv.repSel || null });
+  board.setOrientation(sv.orient || 'w');
+  recompute();
+}
+const FRESH = {
+  game: () => ({}),
+  free: () => ({ variation: { base: 0, moves: [], vidx: 0 }, orient: 'w' }),
+  rep: () => ({ orient: REP.color }),
+};
+function setMode(mode) {
+  if (mode === S.mode) { render(); return; }
+  S.store[S.mode] = snapshot();
+  restore(S.store[mode] || FRESH[mode]());
+  S.mode = mode;
+  $('#evalGraph')._key = null;
+  render();
+}
+
+// ------------------------------------------------------------------ répertoire d'ouvertures
+const REP = { color: 'w', q: '' };
+function renderRep() {
+  const el = $('#repPanel');
+  el.classList.toggle('hidden', S.mode !== 'rep');
+  if (S.mode !== 'rep') return;
+  for (const b of el.querySelectorAll('.repColor button')) b.classList.toggle('on', b.dataset.color === REP.color);
+  const ul = $('#repList');
+  if (!S.rep) { ul.innerHTML = '<li class="empty">Chargement du répertoire…</li>'; return; }
+  const q = REP.q.trim().toLowerCase();
+  const items = S.rep.filter((o) => o.color === REP.color && (!q || (o.eco + ' ' + o.name).toLowerCase().includes(q)));
+  $('#repCount').textContent = `${items.length} ouvertures`;
+  if (!items.length) { ul.innerHTML = '<li class="empty">Aucune ouverture.</li>'; return; }
+  ul.innerHTML = items.map((o) => `<li data-name="${esc(o.name)}" class="${S.repSel?.name === o.name ? 'active' : ''}"><span class="eco">${esc(o.eco)}</span><span class="nm">${esc(o.name)}</span><span class="ln">${esc(o.san.map((m, i) => (i % 2 === 0 ? `${i / 2 + 1}.${sanFr(m)}` : sanFr(m))).join(' '))}</span></li>`).join('');
+}
+$('#repPanel .repColor').addEventListener('click', (e) => { const b = e.target.closest('button'); if (!b) return; REP.color = b.dataset.color; renderRep(); });
+$('#repSearch').addEventListener('input', (e) => { REP.q = e.target.value; renderRep(); });
+$('#repList').addEventListener('click', (e) => {
+  const li = e.target.closest('li[data-name]');
+  if (!li || !S.rep) return;
+  const o = S.rep.find((x) => x.name === li.dataset.name);
+  if (!o) return;
+  S.repSel = o;
+  S.plies = repertoirePlies(o);
+  S.startFen = null; S.game = null; S.analysis = null; S.sum = null; S.variation = null; S.idx = 0;
+  board.setOrientation(o.color);
+  render();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+});
 document.querySelector('.tabbar').addEventListener('click', (e) => { const b = e.target.closest('button'); if (b) showView(b.dataset.view); });
 $('#settingsBtn').addEventListener('click', () => $('#settings').classList.toggle('hidden'));
 $('#depthSel').addEventListener('change', (e) => { settings.depth = Number(e.target.value); saveSettings(); showEngine(); });
@@ -1464,6 +1717,7 @@ async function openGame(id) {
   if (S.analyzing) return toast('Une analyse est en cours : annulez-la d\'abord.');
   const g = S.games.find((x) => x.id === id);
   if (!g) return;
+  if (S.mode !== 'game') { S.store[S.mode] = snapshot(); S.mode = 'game'; }
   const c = new Chess();
   try { c.loadPgn(g.pgn); } catch (err) { return toast('PGN illisible : ' + esc(err.message)); }
   const hist = c.history({ verbose: true });
@@ -1555,7 +1809,7 @@ function curFen() {
 function go(where) {
   if (S.variation) {
     const v = S.variation;
-    if (where === 'prev') { if (v.vidx > 0) v.vidx--; else S.variation = null; }
+    if (where === 'prev') { if (v.vidx > 0) v.vidx--; else if (S.mode !== 'free') S.variation = null; }
     else if (where === 'next') v.vidx = Math.min(v.moves.length, v.vidx + 1);
     else if (where === 'first') v.vidx = 0;
     else if (where === 'last') v.vidx = v.moves.length;
@@ -1599,7 +1853,7 @@ async function onBoardMove(uci) {
   v.vidx = v.moves.length;
   render();
   try {
-    mv.rec = await analyzePosition(fenBefore, uci, { useCloud: true });
+    mv.rec = await analyzePosition(fenBefore, uci, { useCloud: true, depth: S.mode !== 'game' ? settings.hintDepth : settings.depth });
     delete mv.rec.cloudHit;
     const i = v.moves.indexOf(mv);
     const prevMv = i > 0 ? v.moves[i - 1] : null;
@@ -1643,15 +1897,20 @@ function render() {
     }
   }
   if (c.inCheck()) for (const row of c.board()) for (const p of row) if (p && p.type === 'k' && p.color === c.turn()) opts.check = p.square;
+  const hint = settings.hintOn && !c.isGameOver() ? hintFor(fen) : null;
+  if (hint?.lines?.[0]) { const b = hint.lines[0].pv[0]; opts.arrows.push({ from: b.slice(0, 2), to: b.slice(2, 4), color: '#3b82f6', opacity: 0.75 }); }
   board.set(fen, opts);
+  renderHint(fen, hint, c);
+  $('#freeBar').classList.toggle('hidden', S.mode !== 'free');
+  renderRep();
   const showAna = !!S.game && !S.analysis;
   $('#analyzeBox').classList.toggle('hidden', !showAna);
   if (showAna && !S.analyzing) {
     const n = S.partial && S.partial.depth === settings.depth && S.partial.n === S.plies.length ? S.partial.records.length : 0;
     $('#analyzeBtn').textContent = n ? `Reprendre l'analyse (${n} / ${S.plies.length})` : `Analyser cette partie (profondeur ${settings.depth})`;
   }
-  $('#variationBar').classList.toggle('hidden', !S.variation);
-  renderPlayers(); renderEval(); renderSummary(); renderDetail(cm); renderLines(); renderMoves(); renderOpening();
+  $('#variationBar').classList.toggle('hidden', !S.variation || S.mode === 'free');
+  renderPlayers(); renderEval(); renderSummary(); renderGraph(); renderDetail(cm); renderLines(); renderMoves(); renderOpening();
 }
 function renderPlayers() {
   const g = S.game;
@@ -1690,6 +1949,15 @@ function renderEval() {
   t.classList.toggle('right', whiteAhead === flipped);
   t.classList.toggle('light', !whiteAhead);
 }
+const GRAPH_MARKS = ['brillant', 'tresbon', 'manquee', 'erreur', 'gaffe'];
+function renderGraph() {
+  const el = $('#evalGraph');
+  if (!S.sum || document.body.dataset.view !== 'board') { if (!S.sum) { el.innerHTML = ''; el.hidden = true; el._key = null; } return; }
+  const marks = S.sum.results.map((r, i) => (GRAPH_MARKS.includes(r.cls) ? { i: i + 1, color: CLASSES[r.cls].color } : null)).filter(Boolean);
+  renderEvalGraph(el, { series: S.sum.series, phases: S.sum.phases, marks, current: S.variation ? S.variation.base : S.idx, onSeek: (i) => { S.variation = null; go(i); } });
+}
+window.addEventListener('resize', () => { if (S.sum) { $('#evalGraph')._key = null; renderGraph(); } });
+
 function renderSummary() {
   const el = $('#summary');
   if (!S.sum) { el.innerHTML = ''; return; }
@@ -1726,7 +1994,7 @@ function renderDetail(cm) {
   const { ply, rec: r0, r } = cm;
   const num = `${ply.moveNumber}${ply.color === 'w' ? '.' : '…'} ${esc(sanFr(ply.san))}`;
   if (cm.pending) { el.innerHTML = `<div class="card"><h4>${num}</h4>Stockfish réfléchit… (profondeur ${settings.depth})</div>`; return; }
-  if (!r0 || !r?.cls) { el.innerHTML = S.analysis || cm.variation ? '' : `<div class="card"><h4>${num}</h4><span class="muted">Lancez l'analyse pour voir le classement des coups.</span></div>`; return; }
+  if (!r0 || !r?.cls) { el.innerHTML = S.analysis || cm.variation || S.mode !== 'game' ? '' : `<div class="card"><h4>${num}</h4><span class="muted">Lancez l'analyse pour voir le classement des coups.</span></div>`; return; }
   const k = CLASSES[r.cls];
   const ex = explainMove(ply, r0, r);
   let h = `<div class="card" style="--c:${k.color}"><h4><span class="sym" style="background:${k.color}">${k.sym}</span>${num} — ${k.label}</h4><div>${esc(ex.text)}</div>`;
@@ -1790,10 +2058,43 @@ $('#moves').addEventListener('click', (e) => {
 function openingName() {
   let name = '';
   const upto = S.variation ? S.variation.base : S.plies.length;
-  for (let i = 0; i < upto; i++) { const n = S.names[epd(S.plies[i].fenAfter)]; if (n) name = n; }
+  const fens = S.plies.slice(0, upto).map((p) => p.fenAfter);
+  if (S.variation) fens.push(...S.variation.moves.slice(0, S.variation.vidx).map((m) => m.fenAfter));
+  for (const f of fens) { const n = S.names[epd(f)]; if (n) name = n; }
   return name;
 }
 function renderOpening() { const n = openingName(); $('#opening').textContent = n ? '📖 ' + n : ''; }
+
+
+// ------------------------------------------------------------------ échiquier libre et conseil « meilleur coup »
+$('#restartFree').addEventListener('click', () => { S.variation = { base: 0, moves: [], vidx: 0 }; render(); });
+$('#hintOn').checked = !!settings.hintOn;
+$('#hintDepth').value = String(settings.hintDepth);
+$('#hintOn').addEventListener('change', (e) => { settings.hintOn = e.target.checked; saveSettings(); render(); });
+$('#hintDepth').addEventListener('change', (e) => { settings.hintDepth = Number(e.target.value); hintCache.clear(); saveSettings(); render(); });
+function hintFor(fen) {
+  if (!S.variation && S.analysis) { const r = rec(S.idx); if (r?.lines?.length && r.fen === fen) return r; }
+  const key = settings.hintDepth + '|' + fen;
+  const h = hintCache.get(key);
+  if (h && h !== 'pending') return h;
+  if (!h && !S.analyzing) {
+    hintCache.set(key, 'pending');
+    analyzePosition(fen, null, { useCloud: true, depth: settings.hintDepth })
+      .then((j) => { hintCache.set(key, j); if (curFen() === fen && settings.hintOn) render(); })
+      .catch(() => hintCache.delete(key));
+  }
+  return null;
+}
+function renderHint(fen, hint, c) {
+  const el = $('#hintText');
+  if (!settings.hintOn) { el.textContent = ''; return; }
+  if (c.isGameOver()) { el.textContent = 'Partie terminée.'; return; }
+  if (S.analyzing && !hint) { el.textContent = 'Conseil disponible après l\'analyse en cours.'; return; }
+  if (!hint?.lines?.[0]) { el.textContent = 'Recherche du meilleur coup…'; return; }
+  const l = hint.lines[0];
+  const m = tryMove(new Chess(fen), l.pv[0]);
+  el.innerHTML = `Meilleur coup : <b>${esc(m ? sanFr(m.san) : l.pv[0])}</b> <span class="muted">(${fmtScore(l.score, fen.split(' ')[1])}, prof. ${hint.depth})</span>`;
+}
 
 </script>
 </body></html>
