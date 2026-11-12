@@ -117,6 +117,23 @@ h3 { font-size: 12px; margin: 16px 0 6px; color: var(--muted); text-transform: u
 .tabbar { position: fixed; left: 0; right: 0; bottom: 0; display: flex; background: var(--panel); border-top: 1px solid var(--border); padding-bottom: env(safe-area-inset-bottom); z-index: 50; }
 .tabbar button { flex: 1; border: 0; background: transparent; border-radius: 0; padding: 7px 0 9px; font-size: 11px; line-height: 1.25; color: var(--muted); }
 .tabbar button.on { color: var(--accent); font-weight: 700; }
+.tabbar button { display: flex; flex-direction: column; align-items: center; gap: 2px; }
+.tabbar .ui-ic { transition: transform .2s; } .tabbar button.on .ui-ic { transform: translateY(-1px) scale(1.08); }
+#settingsBtn, #aboutBtn { display: inline-flex; align-items: center; justify-content: center; }
+.symi { display: inline-flex; vertical-align: middle; margin-right: 6px; }
+.cls-ic.pop { animation: icPop .3s cubic-bezier(.2,1.6,.4,1) both; }
+@keyframes icPop { from { transform: scale(.3); opacity: 0; } }
+#toast:not(.hidden) { animation: toastIn .28s cubic-bezier(.2,1.2,.4,1) both; }
+@keyframes toastIn { from { transform: translateY(16px); opacity: 0; } }
+.view { animation: viewIn .25s ease-out both; }
+body[data-view] .view { animation: none; }
+body[data-view="games"] #gamesView, body[data-view="board"] #boardView, body[data-view="train"] #trainView, body[data-view="stats"] #statsView { animation: viewIn .25s ease-out both; }
+@keyframes viewIn { from { opacity: 0; transform: translateY(8px); } }
+#detail .card, .sumTable, #settings:not(.hidden), #about:not(.hidden), #pgnBox:not(.hidden) { animation: viewIn .25s ease-out both; }
+button { transition: transform .08s, filter .15s; } button:active { transform: scale(.96); }
+.progress div { background: linear-gradient(90deg, var(--accent), #a6d06c, var(--accent)); background-size: 200% 100%; animation: shine 1.6s linear infinite; }
+@keyframes shine { to { background-position: -200% 0; } }
+@media (prefers-reduced-motion: reduce) { *, *::before { animation: none !important; transition: none !important; } }
 #toast { position: fixed; bottom: calc(80px + env(safe-area-inset-bottom)); left: 16px; right: 16px; background: #111; color: #fff; padding: 12px 14px; border-radius: 12px; z-index: 2000; box-shadow: 0 4px 16px rgba(0, 0, 0, .4); font-size: 14px; }
 #toast a { color: #f0a37f; }
 .repColor { display: flex; gap: 4px; margin: 4px 0 8px; background: var(--panel2); border-radius: 10px; padding: 3px; }
@@ -182,6 +199,8 @@ h3:has(+ #evalGraph[hidden]) { display: none; }
       <option value="full">Stockfish 19 complet (99 Mo, plus fort, lent à charger)</option>
     </select>
   </label>
+  <h3 style="margin:6px 0 0">Apparence</h3>
+  <div id="apPanel"></div>
   <div class="muted small">Les parties, analyses et réglages sont gardés sur cet appareil.</div>
 </div>
 <div id="about" class="hidden"><h2>À propos</h2>
@@ -191,7 +210,8 @@ h3:has(+ #evalGraph[hidden]) { display: none; }
   <li><b>Moteur : Stockfish 19</b>, par l'équipe Stockfish (<a href="https://stockfishchess.org" target="_blank" rel="noopener">stockfishchess.org</a>). Licence <a href="https://www.gnu.org/licenses/gpl-3.0.html" target="_blank" rel="noopener">GPL v3</a>. Code source : <a href="https://github.com/official-stockfish/Stockfish" target="_blank" rel="noopener">github.com/official-stockfish/Stockfish</a>. Version web : <a href="https://github.com/nmrugg/stockfish.js" target="_blank" rel="noopener">stockfish.js</a> de Nathan Rugg (GPL v3), chargée depuis unpkg.com.</li>
   <li><b>Analyse cloud et tables de finales :</b> <a href="https://lichess.org" target="_blank" rel="noopener">Lichess</a>, via son API publique.</li>
   <li><b>Base d'ouvertures :</b> <a href="https://github.com/lichess-org/chess-openings" target="_blank" rel="noopener">lichess-org/chess-openings</a>, domaine public (CC0).</li>
-  <li><b>Pièces :</b> jeu « cburnett » de Colin M. L. Burnett, licence <a href="https://creativecommons.org/licenses/by-sa/3.0/deed.fr" target="_blank" rel="noopener">CC BY-SA 3.0</a>.</li>
+  <li><b>Pièces :</b> jeux de pièces de Lichess : cburnett (Colin M. L. Burnett, CC BY-SA 3.0 / GPLv2+), Merida (Armando Hernandez Marroquin, GPLv2+), Staunty, Cardinal (sadsnake1) et California (Jerry S.) sous CC BY-NC-SA 4.0, Chessnut (Alexis Luengas, Apache 2.0), Fantasy et Celtic (Maurizio Monge, MIT). <a href="https://github.com/lichess-org/lila/blob/master/COPYING.md" target="_blank" rel="noopener">Détail des licences</a>.</li>
+  <li><b>Sons :</b> générés par l'appli elle-même.</li>
   <li><b>Parties :</b> API publiques de <a href="https://www.chess.com/news/view/published-data-api" target="_blank" rel="noopener">chess.com</a> et de <a href="https://lichess.org/api" target="_blank" rel="noopener">Lichess</a> (parties terminées uniquement).</li>
   <li><b>Formules :</b> chances de gain et précision d'après celles de Lichess.</li>
 </ul>
@@ -1092,8 +1112,190 @@ Explique-moi simplement, en français :
 
 return { CLASSES, BAD, summarize, classifyMove, explainMove, commentLine, claudePrompt, fmtScore, whiteWp, sanFr, epd, tryMove, fmtElo, fmtEloRange, setEloCalibration, winPct };
 })();
+const { PREFS, PIECE_SETS, BOARD_THEMES, onPrefs, setPref, reducedMotion, remotePieceUrl, mountAppearance, APPEARANCE_CSS } = (() => {
+// Réglages d'apparence partagés Mac / iPhone : pièces, échiquier, animations, sons.
+const PIECE_SETS = [
+  { id: 'cburnett', label: 'Classique (cburnett)', credit: 'Colin M. L. Burnett, GPLv2+' },
+  { id: 'merida', label: 'Merida', credit: 'Armando Hernandez Marroquin, GPLv2+' },
+  { id: 'staunty', label: 'Staunty', credit: 'sadsnake1, CC BY-NC-SA 4.0' },
+  { id: 'california', label: 'California', credit: 'Jerry S., CC BY-NC-SA 4.0' },
+  { id: 'cardinal', label: 'Cardinal', credit: 'sadsnake1, CC BY-NC-SA 4.0' },
+  { id: 'chessnut', label: 'Chessnut', credit: 'Alexis Luengas, Apache 2.0' },
+  { id: 'fantasy', label: 'Fantasy', credit: 'Maurizio Monge, MIT' },
+  { id: 'celtic', label: 'Celtic', credit: 'Maurizio Monge, MIT' },
+];
+const BOARD_THEMES = [
+  { id: 'vert', label: 'Vert', light: '#ebecd0', dark: '#779556' },
+  { id: 'bois', label: 'Bois', light: '#f0d9b5', dark: '#b58863', wood: true },
+  { id: 'bleu', label: 'Bleu', light: '#dee3e6', dark: '#8ca2ad' },
+  { id: 'ardoise', label: 'Ardoise', light: '#d9dde3', dark: '#6f7b8c' },
+  { id: 'sable', label: 'Sable', light: '#f3e7cf', dark: '#c79c6a' },
+];
+const DEFAULTS = { pieceSet: 'cburnett', theme: 'vert', anim: true, sound: true, volume: 0.6 };
+const PREFS = { ...DEFAULTS };
+try { Object.assign(PREFS, JSON.parse(localStorage.getItem('apparence') || '{}')); } catch {}
+const listeners = new Set();
+function onPrefs(fn) { listeners.add(fn); return () => listeners.delete(fn); }
+function setPref(k, v) {
+  PREFS[k] = v;
+  try { localStorage.setItem('apparence', JSON.stringify(PREFS)); } catch {}
+  listeners.forEach((fn) => fn(k, v));
+}
+const reducedMotion = () => !PREFS.anim || (typeof matchMedia === 'function' && matchMedia('(prefers-reduced-motion: reduce)').matches);
+const remotePieceUrl = (set, code) => `https://cdn.jsdelivr.net/gh/lichess-org/lila@master/public/piece/${set}/${code}.svg`;
+
+// Panneau de réglages (identique sur Mac et iPhone)
+function mountAppearance(el, { pieceUrl, onTestSound }) {
+  const codes = ['wK', 'wQ', 'wN', 'bK', 'bQ', 'bN'];
+  const render = () => {
+    el.innerHTML = `
+      <div class="ap-row"><span class="ap-lab">Pièces</span>
+        <select id="apPieces">${PIECE_SETS.map((s) => `<option value="${s.id}" ${s.id === PREFS.pieceSet ? 'selected' : ''}>${s.label}</option>`).join('')}</select></div>
+      <div class="ap-preview">${codes.map((c) => `<img src="${pieceUrl(c)}" alt="" width="40" height="40">`).join('')}</div>
+      <div class="ap-row"><span class="ap-lab">Échiquier</span>
+        <div class="ap-themes">${BOARD_THEMES.map((t) => `<button type="button" class="ap-theme ${t.id === PREFS.theme ? 'on' : ''}" data-theme-id="${t.id}" title="${t.label}" aria-label="${t.label}"><i style="background:${t.light}"></i><i style="background:${t.dark}"></i><i style="background:${t.dark}"></i><i style="background:${t.light}"></i></button>`).join('')}</div></div>
+      <label class="ap-row"><span class="ap-lab">Animations</span><input type="checkbox" id="apAnim" ${PREFS.anim ? 'checked' : ''}></label>
+      <label class="ap-row"><span class="ap-lab">Sons</span><input type="checkbox" id="apSound" ${PREFS.sound ? 'checked' : ''}></label>
+      <div class="ap-row"><span class="ap-lab">Volume</span><input type="range" id="apVol" min="0" max="1" step="0.05" value="${PREFS.volume}" ${PREFS.sound ? '' : 'disabled'}><button type="button" id="apTest">Tester</button></div>`;
+    el.querySelector('#apPieces').onchange = (e) => { setPref('pieceSet', e.target.value); render(); };
+    el.querySelectorAll('.ap-theme').forEach((b) => { b.onclick = () => { setPref('theme', b.dataset.themeId); render(); }; });
+    el.querySelector('#apAnim').onchange = (e) => setPref('anim', e.target.checked);
+    el.querySelector('#apSound').onchange = (e) => { setPref('sound', e.target.checked); render(); };
+    el.querySelector('#apVol').oninput = (e) => setPref('volume', Number(e.target.value));
+    el.querySelector('#apTest').onclick = () => onTestSound?.();
+  };
+  render();
+}
+
+const APPEARANCE_CSS = `
+.ap-row { display: flex; align-items: center; gap: 10px; margin: 8px 0; }
+.ap-lab { min-width: 92px; color: var(--muted); font-size: 13px; }
+.ap-row select { flex: 1; }
+.ap-row input[type=range] { flex: 1; }
+.ap-row input[type=checkbox] { width: 20px; height: 20px; accent-color: var(--accent); }
+.ap-preview { display: flex; gap: 4px; padding: 6px; border-radius: 8px; background: linear-gradient(90deg, #ebecd0 50%, #779556 50%); background-size: 88px 100%; width: fit-content; }
+.ap-themes { display: flex; gap: 8px; flex-wrap: wrap; }
+.ap-theme { width: 40px; height: 40px; padding: 0; display: grid; grid-template-columns: 1fr 1fr; border-radius: 8px; overflow: hidden; border: 2px solid transparent; }
+.ap-theme.on { border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent); }
+.ap-theme i { display: block; }
+`;
+
+return { PREFS, PIECE_SETS, BOARD_THEMES, onPrefs, setPref, reducedMotion, remotePieceUrl, mountAppearance, APPEARANCE_CSS };
+})();
+const { play, playMove } = (() => {
+// Sons générés par l'appli (Web Audio) : aucun fichier, rien à télécharger.
+
+let ctx = null, master = null, noiseBuf = null;
+function ac() {
+  if (!ctx) {
+    const AC = window.AudioContext || window.webkitAudioContext;
+    if (!AC) return null;
+    ctx = new AC();
+    master = ctx.createGain();
+    master.connect(ctx.destination);
+    noiseBuf = ctx.createBuffer(1, ctx.sampleRate * 0.3, ctx.sampleRate);
+    const d = noiseBuf.getChannelData(0);
+    for (let i = 0; i < d.length; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / d.length, 3);
+  }
+  if (ctx.state === 'suspended') ctx.resume().catch(() => {});
+  return ctx;
+}
+// iOS et les navigateurs n'autorisent le son qu'après un geste de l'utilisateur
+const unlock = () => { if (PREFS.sound) ac(); };
+window.addEventListener('pointerdown', unlock, { capture: true });
+window.addEventListener('keydown', unlock, { capture: true });
+
+function tone(t0, freq, dur, { type = 'sine', gain = 0.3, glide = null } = {}) {
+  const o = ctx.createOscillator(), g = ctx.createGain();
+  o.type = type;
+  o.frequency.setValueAtTime(freq, t0);
+  if (glide) o.frequency.exponentialRampToValueAtTime(glide, t0 + dur);
+  g.gain.setValueAtTime(0.0001, t0);
+  g.gain.exponentialRampToValueAtTime(gain, t0 + 0.006);
+  g.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
+  o.connect(g); g.connect(master);
+  o.start(t0); o.stop(t0 + dur + 0.02);
+}
+function knock(t0, { gain = 0.5, freq = 1800, q = 1.2, dur = 0.09 } = {}) {
+  const s = ctx.createBufferSource(), f = ctx.createBiquadFilter(), g = ctx.createGain();
+  s.buffer = noiseBuf;
+  f.type = 'bandpass'; f.frequency.value = freq; f.Q.value = q;
+  g.gain.setValueAtTime(gain, t0);
+  g.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
+  s.connect(f); f.connect(g); g.connect(master);
+  s.start(t0); s.stop(t0 + dur + 0.02);
+}
+// pièce posée sur le bois
+function wood(t0, strength = 1) {
+  knock(t0, { gain: 0.55 * strength, freq: 1300, q: 1.4, dur: 0.07 });
+  tone(t0, 190, 0.09, { gain: 0.35 * strength, glide: 120 });
+}
+
+const SOUNDS = {
+  move: (t) => wood(t, 1),
+  capture: (t) => { wood(t, 1.25); knock(t + 0.012, { gain: 0.45, freq: 3200, q: 0.9, dur: 0.06 }); },
+  castle: (t) => { wood(t, 0.9); wood(t + 0.09, 0.9); },
+  check: (t) => { wood(t, 1); tone(t + 0.03, 988, 0.16, { gain: 0.12, type: 'triangle' }); },
+  promote: (t) => { wood(t, 1); tone(t + 0.04, 784, 0.12, { gain: 0.1 }); tone(t + 0.12, 1175, 0.16, { gain: 0.1 }); },
+  end: (t) => { [523, 659, 784, 1047].forEach((f, i) => tone(t + i * 0.11, f, 0.32, { gain: 0.13, type: 'triangle' })); },
+  correct: (t) => { tone(t, 784, 0.14, { gain: 0.14, type: 'triangle' }); tone(t + 0.1, 1175, 0.26, { gain: 0.14, type: 'triangle' }); },
+  wrong: (t) => { tone(t, 220, 0.22, { gain: 0.13, type: 'sawtooth', glide: 150 }); },
+  brilliant: (t) => { [1319, 1760, 2093, 2637].forEach((f, i) => tone(t + i * 0.06, f, 0.22, { gain: 0.07 })); },
+  blunder: (t) => { tone(t, 180, 0.3, { gain: 0.16, type: 'triangle', glide: 90 }); },
+  done: (t) => { tone(t, 880, 0.18, { gain: 0.1 }); tone(t + 0.12, 1320, 0.3, { gain: 0.1 }); },
+};
+function play(name) {
+  if (!PREFS.sound || !SOUNDS[name]) return;
+  const c = ac();
+  if (!c) return;
+  master.gain.value = Math.max(0, Math.min(1, PREFS.volume ?? 0.6));
+  try { SOUNDS[name](c.currentTime + 0.01); } catch {}
+}
+// Son adapté à un coup joué (objet coup de chess.js + position obtenue)
+function playMove(m, after) {
+  if (!m) return;
+  if (after?.isCheckmate?.() || after?.isStalemate?.()) { play(m.captured ? 'capture' : 'move'); setTimeout(() => play('end'), 120); return; }
+  if (m.promotion) return play('promote');
+  if (after?.inCheck?.()) return play('check');
+  if (m.flags?.includes('k') || m.flags?.includes('q')) return play('castle');
+  play(m.captured ? 'capture' : 'move');
+}
+
+return { play, playMove };
+})();
 const { Board } = (() => {
 // Échiquier interactif (cliquer-cliquer ou glisser-déposer)
+
+
+
+// Thèmes, matière des cases et animations (partagés Mac / iPhone)
+const GRAIN = "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 .55 0'/%3E%3C/filter%3E%3Crect width='120' height='120' filter='url(%23n)'/%3E%3C/svg%3E\")";
+const WOOD = 'repeating-linear-gradient(100deg, rgba(90,50,20,.07) 0 2px, rgba(255,255,255,.04) 2px 5px, rgba(90,50,20,.05) 5px 9px)';
+const BOARD_CSS = `
+.board .sq.light, .board .sq.dark { background-image: var(--tex, none), ${GRAIN}; background-blend-mode: multiply; background-size: auto, 120px 120px; }
+.board.wood .sq { --tex: ${WOOD}; }
+.board .badge { animation: badgePop .28s cubic-bezier(.2,1.6,.4,1) both; display: flex; align-items: center; justify-content: center; padding: 0; background: none !important; border: 0 !important; box-shadow: 0 1px 3px rgba(0,0,0,.45); border-radius: 50%; }
+.board .badge svg { width: 100%; height: 100%; display: block; }
+.board .arrows line { animation: arrowIn .3s ease-out both; }
+.board .sq.check { animation: checkPulse 1.2s ease-in-out infinite alternate; }
+.board .piece.anim { transition: transform .19s cubic-bezier(.25,.8,.35,1); z-index: 5; will-change: transform; }
+.board .fade-out { position: absolute; z-index: 4; pointer-events: none; animation: pieceOut .2s ease-in forwards; }
+.board .sq.last::before { animation: hlIn .25s ease-out both; }
+.board.no-anim *, .board.no-anim *::before { animation: none !important; transition: none !important; }
+@keyframes badgePop { from { transform: scale(.2); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+@keyframes arrowIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes checkPulse { from { filter: brightness(1); } to { filter: brightness(1.18) saturate(1.2); } }
+@keyframes pieceOut { from { opacity: 1; transform: scale(1); } to { opacity: 0; transform: scale(.7); } }
+@keyframes hlIn { from { opacity: 0; } }
+@media (prefers-reduced-motion: reduce) { .board *, .board *::before { animation: none !important; transition: none !important; } }
+`;
+function injectBoardCss() {
+  if (document.getElementById('board-css')) return;
+  const st = document.createElement('style');
+  st.id = 'board-css';
+  st.textContent = BOARD_CSS;
+  document.head.appendChild(st);
+}
 
 const FILES = 'abcdefgh';
 const UNICODE = { k: '♚', q: '♛', r: '♜', b: '♝', n: '♞', p: '♟' };
@@ -1109,6 +1311,10 @@ class Board {
     this.selected = null;
     this.useImages = false;
     this.el.classList.add('board');
+    injectBoardCss();
+    this.applyTheme();
+    onPrefs((k) => { if (k === 'theme') this.applyTheme(); if (k === 'pieceSet') { this.prevMap = null; this.render(); } if (k === 'anim') this.el.classList.toggle('no-anim', !PREFS.anim); });
+    this.el.classList.toggle('no-anim', !PREFS.anim);
     this.el.innerHTML = '<div class="squares"></div><svg class="arrows" viewBox="0 0 8 8"></svg><div class="promo hidden"></div>';
     this.sqEl = this.el.querySelector('.squares');
     this.svg = this.el.querySelector('.arrows');
@@ -1118,9 +1324,32 @@ class Board {
     window.addEventListener('pointerup', (e) => this.up(e));
     this.el.addEventListener('contextmenu', (e) => e.preventDefault());
   }
-  setOrientation(c) { this.orientation = c; this.render(); }
+  applyTheme() {
+    const t = BOARD_THEMES.find((x) => x.id === PREFS.theme) || BOARD_THEMES[0];
+    this.el.style.setProperty('--light', t.light);
+    this.el.style.setProperty('--dark', t.dark);
+    this.el.classList.toggle('wood', !!t.wood);
+  }
+  setOrientation(c) { if (c !== this.orientation) this.prevMap = null; this.orientation = c; this.render(); }
   flip() { this.setOrientation(this.orientation === 'w' ? 'b' : 'w'); }
-  set(fen, opts = {}) { this.fen = fen; this.opts = opts; this.selected = null; this.render(); }
+  set(fen, opts = {}) {
+    const prev = this.fen;
+    this.fen = fen; this.opts = opts; this.selected = null;
+    this.render();
+    if (prev && prev !== fen && !opts.silent) this.soundFor(prev, fen);
+  }
+  // Joue le son du coup si la nouvelle position découle d'un seul coup légal
+  soundFor(prev, fen) {
+    const key = (f) => f.split(' ').slice(0, 2).join(' ');
+    try {
+      const c = new Chess(prev);
+      for (const m of c.moves({ verbose: true })) {
+        c.move(m);
+        if (key(c.fen()) === key(fen)) { playMove(m, c); return; }
+        c.undo();
+      }
+    } catch {}
+  }
 
   squareAt(x, y) {
     const r = this.el.getBoundingClientRect();
@@ -1136,6 +1365,10 @@ class Board {
   render() {
     const chess = new Chess(this.fen);
     const o = this.opts;
+    const map = {};
+    for (const row of chess.board()) for (const p of row) if (p) map[p.square] = p.color + p.type;
+    const prevMap = this.prevMap;
+    this.prevMap = map;
     const legal = this.selected ? chess.moves({ square: this.selected, verbose: true }).map((m) => m.to) : [];
     let html = '';
     for (let y = 0; y < 8; y++) for (let x = 0; x < 8; x++) {
@@ -1152,10 +1385,11 @@ class Board {
       if (x === 0) inner += `<span class="coord rank">${sq[1]}</span>`;
       if (p && !(this.drag && this.drag.from === sq)) inner += this.pieceHtml(p);
       if (legal.includes(sq)) inner += `<span class="${p ? 'capture-ring' : 'dot'}"></span>`;
-      if (o.badge && o.badge.square === sq) inner += `<span class="badge" style="background:${o.badge.color}">${o.badge.sym}</span>`;
+      if (o.badge && o.badge.square === sq) inner += `<span class="badge" style="background:${o.badge.color}">${o.badge.html || o.badge.sym}</span>`;
       html += `<div class="${cls.join(' ')}" data-sq="${sq}" style="${style}">${inner}</div>`;
     }
     this.sqEl.innerHTML = html;
+    if (prevMap && !reducedMotion()) this.animate(prevMap, map);
     // flèches
     let svg = '<defs>';
     (o.arrows || []).forEach((a, i) => { svg += `<marker id="ah${i}" markerWidth="4" markerHeight="4" refX="2.05" refY="2" orient="auto"><path d="M0,0 L4,2 L0,4 z" fill="${a.color}"/></marker>`; });
@@ -1168,6 +1402,56 @@ class Board {
       svg += `<line x1="${cx1}" y1="${cy1}" x2="${ex}" y2="${ey}" stroke="${a.color}" stroke-width="0.17" stroke-linecap="round" opacity="${a.opacity ?? 0.85}" marker-end="url(#ah${i})"/>`;
     });
     this.svg.innerHTML = svg;
+  }
+  // Fait glisser les pièces déplacées et estompe les pièces prises
+  animate(prev, next) {
+    const changed = new Set([...Object.keys(prev), ...Object.keys(next)].filter((sq) => prev[sq] !== next[sq]));
+    if (!changed.size || changed.size > 6) return;
+    const arrivals = [...changed].filter((sq) => next[sq]);
+    const departures = [...changed].filter((sq) => prev[sq] && prev[sq] !== next[sq]);
+    const used = new Set();
+    const dist = (a, b) => Math.abs(a.charCodeAt(0) - b.charCodeAt(0)) + Math.abs(a[1] - b[1]);
+    for (const to of arrivals) {
+      if (this.dropped === to) continue;
+      const from = departures.filter((sq) => !used.has(sq) && prev[sq] === next[to]).sort((a, b) => dist(a, to) - dist(b, to))[0];
+      if (!from) continue;
+      used.add(from);
+      const img = this.sqEl.querySelector(`[data-sq="${to}"] .piece`);
+      if (!img) continue;
+      const [x1, y1] = this.coords(from), [x2, y2] = this.coords(to);
+      img.style.transform = `translate(${(x1 - x2) * 100}%, ${(y1 - y2) * 100}%)`;
+      img.getBoundingClientRect();
+      img.classList.add('anim');
+      img.style.transform = '';
+      img.addEventListener('transitionend', () => img.classList.remove('anim'), { once: true });
+    }
+    // pièces prises : petit fondu là où elles étaient
+    for (const sq of departures) {
+      if (used.has(sq)) continue;
+      const captured = prev[sq];
+      const target = next[sq] ? sq : null;
+      if (!captured || (!target && arrivals.length === 0)) continue;
+      const [x, y] = this.coords(sq);
+      const ghost = document.createElement('div');
+      ghost.className = 'fade-out';
+      ghost.style.cssText = `left:${x * 12.5}%;top:${y * 12.5}%;width:12.5%;height:12.5%`;
+      ghost.innerHTML = this.pieceHtml({ color: captured[0], type: captured[1] });
+      this.el.appendChild(ghost);
+      setTimeout(() => ghost.remove(), 260);
+    }
+    // prise « sur place » : la pièce prise était sur la case d'arrivée
+    for (const to of arrivals) {
+      if (prev[to] && prev[to] !== next[to] && prev[to][0] !== next[to][0]) {
+        const [x, y] = this.coords(to);
+        const ghost = document.createElement('div');
+        ghost.className = 'fade-out';
+        ghost.style.cssText = `left:${x * 12.5}%;top:${y * 12.5}%;width:12.5%;height:12.5%`;
+        ghost.innerHTML = this.pieceHtml({ color: prev[to][0], type: prev[to][1] });
+        this.el.insertBefore(ghost, this.svg);
+        setTimeout(() => ghost.remove(), 260);
+      }
+    }
+    this.dropped = null;
   }
   pieceHtml(p) {
     if (this.useImages) return `<img class="piece" draggable="false" src="${this.pieceUrl(p.color + p.type.toUpperCase())}" alt="">`;
@@ -1207,10 +1491,11 @@ class Board {
   move(e) { if (this.drag && this.ghost) { this.drag.moved = true; this.placeGhost(e); } }
   up(e) {
     if (!this.drag) return;
-    const from = this.drag.from;
+    const from = this.drag.from, moved = this.drag.moved;
     this.ghost?.remove(); this.ghost = null;
     this.drag = null;
     const to = this.squareAt(e.clientX, e.clientY);
+    this.dropped = to && to !== from && moved ? to : null;
     if (to && to !== from) this.tryMove(from, to);
     else this.render();
   }
@@ -1237,6 +1522,45 @@ class Board {
 }
 
 return { Board };
+})();
+const { classIcon, uiIcon } = (() => {
+// Icônes vectorielles nettes (remplacent les emojis) — partagées Mac / iPhone.
+
+const G = 'fill="#fff"';
+const GLYPH = {
+  brillant: `<text x="10" y="14.3" text-anchor="middle" font-size="11.5" font-weight="900" ${G} font-family="-apple-system,Segoe UI,Arial,sans-serif" letter-spacing="-1">!!</text>`,
+  tresbon: `<text x="10" y="14.6" text-anchor="middle" font-size="12.5" font-weight="900" ${G} font-family="-apple-system,Segoe UI,Arial,sans-serif">!</text>`,
+  meilleur: `<path ${G} d="M10 3.6l1.86 3.94 4.3.53-3.17 2.95.82 4.27L10 13.2l-3.81 2.09.82-4.27-3.17-2.95 4.3-.53z"/>`,
+  excellent: `<path ${G} d="M8.1 8.6l2.5-4.3c.9-.2 1.6.5 1.4 1.5l-.5 2.4h3.1c1 0 1.6.9 1.3 1.8l-1.4 4.6c-.2.6-.7 1-1.3 1H8.1zM4.4 8.6h2.4v7H4.4z"/>`,
+  bon: `<path fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" d="M5.6 10.4l3 3 5.8-6.4"/>`,
+  theorie: `<path ${G} d="M4 5.6c2.2-.6 4.2-.3 5.4.8v8.4c-1.3-1-3.2-1.3-5.4-.8zM16 5.6c-2.2-.6-4.2-.3-5.4.8v8.4c1.3-1 3.2-1.3 5.4-.8z"/>`,
+  imprecision: `<text x="10" y="14.3" text-anchor="middle" font-size="11" font-weight="900" ${G} font-family="-apple-system,Segoe UI,Arial,sans-serif" letter-spacing="-.6">?!</text>`,
+  erreur: `<text x="10" y="14.6" text-anchor="middle" font-size="12.5" font-weight="900" ${G} font-family="-apple-system,Segoe UI,Arial,sans-serif">?</text>`,
+  manquee: `<path fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" d="M6.5 6.5l7 7M13.5 6.5l-7 7"/>`,
+  gaffe: `<text x="10" y="14.3" text-anchor="middle" font-size="11.5" font-weight="900" ${G} font-family="-apple-system,Segoe UI,Arial,sans-serif" letter-spacing="-1">??</text>`,
+};
+function classIcon(cls, size = 20, extra = '') {
+  const c = CLASSES[cls];
+  if (!c) return '';
+  return `<svg class="cls-ic ${extra}" viewBox="0 0 20 20" width="${size}" height="${size}" aria-label="${c.label}" role="img"><circle cx="10" cy="10" r="10" fill="${c.color}"/>${GLYPH[cls]}</svg>`;
+}
+
+const S = 'fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"';
+const UI = {
+  games: `<path ${S} d="M8 6h11M8 12h11M8 18h11"/><circle cx="4" cy="6" r="1.3" fill="currentColor"/><circle cx="4" cy="12" r="1.3" fill="currentColor"/><circle cx="4" cy="18" r="1.3" fill="currentColor"/>`,
+  analyse: `<path ${S} d="M3 20h18M5 16l4-5 4 3 6-8"/><circle cx="19" cy="6" r="1.6" fill="currentColor"/>`,
+  board: `<rect ${S} x="3.5" y="3.5" width="17" height="17" rx="2"/><path fill="currentColor" d="M3.5 3.5h4.25v4.25H3.5zM12 3.5h4.25v4.25H12zM7.75 7.75H12V12H7.75zM16.25 7.75h4.25V12h-4.25zM3.5 12h4.25v4.25H3.5zM12 12h4.25v4.25H12zM7.75 16.25H12v4.25H7.75zM16.25 16.25h4.25v4.25h-4.25z" opacity=".85"/>`,
+  train: `<circle ${S} cx="12" cy="12" r="8.5"/><circle ${S} cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1.6" fill="currentColor"/>`,
+  stats: `<path ${S} d="M4 20V10M10 20V4M16 20v-7M22 20H2"/>`,
+  info: `<circle ${S} cx="12" cy="12" r="9"/><path ${S} d="M12 11v6"/><circle cx="12" cy="7.6" r="1.2" fill="currentColor"/>`,
+  gear: `<circle ${S} cx="12" cy="12" r="3.2"/><path ${S} d="M12 2.8v2.4M12 18.8v2.4M2.8 12h2.4M18.8 12h2.4M5.5 5.5l1.7 1.7M16.8 16.8l1.7 1.7M5.5 18.5l1.7-1.7M16.8 7.2l1.7-1.7"/>`,
+  palette: `<path ${S} d="M12 3a9 9 0 1 0 0 18c1.2 0 1.8-.9 1.4-1.9-.5-1.2.3-2.4 1.6-2.4H17a4 4 0 0 0 4-4C21 7 17 3 12 3z"/><circle cx="7.5" cy="11" r="1.3" fill="currentColor"/><circle cx="10.5" cy="7" r="1.3" fill="currentColor"/><circle cx="15" cy="7.5" r="1.3" fill="currentColor"/>`,
+};
+function uiIcon(name, size = 22) {
+  return `<svg class="ui-ic" viewBox="0 0 24 24" width="${size}" height="${size}" aria-hidden="true">${UI[name] || ''}</svg>`;
+}
+
+return { classIcon, uiIcon };
 })();
 const { renderEvalGraph } = (() => {
 // Graphique de l'évaluation au fil de la partie (chances de gain des Blancs)
@@ -1671,6 +1995,8 @@ const { mountExercises, mountProgress } = (() => {
 
 
 
+
+
 const esc = (s) => String(s ?? '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 const fmt1 = (x) => (x == null ? '–' : x.toFixed(1).replace('.', ','));
 const TC = { bullet: 'Bullet', blitz: 'Blitz', rapid: 'Rapide', daily: 'Par jour', classical: 'Classique' };
@@ -1704,6 +2030,11 @@ const CSS = `
 .tr-table td { padding: 5px 6px; border-bottom: 1px solid var(--border); }
 .tr-table tr.weak td { background: rgba(217, 69, 47, .10); }
 .tr-scroll { overflow-x: auto; }
+.tr-board.shake { animation: trShake .35s ease-in-out; }
+@keyframes trShake { 20%, 60% { transform: translateX(-6px); } 40%, 80% { transform: translateX(6px); } }
+.tr-ok { animation: icPop2 .3s ease-out both; } @keyframes icPop2 { from { transform: scale(.8); opacity: 0; } }
+.tr-wrap > * { animation: trIn .3s ease-out both; } @keyframes trIn { from { opacity: 0; transform: translateY(6px); } }
+@media (prefers-reduced-motion: reduce) { .tr-board.shake, .tr-ok, .tr-wrap > * { animation: none; } }
 .tr-bar { height: 8px; background: var(--panel2); border-radius: 4px; overflow: hidden; min-width: 60px; }
 .tr-bar i { display: block; height: 100%; background: var(--accent); }
 .tr-advice { background: var(--panel); border-left: 4px solid var(--accent); border-radius: 8px; padding: 10px 12px; }
@@ -1803,7 +2134,7 @@ function mountExercises(el, env) {
     if (st.feedback) h += `<div style="margin-top:10px">${st.feedback}</div>`;
     if (st.solved) {
       h += `<div style="margin-top:10px"><b>Solution : ${esc(sanOf(e.fen, e.best))}</b> <span class="tr-ctx">(${fmtScore(e.score, e.color)})</span>${lineHtml(e.fen, e.line, e.prevCapTo)}</div>
-        <div class="tr-ctx" style="margin-top:6px">Dans la partie, vous aviez joué ${esc(sanFr(e.playedSan))} (${CLASSES[e.cls].label.toLowerCase()}, −${e.loss.toFixed(0)} % de chances de gain).</div>`;
+        <div class="tr-ctx" style="margin-top:6px">Dans la partie, vous aviez joué ${esc(sanFr(e.playedSan))} ${classIcon(e.cls, 16)} ${CLASSES[e.cls].label.toLowerCase()}, −${e.loss.toFixed(0)} % de chances de gain.</div>`;
     }
     h += '<div class="tr-btns">';
     if (!st.solved) h += '<button data-a="hint">Indice</button><button data-a="show">Voir la solution</button>';
@@ -1829,9 +2160,12 @@ function mountExercises(el, env) {
       board.set(c.fen(), { lastMove: { from: m.from, to: m.to }, lastColor: '#81b64c' });
       st.feedback = `<span class="tr-ok">✓ Bravo, ${esc(sanFr(m.san))} est le bon coup !</span>`;
       st.solved = true;
+      play('correct');
       if (st.tries === 0) await record(true);
     } else {
       st.tries++;
+      setTimeout(() => play('wrong'), 120);
+      $r('board').classList.remove('shake'); void $r('board').offsetWidth; $r('board').classList.add('shake');
       if (st.tries === 1) await record(false);
       board.set(e.fen, {});
       st.feedback = `<span class="tr-ko">✗ ${esc(sanFr(m.san))} n'est pas le meilleur coup.</span> <span class="tr-ctx">Réessayez${st.tries >= 2 ? ', ou demandez un indice' : ''}.</span>`;
@@ -2106,6 +2440,21 @@ function showEngine() {
 }
 
 // ------------------------------------------------------------------ Lichess
+
+// Lichess note le roque « roi prend tour » (e1h1) : on le convertit en notation UCI classique (e1g1)
+const CASTLE_FIX = { e1h1: 'e1g1', e1a1: 'e1c1', e8h8: 'e8g8', e8a8: 'e8c8' };
+function normalizePv(fen, pv, ChessCls) {
+  if (!pv.some((m) => CASTLE_FIX[m])) return pv;
+  const c = new ChessCls(fen);
+  const out = [];
+  for (const m of pv) {
+    const p = c.get(m.slice(0, 2));
+    const u = p && p.type === 'k' && CASTLE_FIX[m] ? CASTLE_FIX[m] : m;
+    try { c.move({ from: u.slice(0, 2), to: u.slice(2, 4), promotion: u[4] }); } catch { break; }
+    out.push(u);
+  }
+  return out;
+}
 let cloudPausedUntil = 0;
 async function cloudEval(fen) {
   if (Date.now() < cloudPausedUntil) return null;
@@ -2117,7 +2466,7 @@ async function cloudEval(fen) {
     if (!j.pvs?.length) return null;
     const black = fen.split(' ')[1] === 'b';
     const flip = (s) => (black ? -s : s);
-    return { depth: j.depth, lines: j.pvs.map((p) => ({ depth: j.depth, pv: p.moves.split(' '), score: p.mate !== undefined ? { mate: flip(p.mate) } : { cp: flip(p.cp) } })) };
+    return { depth: j.depth, lines: j.pvs.map((p) => ({ depth: j.depth, pv: normalizePv(fen, p.moves.split(' '), Chess), score: p.mate !== undefined ? { mate: flip(p.mate) } : { cp: flip(p.cp) } })) };
   } catch { return null; }
 }
 const TB_MAP = { win: 'win', 'syzygy-win': 'win', 'maybe-win': 'win', 'cursed-win': 'draw', draw: 'draw', 'blessed-loss': 'draw', loss: 'loss', 'syzygy-loss': 'loss', 'maybe-loss': 'loss' };
@@ -2257,7 +2606,9 @@ async function loadOpenings() {
 // ===================== Interface iPhone =====================
 const S = { localGames: [], site: 'chesscom', user: '', games: [], shown: 40, game: null, plies: [], startFen: null, analysis: null, sum: null, idx: 0, variation: null, book: new Set(), names: {}, analyzing: null, mode: 'game', saved: null, freeVar: null };
 const hintCache = new Map();
-const board = new Board($('#board'), { onMove: onBoardMove, pieceUrl: (code) => PIECE_URLS[code] });
+const pieceUrl = (code) => (PREFS.pieceSet === 'cburnett' ? PIECE_URLS[code] : remotePieceUrl(PREFS.pieceSet, code));
+const board = new Board($('#board'), { onMove: onBoardMove, pieceUrl });
+onPrefs((k) => { if (k === 'pieceSet') for (const c of Object.keys(PIECE_URLS)) new Image().src = pieceUrl(c); });
 board.useImages = true;
 
 (function init() {
@@ -2335,6 +2686,10 @@ $('#repList').addEventListener('click', (e) => {
 });
 document.querySelector('.tabbar').addEventListener('click', (e) => { const b = e.target.closest('button'); if (b) showView(b.dataset.view); });
 $('#settingsBtn').addEventListener('click', () => $('#settings').classList.toggle('hidden'));
+{ const st = document.createElement('style'); st.textContent = APPEARANCE_CSS; document.head.appendChild(st); }
+mountAppearance($('#apPanel'), { pieceUrl, onTestSound: () => { play('move'); setTimeout(() => play('capture'), 350); setTimeout(() => play('check'), 750); } });
+$('#settingsBtn').innerHTML = uiIcon('gear', 20); $('#aboutBtn').innerHTML = uiIcon('info', 20);
+{ const ic = { games: ['games', 'Parties'], board: ['analyse', 'Analyse'], tools: ['board', 'Échiquier'], train: ['train', 'Exercices'], stats: ['stats', 'Progrès'] }; for (const b of document.querySelectorAll('.tabbar button')) { const [i, lab] = ic[b.dataset.view]; b.innerHTML = uiIcon(i, 22) + '<span>' + lab + '</span>'; } }
 $('#aboutBtn').addEventListener('click', () => $('#about').classList.toggle('hidden'));
 $('#aboutClose').addEventListener('click', () => $('#about').classList.add('hidden'));
 $('#depthSel').addEventListener('change', (e) => { settings.depth = Number(e.target.value); saveSettings(); showEngine(); });
@@ -2497,6 +2852,7 @@ async function analyze() {
   try {
     const analysis = await analyzeCore(game, plies, job, (d, t, left) => setProgress(pr, d, t, `Coup ${d} / ${t} · encore ~${fmtLeft(left)}`));
     if (analysis) {
+      play('done');
       if (S.game === game) { S.analysis = analysis; recompute(); }
       else if (S.store?.game?.game === game) S.store.game.analysis = analysis;
       renderGames();
@@ -2534,6 +2890,11 @@ function go(where) {
     else if (typeof where === 'number') S.idx = Math.max(0, Math.min(n, where));
   }
   render();
+  if (where === 'next') {
+    const c = currentMove()?.r?.cls;
+    if (c === 'brillant') setTimeout(() => play('brilliant'), 170);
+    else if (c === 'gaffe') setTimeout(() => play('blunder'), 170);
+  }
 }
 document.querySelector('.nav').addEventListener('click', (e) => {
   const b = e.target.closest('button');
@@ -2603,7 +2964,7 @@ function render() {
     if (cm.r?.cls) {
       const k = CLASSES[cm.r.cls];
       opts.lastColor = k.color;
-      opts.badge = { square: opts.lastMove.to, color: k.color, sym: k.sym };
+      opts.badge = { square: opts.lastMove.to, color: k.color, sym: k.sym, html: classIcon(cm.r.cls, 40) };
       if (!cm.r.isBest && cm.rec?.lines?.[0] && cm.r.cls !== 'theorie') {
         const b = cm.rec.lines[0].pv[0];
         opts.arrows.push({ from: b.slice(0, 2), to: b.slice(2, 4), color: '#4caf50' });
@@ -2684,7 +3045,7 @@ function renderSummary() {
   <tr><td>Précision</td><td class="big">${fmt(P.w.accuracy)}</td><td class="big">${fmt(P.b.accuracy)}</td></tr>
   <tr><td>Elo estimé</td><td class="big sm">${fmtElo(P.w.elo)}<div class="range">${fmtEloRange(P.w.elo)}</div></td><td class="big sm">${fmtElo(P.b.elo)}<div class="range">${fmtEloRange(P.b.elo)}</div></td></tr>`;
   for (const [k, c] of Object.entries(CLASSES).sort((a, b) => a[1].order - b[1].order)) {
-    h += `<tr><td><span class="sym" style="background:${c.color}">${c.sym}</span>${c.label}</td>`;
+    h += `<tr><td><span class="symi">${classIcon(k, 20)}</span>${c.label}</td>`;
     for (const col of ['w', 'b']) { const n = P[col].counts[k]; h += `<td class="n ${n ? '' : 'zero'}" style="color:${c.color}" data-cls="${k}" data-col="${col}">${n}</td>`; }
     h += '</tr>';
   }
@@ -2714,7 +3075,7 @@ function renderDetail(cm) {
   if (!r0 || !r?.cls) { el.innerHTML = S.analysis || cm.variation || S.mode !== 'game' ? '' : `<div class="card"><h4>${num}</h4><span class="muted">Lancez l'analyse pour voir le classement des coups.</span></div>`; return; }
   const k = CLASSES[r.cls];
   const ex = explainMove(ply, r0, r);
-  let h = `<div class="card" style="--c:${k.color}"><h4><span class="sym" style="background:${k.color}">${k.sym}</span>${num} — ${k.label}</h4><div>${esc(ex.text)}</div>`;
+  let h = `<div class="card" style="--c:${k.color}"><h4><span class="symi">${classIcon(r.cls, 22, 'pop')}</span>${num} — ${k.label}</h4><div>${esc(ex.text)}</div>`;
   if (ex.best) h += `<div class="line"><b>Meilleur coup : ${esc(ex.bestSan)}</b> (${fmtScore(r0.lines[0].score, ply.color)})${lineHtml(ex.best)}</div>`;
   if (ex.played && BAD.has(r.cls)) h += `<div class="line"><b style="color:${k.color}">Suite probable après votre coup</b> (${fmtScore(r0.played.score, ply.color)})${lineHtml(ex.played)}</div>`;
   h += `<button class="claudeBtn" id="askClaude">✳ Demander à Claude</button></div>`;
@@ -2747,7 +3108,7 @@ function renderLines() {
 function moveCell(p, r, cur, attrs) {
   const k = r?.cls ? CLASSES[r.cls] : null;
   const showSym = k && !['meilleur', 'excellent', 'bon', 'theorie'].includes(r.cls);
-  return `<span class="mv ${cur ? 'cur' : ''}" ${attrs}>${esc(sanFr(p.san))}${showSym ? `<span class="s" style="color:${k.color}">${k.sym}</span>` : ''}${k && r.cls === 'theorie' ? '<span class="s" style="opacity:.6">📖</span>' : ''}</span>`;
+  return `<span class="mv ${cur ? 'cur' : ''}" ${attrs}>${esc(sanFr(p.san))}${showSym ? `<span class="s" style="color:${k.color}">${k.sym}</span>` : ''}${k && r.cls === 'theorie' ? '<span class="s" style="opacity:.55"><svg class="ui-ic" viewBox="0 0 20 20" width="14" height="14" aria-hidden="true" style="vertical-align:-2px"><path fill="currentColor" d="M3 4.6c2.6-.7 5-.4 6.4 1v10c-1.5-1.2-3.8-1.5-6.4-1zM17 4.6c-2.6-.7-5-.4-6.4 1v10c1.5-1.2 3.8-1.5 6.4-1z"/></svg></span>' : ''}</span>`;
 }
 function renderMoves() {
   const el = $('#moves');
@@ -2780,7 +3141,7 @@ function openingName() {
   for (const f of fens) { const n = S.names[epd(f)]; if (n) name = n; }
   return name;
 }
-function renderOpening() { const n = openingName(); $('#opening').textContent = n ? '📖 ' + openingFr(n) : ''; }
+function renderOpening() { const n = openingName(); $('#opening').innerHTML = n ? '<svg class="ui-ic" viewBox="0 0 20 20" width="14" height="14" aria-hidden="true" style="vertical-align:-2px"><path fill="currentColor" d="M3 4.6c2.6-.7 5-.4 6.4 1v10c-1.5-1.2-3.8-1.5-6.4-1zM17 4.6c-2.6-.7-5-.4-6.4 1v10c1.5-1.2 3.8-1.5 6.4-1z"/></svg> ' + esc(openingFr(n)) : ''; }
 
 
 // ------------------------------------------------------------------ échiquier libre et conseil « meilleur coup »
@@ -2889,7 +3250,7 @@ $('#batchStop').addEventListener('click', () => { if (batchJob) { batchJob.cance
 
 // ------------------------------------------------------------------ exercices et progression
 const trainerEnv = {
-  Board, pieceUrl: (code) => PIECE_URLS[code], useImages: () => true,
+  Board, pieceUrl, useImages: () => true,
   loadEntries: async () => {
     const out = [];
     for (const g of S.games.length ? S.games : S.localGames) { if (!g.analyzed) continue; const a = await store.get('ana:' + g.id); if (a) out.push({ game: g, analysis: a }); }
