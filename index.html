@@ -24,7 +24,12 @@ input, select { background: var(--panel2); border: 1px solid var(--border); bord
 
 header { display: flex; align-items: center; gap: 10px; padding: 10px 16px; }
 header h1 { font-size: 18px; margin: 0; flex: 1; }
-#settingsBtn { padding: 6px 12px; }
+#settingsBtn, #aboutBtn { padding: 6px 12px; }
+#about { margin: 0 16px 10px; background: var(--panel); border-radius: 12px; padding: 4px 14px 12px; font-size: 14px; }
+#about h2 { font-size: 17px; margin: 10px 0 4px; }
+#about ul { padding-left: 18px; margin: 4px 0; }
+#about li { margin: 4px 0; }
+#about a { color: var(--accent); }
 #settings { margin: 0 16px 10px; background: var(--panel); border-radius: 12px; padding: 12px; display: grid; gap: 8px; }
 #settings label { display: grid; gap: 4px; font-size: 13px; color: var(--muted); }
 #engineStatus { font-size: 12px; padding: 0 16px 6px; }
@@ -148,6 +153,7 @@ h3:has(+ #evalGraph[hidden]) { display: none; }
 
 <header>
   <h1>♞ Analyse Echecs</h1>
+  <button id="aboutBtn" aria-label="À propos">ⓘ</button>
   <button id="settingsBtn" aria-label="Réglages">⚙︎</button>
 </header>
 <div id="settings" class="hidden">
@@ -168,6 +174,20 @@ h3:has(+ #evalGraph[hidden]) { display: none; }
   </label>
   <div class="muted small">Les parties, analyses et réglages sont gardés sur cet appareil.</div>
 </div>
+<div id="about" class="hidden"><h2>À propos</h2>
+<p><b>Analyse Echecs</b> est une application gratuite pour analyser ses parties chess.com : classement des coups, précision, Elo estimé, graphique d'évaluation, échiquier libre et répertoire d'ouvertures. Elle n'est affiliée ni à chess.com ni à Lichess.</p>
+<h3>Crédits</h3>
+<ul>
+  <li><b>Moteur : Stockfish 19</b>, par l'équipe Stockfish (<a href="https://stockfishchess.org" target="_blank" rel="noopener">stockfishchess.org</a>). Licence <a href="https://www.gnu.org/licenses/gpl-3.0.html" target="_blank" rel="noopener">GPL v3</a>. Code source : <a href="https://github.com/official-stockfish/Stockfish" target="_blank" rel="noopener">github.com/official-stockfish/Stockfish</a>. Version web : <a href="https://github.com/nmrugg/stockfish.js" target="_blank" rel="noopener">stockfish.js</a> de Nathan Rugg (GPL v3), chargée depuis unpkg.com.</li>
+  <li><b>Analyse cloud et tables de finales :</b> <a href="https://lichess.org" target="_blank" rel="noopener">Lichess</a>, via son API publique.</li>
+  <li><b>Base d'ouvertures :</b> <a href="https://github.com/lichess-org/chess-openings" target="_blank" rel="noopener">lichess-org/chess-openings</a>, domaine public (CC0).</li>
+  <li><b>Pièces :</b> jeu « cburnett » de Colin M. L. Burnett, licence <a href="https://creativecommons.org/licenses/by-sa/3.0/deed.fr" target="_blank" rel="noopener">CC BY-SA 3.0</a>.</li>
+  <li><b>Parties :</b> <a href="https://www.chess.com/news/view/published-data-api" target="_blank" rel="noopener">API publique de chess.com</a> (parties terminées uniquement).</li>
+  <li><b>Formules :</b> chances de gain et précision d'après celles de Lichess.</li>
+</ul>
+<h3>Vos données</h3>
+<p>Votre pseudo, vos parties et vos analyses restent sur cet appareil. L'application ne les envoie nulle part, à part les positions interrogées auprès de Lichess pour l'analyse cloud.</p>
+<button id="aboutClose" class="ghostBtn">Fermer</button></div>
 <div id="engineStatus" class="muted">Stockfish se charge à la première analyse.</div>
 
 <section id="gamesView" class="view">
@@ -1640,6 +1660,8 @@ $('#repList').addEventListener('click', (e) => {
 });
 document.querySelector('.tabbar').addEventListener('click', (e) => { const b = e.target.closest('button'); if (b) showView(b.dataset.view); });
 $('#settingsBtn').addEventListener('click', () => $('#settings').classList.toggle('hidden'));
+$('#aboutBtn').addEventListener('click', () => $('#about').classList.toggle('hidden'));
+$('#aboutClose').addEventListener('click', () => $('#about').classList.add('hidden'));
 $('#depthSel').addEventListener('change', (e) => { settings.depth = Number(e.target.value); saveSettings(); showEngine(); });
 $('#flavorSel').addEventListener('change', (e) => { settings.flavor = e.target.value; saveSettings(); if (engine) getEngine(); });
 
