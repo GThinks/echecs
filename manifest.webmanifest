@@ -1,0 +1,9 @@
+{
+  "name": "Analyse Echecs",
+  "short_name": "Échecs",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#262421",
+  "theme_color": "#312e2b",
+  "icons": [{ "src": "apple-touch-icon.png", "sizes": "180x180", "type": "image/png" }]
+}

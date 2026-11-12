@@ -1,0 +1,1774 @@
+<!doctype html><html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#312e2b"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><link rel="apple-touch-icon" href="apple-touch-icon.png"><link rel="manifest" href="manifest.webmanifest"></head><body><title>Analyse Echecs</title>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Échecs">
+<style>
+:root {
+  --bg: #f3f1ec; --panel: #ffffff; --panel2: #ece9e3; --text: #1d1b19; --muted: #6f6a64; --border: #dcd7cf;
+  --light: #ebecd0; --dark: #779556; --accent: #5d9a2b; --accentText: #fff; --hlcur: #d8d2c6;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #262421; --panel: #312e2b; --panel2: #3b3835; --text: #e8e6e3; --muted: #9e9b98; --border: #45423f; --accent: #81b64c; --hlcur: #57534e;
+  }
+}
+:root[data-theme="dark"] { --bg: #262421; --panel: #312e2b; --panel2: #3b3835; --text: #e8e6e3; --muted: #9e9b98; --border: #45423f; --accent: #81b64c; --hlcur: #57534e; }
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+html, body { margin: 0; background: var(--bg); color: var(--text); font: 15px/1.45 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+body { padding: env(safe-area-inset-top) 0 calc(64px + env(safe-area-inset-bottom)); overflow-x: hidden; }
+button, input, select { font: inherit; color: inherit; }
+button { cursor: pointer; border: 1px solid var(--border); background: var(--panel2); border-radius: 10px; padding: 10px 14px; touch-action: manipulation; }
+button.primary { background: var(--accent); border-color: var(--accent); color: var(--accentText); font-weight: 650; width: 100%; padding: 13px; }
+.ghostBtn { background: transparent; width: 100%; margin-top: 8px; }
+input, select { background: var(--panel2); border: 1px solid var(--border); border-radius: 10px; padding: 10px 12px; font-size: 16px; min-width: 0; }
+.muted { color: var(--muted); } .small { font-size: 12px; } .hidden { display: none !important; }
+
+header { display: flex; align-items: center; gap: 10px; padding: 10px 16px; }
+header h1 { font-size: 18px; margin: 0; flex: 1; }
+#settingsBtn { padding: 6px 12px; }
+#settings { margin: 0 16px 10px; background: var(--panel); border-radius: 12px; padding: 12px; display: grid; gap: 8px; }
+#settings label { display: grid; gap: 4px; font-size: 13px; color: var(--muted); }
+#engineStatus { font-size: 12px; padding: 0 16px 6px; }
+
+.view { display: none; padding: 0 16px; }
+body[data-view="games"] #gamesView, body[data-view="board"] #boardView { display: block; }
+#userForm { display: flex; gap: 8px; margin-bottom: 10px; }
+#userForm input { flex: 1; }
+.filters { display: flex; gap: 8px; margin-bottom: 8px; }
+.filters input { flex: 1; }
+h2 { font-size: 16px; margin: 6px 0 8px; }
+h3 { font-size: 12px; margin: 16px 0 6px; color: var(--muted); text-transform: uppercase; letter-spacing: .05em; }
+.games { list-style: none; margin: 0; padding: 0; background: var(--panel); border-radius: 12px; overflow: hidden; }
+.games li { padding: 11px 12px; border-bottom: 1px solid var(--border); display: grid; grid-template-columns: 1fr auto; gap: 2px 8px; }
+.games li:last-child { border-bottom: 0; }
+.games li.active { background: var(--panel2); }
+.games li.empty { display: block; color: var(--muted); }
+.games .opp { font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.games .meta { font-size: 12px; color: var(--muted); }
+.res { font-weight: 700; text-align: right; } .res.win { color: #5d9a2b; } .res.loss { color: #d9452f; } .res.draw { color: var(--muted); }
+.done-mark { color: var(--accent); font-size: 12px; text-align: right; }
+.progress { position: relative; height: 20px; background: var(--panel2); border-radius: 10px; overflow: hidden; margin: 8px 0; }
+.progress div { height: 100%; width: 0; background: var(--accent); transition: width .2s; }
+.progress span { position: absolute; inset: 0; text-align: center; font-size: 12px; line-height: 20px; }
+
+.player { display: flex; gap: 8px; align-items: center; font-weight: 600; padding: 6px 0; font-size: 14px; }
+.player .rating { color: var(--muted); font-weight: 400; }
+.player .acc { margin-left: auto; background: var(--panel2); border-radius: 6px; padding: 1px 8px; font-size: 13px; }
+#evalBar { height: 12px; position: relative; background: #403d39; border-radius: 4px; overflow: hidden; margin-bottom: 4px; }
+#evalBar .fill { position: absolute; top: 0; bottom: 0; left: 0; width: 50%; background: #f0f0f0; transition: width .3s; }
+#evalBar.flipped .fill { left: auto; right: 0; }
+#evalBar .txt { position: absolute; top: 0; left: 4px; font-size: 9px; line-height: 12px; font-weight: 700; color: #333; }
+#evalBar .txt.right { left: auto; right: 4px; }
+#evalBar .txt.light { color: #eee; }
+#board { width: 100%; aspect-ratio: 1; position: relative; user-select: none; -webkit-user-select: none; touch-action: none; }
+.board .squares { display: grid; grid-template-columns: repeat(8, 1fr); grid-template-rows: repeat(8, 1fr); width: 100%; height: 100%; border-radius: 6px; overflow: hidden; }
+.sq { position: relative; display: flex; align-items: center; justify-content: center; }
+.sq.light { background: var(--light); } .sq.dark { background: var(--dark); }
+.sq.last::before { content: ""; position: absolute; inset: 0; background: var(--hl, rgba(255, 255, 0, .4)); opacity: .55; }
+.sq.sel::before { content: ""; position: absolute; inset: 0; background: rgba(20, 85, 30, .5); }
+.sq.check { background: radial-gradient(circle, #ff3b3b 0%, rgba(255, 0, 0, .5) 40%, transparent 75%), var(--dark); }
+.piece { width: 100%; height: 100%; position: relative; z-index: 1; pointer-events: none; }
+.coord { position: absolute; font-size: 9px; font-weight: 700; z-index: 1; pointer-events: none; }
+.coord.file { right: 2px; bottom: 0; } .coord.rank { left: 2px; top: 0; }
+.sq.light .coord { color: var(--dark); } .sq.dark .coord { color: var(--light); }
+.dot { position: absolute; width: 30%; height: 30%; border-radius: 50%; background: rgba(0, 0, 0, .22); z-index: 2; }
+.capture-ring { position: absolute; inset: 4%; border-radius: 50%; border: 4px solid rgba(0, 0, 0, .22); z-index: 2; }
+.badge { position: absolute; top: -10%; right: -10%; width: 46%; height: 46%; border-radius: 50%; z-index: 4; color: #fff; font-weight: 800; font-size: 10px; display: flex; align-items: center; justify-content: center; box-shadow: 0 1px 3px rgba(0, 0, 0, .5); border: 1.5px solid #fff; }
+.arrows { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 3; }
+.ghost { position: fixed; z-index: 1000; pointer-events: none; display: flex; align-items: center; justify-content: center; }
+.promo { position: absolute; inset: 35% 6%; background: var(--panel); border-radius: 10px; z-index: 10; display: flex; gap: 6px; padding: 8px; box-shadow: 0 4px 20px rgba(0, 0, 0, .5); }
+.promo button { flex: 1; padding: 2px; background: var(--light); display: flex; align-items: center; justify-content: center; }
+.nav { display: flex; gap: 6px; margin-top: 10px; }
+.nav button { flex: 1; font-size: 17px; padding: 10px 0; }
+#opening { margin-top: 8px; text-align: center; font-size: 13px; }
+#variationBar { margin-top: 8px; background: #4b3f22; color: #f3e6c4; padding: 8px 10px; border-radius: 10px; font-size: 13px; display: flex; gap: 8px; align-items: center; justify-content: space-between; }
+#variationBar button { padding: 6px 10px; font-size: 13px; color: #f3e6c4; background: transparent; border-color: #8a7a4f; }
+#analyzeBox { margin-top: 12px; }
+.sumTable { width: 100%; border-collapse: collapse; margin-top: 12px; background: var(--panel); border-radius: 12px; overflow: hidden; font-size: 14px; }
+.sumTable th { font-size: 12px; color: var(--muted); font-weight: 600; padding: 8px 4px 4px; overflow: hidden; text-overflow: ellipsis; max-width: 100px; white-space: nowrap; }
+.sumTable td { padding: 4px 6px; }
+.sumTable td.n { text-align: center; font-weight: 800; }
+.sumTable td.n.zero { opacity: .3; }
+.sumTable .big { font-size: 20px; font-weight: 800; text-align: center; } .sumTable .big.sm { font-size: 16px; }
+.sym { display: inline-flex; width: 20px; height: 20px; border-radius: 50%; color: #fff; font-size: 10px; font-weight: 800; align-items: center; justify-content: center; margin-right: 6px; vertical-align: middle; }
+#detail .card { background: var(--panel); border-radius: 12px; padding: 12px; margin: 12px 0; border-left: 4px solid var(--c, var(--border)); }
+#detail .card h4 { margin: 0 0 6px; font-size: 16px; display: flex; align-items: center; }
+#detail .line { margin-top: 10px; }
+#detail .line b { color: var(--accent); }
+.lineMoves { margin: 4px 0 0; padding: 0; list-style: none; font-size: 14px; }
+.lineMoves .note { color: #b08a1e; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .lineMoves .note { color: #d9c27a; } }
+.claudeBtn { margin-top: 12px; background: #c96442; border-color: #c96442; color: #fff; font-weight: 650; width: 100%; }
+.eline { font-size: 13px; padding: 6px 8px; background: var(--panel); border-radius: 8px; margin-bottom: 4px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.eline .score { display: inline-block; min-width: 48px; font-weight: 700; }
+.moves { display: grid; grid-template-columns: 34px 1fr 1fr; gap: 1px; font-size: 14px; background: var(--panel); border-radius: 12px; padding: 6px; max-height: 260px; overflow-y: auto; position: relative; }
+.moves .num { color: var(--muted); padding: 5px 4px; }
+.moves .mv { padding: 5px 6px; border-radius: 6px; display: flex; align-items: center; gap: 4px; }
+.moves .mv.cur { background: var(--hlcur); }
+.moves .mv .s { font-weight: 800; font-size: 12px; }
+.moves .var { grid-column: 1 / -1; background: rgba(160, 130, 50, .18); border-radius: 6px; padding: 4px 6px; display: flex; flex-wrap: wrap; gap: 2px; }
+.moves .var .mv { display: inline-flex; }
+
+.tabbar { position: fixed; left: 0; right: 0; bottom: 0; display: flex; background: var(--panel); border-top: 1px solid var(--border); padding-bottom: env(safe-area-inset-bottom); z-index: 50; }
+.tabbar button { flex: 1; border: 0; background: transparent; border-radius: 0; padding: 10px 0 12px; font-size: 13px; color: var(--muted); }
+.tabbar button.on { color: var(--accent); font-weight: 700; }
+#toast { position: fixed; bottom: calc(80px + env(safe-area-inset-bottom)); left: 16px; right: 16px; background: #111; color: #fff; padding: 12px 14px; border-radius: 12px; z-index: 2000; box-shadow: 0 4px 16px rgba(0, 0, 0, .4); font-size: 14px; }
+#toast a { color: #f0a37f; }
+@media (min-width: 700px) { .view { max-width: 560px; margin: 0 auto; } }
+</style>
+
+<header>
+  <h1>♞ Analyse Echecs</h1>
+  <button id="settingsBtn" aria-label="Réglages">⚙︎</button>
+</header>
+<div id="settings" class="hidden">
+  <label>Profondeur d'analyse
+    <select id="depthSel">
+      <option value="14">14 — rapide</option>
+      <option value="16">16</option>
+      <option value="18">18 — conseillé sur iPhone</option>
+      <option value="20">20</option>
+      <option value="22">22 — comme sur le Mac (lent)</option>
+    </select>
+  </label>
+  <label>Moteur
+    <select id="flavorSel">
+      <option value="lite">Stockfish 19 « lite » (1,8 Mo, conseillé)</option>
+      <option value="full">Stockfish 19 complet (99 Mo, plus fort, lent à charger)</option>
+    </select>
+  </label>
+  <div class="muted small">Les parties, analyses et réglages sont gardés sur cet appareil.</div>
+</div>
+<div id="engineStatus" class="muted">Stockfish se charge à la première analyse.</div>
+
+<section id="gamesView" class="view">
+  <form id="userForm">
+    <input id="user" placeholder="Pseudo chess.com" autocomplete="off" autocapitalize="none" spellcheck="false">
+    <button type="submit">Charger</button>
+  </form>
+  <div id="gamesProgress" class="progress hidden"><div></div><span></span></div>
+  <div class="filters">
+    <select id="fTc">
+      <option value="all">Toutes</option>
+      <option value="bullet">Bullet</option>
+      <option value="blitz">Blitz</option>
+      <option value="rapid">Rapide</option>
+      <option value="daily">Par jour</option>
+    </select>
+    <input id="fQ" placeholder="Adversaire…" autocapitalize="none" spellcheck="false">
+  </div>
+  <h2>Mes parties <span id="gamesCount" class="muted"></span></h2>
+  <ul id="games" class="games"><li class="empty">Tapez votre pseudo chess.com puis « Charger ». Seules les parties <b>terminées</b> sont récupérées.</li></ul>
+  <button id="more" class="hidden ghostBtn">Afficher plus</button>
+</section>
+
+<section id="boardView" class="view">
+  <div id="playerTop" class="player"></div>
+  <div id="evalBar"><div class="fill"></div><span class="txt"></span></div>
+  <div id="board"></div>
+  <div id="playerBottom" class="player"></div>
+  <div class="nav">
+    <button data-nav="first" aria-label="Début">⏮</button>
+    <button data-nav="prev" aria-label="Précédent">◀</button>
+    <button data-nav="next" aria-label="Suivant">▶</button>
+    <button data-nav="last" aria-label="Fin">⏭</button>
+    <button data-nav="flip" aria-label="Retourner">⇅</button>
+  </div>
+  <div id="opening" class="muted"></div>
+  <div id="variationBar" class="hidden"><span>Variante libre, notée par Stockfish</span><button id="exitVar">Revenir à la partie</button></div>
+  <div id="analyzeBox" class="hidden">
+    <button id="analyzeBtn" class="primary">Analyser cette partie</button>
+    <div id="anaProgress" class="progress hidden"><div></div><span></span></div>
+    <button id="cancelBtn" class="hidden ghostBtn">Mettre en pause</button>
+    <div class="muted small" style="margin-top:6px">Gardez l'écran allumé et la page ouverte pendant l'analyse. Si elle s'interrompt, elle reprend là où elle s'est arrêtée.</div>
+  </div>
+  <div id="detail"></div>
+  <div id="summary"></div>
+  <div id="lines"></div>
+  <h3>Coups</h3>
+  <div id="moves" class="moves"></div>
+</section>
+
+<nav class="tabbar">
+  <button data-view="games">♟︎ Parties</button>
+  <button data-view="board">♞ Analyse</button>
+</nav>
+<div id="toast" class="hidden"></div>
+<script type="module">
+const { Chess, START_FEN } = (() => {
+// Petite bibliothèque d'échecs autonome (règles complètes, FEN, SAN, PGN).
+// API compatible avec un sous-ensemble de chess.js.
+const FILES = 'abcdefgh';
+const START_FEN = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1';
+const sqName = (i) => FILES[i & 7] + ((i >> 3) + 1);
+const sqIndex = (s) => FILES.indexOf(s[0]) + (Number(s[1]) - 1) * 8;
+const fileOf = (i) => i & 7, rankOf = (i) => i >> 3;
+const KNIGHT = [[1, 2], [2, 1], [2, -1], [1, -2], [-1, -2], [-2, -1], [-2, 1], [-1, 2]];
+const KING = [[1, 0], [1, 1], [0, 1], [-1, 1], [-1, 0], [-1, -1], [0, -1], [1, -1]];
+const ROOK_D = [[1, 0], [-1, 0], [0, 1], [0, -1]];
+const BISHOP_D = [[1, 1], [1, -1], [-1, 1], [-1, -1]];
+const off = (i, df, dr) => {
+  const f = fileOf(i) + df, r = rankOf(i) + dr;
+  return f < 0 || f > 7 || r < 0 || r > 7 ? -1 : r * 8 + f;
+};
+const swap = (c) => (c === 'w' ? 'b' : 'w');
+
+class Chess {
+  constructor(fen = START_FEN) {
+    this._history = [];
+    this._headers = {};
+    this.load(fen);
+  }
+
+  load(fen, { skipValidation = false } = {}) {
+    const parts = fen.trim().split(/\s+/);
+    if (parts.length < 4 && !skipValidation) throw new Error('FEN invalide : ' + fen);
+    const rows = parts[0].split('/');
+    if (rows.length !== 8) throw new Error('FEN invalide : ' + fen);
+    const b = new Array(64).fill(null);
+    for (let r = 0; r < 8; r++) {
+      let f = 0;
+      for (const ch of rows[r]) {
+        if (/\d/.test(ch)) f += Number(ch);
+        else {
+          if (!/[pnbrqkPNBRQK]/.test(ch) || f > 7) throw new Error('FEN invalide : ' + fen);
+          b[(7 - r) * 8 + f] = { type: ch.toLowerCase(), color: ch === ch.toUpperCase() ? 'w' : 'b' };
+          f++;
+        }
+      }
+      if (f !== 8) throw new Error('FEN invalide : ' + fen);
+    }
+    if (!skipValidation) {
+      const kings = b.filter((p) => p && p.type === 'k');
+      if (kings.filter((k) => k.color === 'w').length !== 1 || kings.filter((k) => k.color === 'b').length !== 1) throw new Error('FEN invalide (rois) : ' + fen);
+    }
+    this.b = b;
+    this._turn = parts[1] === 'b' ? 'b' : 'w';
+    const c = parts[2] || '-';
+    this.castling = { K: c.includes('K'), Q: c.includes('Q'), k: c.includes('k'), q: c.includes('q') };
+    // on ignore les droits de roque incohérents
+    if (!(b[4]?.type === 'k' && b[4].color === 'w')) this.castling.K = this.castling.Q = false;
+    if (!(b[7]?.type === 'r' && b[7].color === 'w')) this.castling.K = false;
+    if (!(b[0]?.type === 'r' && b[0].color === 'w')) this.castling.Q = false;
+    if (!(b[60]?.type === 'k' && b[60].color === 'b')) this.castling.k = this.castling.q = false;
+    if (!(b[63]?.type === 'r' && b[63].color === 'b')) this.castling.k = false;
+    if (!(b[56]?.type === 'r' && b[56].color === 'b')) this.castling.q = false;
+    this.ep = parts[3] && parts[3] !== '-' ? sqIndex(parts[3]) : -1;
+    this.half = Number(parts[4] || 0);
+    this.full = Number(parts[5] || 1);
+    this._history = [];
+    return true;
+  }
+
+  fen() {
+    let s = '';
+    for (let r = 7; r >= 0; r--) {
+      let e = 0;
+      for (let f = 0; f < 8; f++) {
+        const p = this.b[r * 8 + f];
+        if (!p) { e++; continue; }
+        if (e) { s += e; e = 0; }
+        s += p.color === 'w' ? p.type.toUpperCase() : p.type;
+      }
+      if (e) s += e;
+      if (r) s += '/';
+    }
+    let c = (this.castling.K ? 'K' : '') + (this.castling.Q ? 'Q' : '') + (this.castling.k ? 'k' : '') + (this.castling.q ? 'q' : '');
+    // case de prise en passant seulement si une prise est réellement possible (comme chess.js)
+    let ep = '-';
+    if (this.ep >= 0) {
+      const dir = this._turn === 'w' ? -8 : 8;
+      const pawnSq = this.ep + dir;
+      for (const df of [-1, 1]) {
+        const s2 = off(pawnSq, df, 0);
+        const p = s2 >= 0 ? this.b[s2] : null;
+        if (p && p.type === 'p' && p.color === this._turn) ep = sqName(this.ep);
+      }
+    }
+    return `${s} ${this._turn} ${c || '-'} ${ep} ${this.half} ${this.full}`;
+  }
+
+  turn() { return this._turn; }
+  get(sq) { const p = this.b[sqIndex(sq)]; return p ? { type: p.type, color: p.color } : null; }
+  board() {
+    const out = [];
+    for (let r = 7; r >= 0; r--) {
+      const row = [];
+      for (let f = 0; f < 8; f++) { const i = r * 8 + f, p = this.b[i]; row.push(p ? { square: sqName(i), type: p.type, color: p.color } : null); }
+      out.push(row);
+    }
+    return out;
+  }
+
+  // la case `i` est-elle attaquée par le camp `by` ?
+  attacked(i, by) {
+    const b = this.b;
+    const pd = by === 'w' ? -1 : 1; // les pions blancs attaquent depuis la rangée du dessous
+    for (const df of [-1, 1]) { const s = off(i, df, pd); if (s >= 0 && b[s]?.type === 'p' && b[s].color === by) return true; }
+    for (const [df, dr] of KNIGHT) { const s = off(i, df, dr); if (s >= 0 && b[s]?.type === 'n' && b[s].color === by) return true; }
+    for (const [df, dr] of KING) { const s = off(i, df, dr); if (s >= 0 && b[s]?.type === 'k' && b[s].color === by) return true; }
+    for (const [dirs, types] of [[ROOK_D, 'rq'], [BISHOP_D, 'bq']]) {
+      for (const [df, dr] of dirs) {
+        let s = i;
+        for (;;) {
+          s = off(s, df, dr);
+          if (s < 0) break;
+          const p = b[s];
+          if (p) { if (p.color === by && types.includes(p.type)) return true; break; }
+        }
+      }
+    }
+    return false;
+  }
+  kingSq(color) { return this.b.findIndex((p) => p && p.type === 'k' && p.color === color); }
+  inCheck() { const k = this.kingSq(this._turn); return k >= 0 && this.attacked(k, swap(this._turn)); }
+
+  _pseudo() {
+    const b = this.b, us = this._turn, them = swap(us), moves = [];
+    const add = (from, to, flags, promo) => {
+      const piece = b[from].type, cap = flags.includes('e') ? 'p' : b[to]?.type;
+      if (promo) for (const pr of ['q', 'r', 'b', 'n']) moves.push({ from, to, piece, captured: cap, promotion: pr, flags: flags + 'p' });
+      else moves.push({ from, to, piece, captured: cap, flags });
+    };
+    for (let i = 0; i < 64; i++) {
+      const p = b[i];
+      if (!p || p.color !== us) continue;
+      if (p.type === 'p') {
+        const dr = us === 'w' ? 1 : -1, startR = us === 'w' ? 1 : 6, lastR = us === 'w' ? 7 : 0;
+        const one = off(i, 0, dr);
+        if (one >= 0 && !b[one]) {
+          add(i, one, 'n', rankOf(one) === lastR);
+          const two = off(i, 0, 2 * dr);
+          if (rankOf(i) === startR && !b[two]) add(i, two, 'b');
+        }
+        for (const df of [-1, 1]) {
+          const s = off(i, df, dr);
+          if (s < 0) continue;
+          if (b[s] && b[s].color === them) add(i, s, 'c', rankOf(s) === lastR);
+          else if (s === this.ep) add(i, s, 'e');
+        }
+      } else if (p.type === 'n' || p.type === 'k') {
+        for (const [df, dr] of p.type === 'n' ? KNIGHT : KING) {
+          const s = off(i, df, dr);
+          if (s < 0 || (b[s] && b[s].color === us)) continue;
+          add(i, s, b[s] ? 'c' : 'n');
+        }
+        if (p.type === 'k') {
+          const home = us === 'w' ? 4 : 60;
+          if (i === home && !this.attacked(home, them)) {
+            const [K, Q] = us === 'w' ? ['K', 'Q'] : ['k', 'q'];
+            if (this.castling[K] && !b[home + 1] && !b[home + 2] && !this.attacked(home + 1, them) && !this.attacked(home + 2, them)) add(i, home + 2, 'k');
+            if (this.castling[Q] && !b[home - 1] && !b[home - 2] && !b[home - 3] && !this.attacked(home - 1, them) && !this.attacked(home - 2, them)) add(i, home - 2, 'q');
+          }
+        }
+      } else {
+        const dirs = p.type === 'r' ? ROOK_D : p.type === 'b' ? BISHOP_D : [...ROOK_D, ...BISHOP_D];
+        for (const [df, dr] of dirs) {
+          let s = i;
+          for (;;) {
+            s = off(s, df, dr);
+            if (s < 0) break;
+            if (b[s]) { if (b[s].color === them) add(i, s, 'c'); break; }
+            add(i, s, 'n');
+          }
+        }
+      }
+    }
+    return moves;
+  }
+
+  _make(m) {
+    const b = this.b, us = this._turn;
+    const state = { m, captured: null, castling: { ...this.castling }, ep: this.ep, half: this.half, full: this.full };
+    const piece = b[m.from];
+    if (m.flags.includes('e')) { const cs = m.to + (us === 'w' ? -8 : 8); state.captured = b[cs]; state.capSq = cs; b[cs] = null; }
+    else { state.captured = b[m.to]; state.capSq = m.to; }
+    b[m.to] = m.promotion ? { type: m.promotion, color: us } : piece;
+    b[m.from] = null;
+    if (m.flags.includes('k')) { b[m.to - 1] = b[m.to + 1]; b[m.to + 1] = null; }
+    if (m.flags.includes('q')) { b[m.to + 1] = b[m.to - 2]; b[m.to - 2] = null; }
+    if (piece.type === 'k') { if (us === 'w') this.castling.K = this.castling.Q = false; else this.castling.k = this.castling.q = false; }
+    for (const sq of [m.from, m.to]) {
+      if (sq === 0) this.castling.Q = false;
+      if (sq === 7) this.castling.K = false;
+      if (sq === 56) this.castling.q = false;
+      if (sq === 63) this.castling.k = false;
+    }
+    this.ep = m.flags.includes('b') ? (m.from + m.to) / 2 : -1;
+    this.half = piece.type === 'p' || state.captured ? 0 : this.half + 1;
+    if (us === 'b') this.full++;
+    this._turn = swap(us);
+    return state;
+  }
+  _unmake(state) {
+    const b = this.b, m = state.m;
+    this._turn = swap(this._turn);
+    const us = this._turn;
+    const piece = b[m.to];
+    b[m.from] = m.promotion ? { type: 'p', color: us } : piece;
+    b[m.to] = null;
+    if (state.captured) b[state.capSq] = state.captured;
+    if (m.flags.includes('k')) { b[m.to + 1] = b[m.to - 1]; b[m.to - 1] = null; }
+    if (m.flags.includes('q')) { b[m.to - 2] = b[m.to + 1]; b[m.to + 1] = null; }
+    this.castling = state.castling; this.ep = state.ep; this.half = state.half; this.full = state.full;
+  }
+
+  _legal() {
+    const us = this._turn, out = [];
+    for (const m of this._pseudo()) {
+      const st = this._make(m);
+      const k = this.kingSq(us);
+      if (!(k >= 0 && this.attacked(k, swap(us)))) out.push(m);
+      this._unmake(st);
+    }
+    return out;
+  }
+
+  _san(m, legal) {
+    let s;
+    if (m.flags.includes('k')) s = 'O-O';
+    else if (m.flags.includes('q')) s = 'O-O-O';
+    else {
+      const to = sqName(m.to);
+      if (m.piece === 'p') {
+        s = (m.captured ? FILES[fileOf(m.from)] + 'x' : '') + to + (m.promotion ? '=' + m.promotion.toUpperCase() : '');
+      } else {
+        const others = legal.filter((x) => x.piece === m.piece && x.to === m.to && x.from !== m.from);
+        let dis = '';
+        if (others.length) {
+          const sameFile = others.some((x) => fileOf(x.from) === fileOf(m.from));
+          const sameRank = others.some((x) => rankOf(x.from) === rankOf(m.from));
+          if (!sameFile) dis = FILES[fileOf(m.from)];
+          else if (!sameRank) dis = String(rankOf(m.from) + 1);
+          else dis = sqName(m.from);
+        }
+        s = m.piece.toUpperCase() + dis + (m.captured ? 'x' : '') + to;
+      }
+    }
+    const st = this._make(m);
+    if (this.inCheck()) s += this._legal().length ? '+' : '#';
+    this._unmake(st);
+    return s;
+  }
+  _verbose(m, legal) {
+    const v = { color: this._turn, from: sqName(m.from), to: sqName(m.to), piece: m.piece, flags: m.flags, san: this._san(m, legal) };
+    if (m.captured) v.captured = m.captured;
+    if (m.promotion) v.promotion = m.promotion;
+    v.lan = v.from + v.to + (m.promotion || '');
+    return v;
+  }
+
+  moves({ verbose = false, square = null } = {}) {
+    const legal = this._legal();
+    let list = legal;
+    if (square) { const si = sqIndex(square); list = legal.filter((m) => m.from === si); }
+    return list.map((m) => (verbose ? this._verbose(m, legal) : this._san(m, legal)));
+  }
+
+  move(mv) {
+    const legal = this._legal();
+    let found = null;
+    if (typeof mv === 'string') {
+      const clean = (s) => s.replace(/[+#?!]/g, '').replace(/0/g, 'O').replace(/=/g, '');
+      const target = clean(mv.trim());
+      found = legal.find((m) => clean(this._san(m, legal)) === target);
+      if (!found && /^[a-h][1-8][a-h][1-8][qrbn]?$/.test(mv)) found = legal.find((m) => sqName(m.from) + sqName(m.to) + (m.promotion || '') === mv);
+      if (!found) { // tolérance : prise sans « x », lettres de promotion en minuscule
+        const loose = target.replace(/x/g, '').toLowerCase();
+        found = legal.find((m) => clean(this._san(m, legal)).replace(/x/g, '').toLowerCase() === loose);
+      }
+    } else if (mv && mv.from) {
+      found = legal.find((m) => sqName(m.from) === mv.from && sqName(m.to) === mv.to && (!m.promotion || m.promotion === (mv.promotion || 'q')));
+    }
+    if (!found) throw new Error('Coup illégal : ' + JSON.stringify(mv));
+    const before = this.fen();
+    const v = this._verbose(found, legal);
+    const st = this._make(found);
+    v.before = before;
+    v.after = this.fen();
+    this._history.push({ state: st, verbose: v });
+    return v;
+  }
+  undo() {
+    const h = this._history.pop();
+    if (!h) return null;
+    this._unmake(h.state);
+    return h.verbose;
+  }
+  history({ verbose = false } = {}) { return this._history.map((h) => (verbose ? h.verbose : h.verbose.san)); }
+
+  isCheckmate() { return this.inCheck() && this._legal().length === 0; }
+  isStalemate() { return !this.inCheck() && this._legal().length === 0; }
+  isInsufficientMaterial() {
+    const ps = this.b.filter((p) => p && p.type !== 'k');
+    if (!ps.length) return true;
+    return ps.length === 1 && (ps[0].type === 'n' || ps[0].type === 'b');
+  }
+  isGameOver() { return this._legal().length === 0 || this.isInsufficientMaterial(); }
+  header() { return { ...this._headers }; }
+
+  loadPgn(pgn) {
+    const headers = {};
+    const body = pgn.replace(/^\s*\[(\w+)\s+"((?:[^"\\]|\\.)*)"\]\s*$/gm, (_, k, v) => { headers[k] = v; return ''; });
+    this.load(headers.SetUp === '1' && headers.FEN ? headers.FEN : (headers.FEN || START_FEN));
+    this._headers = headers;
+    let txt = body.replace(/\{[^}]*\}/g, ' ').replace(/;[^\n]*/g, ' ');
+    // supprime les variantes (parenthèses imbriquées)
+    let prev;
+    do { prev = txt; txt = txt.replace(/\([^()]*\)/g, ' '); } while (txt !== prev);
+    txt = txt.replace(/\$\d+/g, ' ').replace(/\d+\.(\.\.)?/g, ' ').replace(/(1-0|0-1|1\/2-1\/2|\*)\s*$/, ' ');
+    for (const tok of txt.split(/\s+/).filter(Boolean)) {
+      if (/^(1-0|0-1|1\/2-1\/2|\*)$/.test(tok)) continue;
+      this.move(tok);
+    }
+    this._headers = headers;
+    return true;
+  }
+}
+
+function perft(chess, depth) {
+  if (depth === 0) return 1;
+  let n = 0;
+  for (const m of chess._legal()) {
+    const st = chess._make(m);
+    n += perft(chess, depth - 1);
+    chess._unmake(st);
+  }
+  return n;
+}
+
+return { Chess, START_FEN };
+})();
+const { CLASSES, BAD, summarize, classifyMove, explainMove, commentLine, claudePrompt, fmtScore, whiteWp, sanFr, epd, tryMove } = (() => {
+// Logique d'analyse : chances de gain, classement des coups, précision, Elo estimé, commentaires en français.
+
+const VALUE = { p: 1, n: 3, b: 3, r: 5, q: 9, k: 0 };
+const NAME = { p: 'pion', n: 'cavalier', b: 'fou', r: 'tour', q: 'dame', k: 'roi' };
+const FEM = { r: true, q: true };
+const DEF = (t) => (FEM[t] ? 'la ' : 'le ') + NAME[t];
+const UNDEF = (t) => (FEM[t] ? 'une ' : 'un ') + NAME[t];
+
+const CLASSES = {
+  brillant:   { label: 'Brillant',         sym: '!!', color: '#1baca6', order: 0 },
+  tresbon:    { label: 'Très bon',         sym: '!',  color: '#5c8bb0', order: 1 },
+  meilleur:   { label: 'Meilleur',         sym: '★',  color: '#81b64c', order: 2 },
+  excellent:  { label: 'Excellent',        sym: '👍', color: '#96bc4b', order: 3 },
+  bon:        { label: 'Bon',              sym: '✓',  color: '#95b776', order: 4 },
+  theorie:    { label: 'Théorie',          sym: '📖', color: '#a88865', order: 5 },
+  imprecision:{ label: 'Imprécision',      sym: '?!', color: '#f7c631', order: 6 },
+  erreur:     { label: 'Erreur',           sym: '?',  color: '#ffa459', order: 7 },
+  manquee:    { label: 'Occasion manquée', sym: '✗',  color: '#ff7769', order: 8 },
+  gaffe:      { label: 'Gaffe',            sym: '??', color: '#fa412d', order: 9 },
+};
+const BAD = new Set(['imprecision', 'erreur', 'manquee', 'gaffe']);
+
+// ------------------------------------------------------------------ scores
+const MATE_CP = 10000;
+function scoreToCp(s) {
+  if (!s) return 0;
+  if (s.mate !== undefined) return s.mate > 0 ? MATE_CP - s.mate : s.mate < 0 ? -MATE_CP - s.mate : -MATE_CP;
+  return s.cp;
+}
+// Formule Lichess : 50 + 50 × (2 / (1 + e^(-0,00368208 × cp)) − 1)
+function winPctCp(cp) {
+  const c = Math.max(-MATE_CP, Math.min(MATE_CP, cp));
+  return 50 + 50 * (2 / (1 + Math.exp(-0.00368208 * c)) - 1);
+}
+const winPct = (s) => winPctCp(scoreToCp(s));
+const TBWP = { win: 100, draw: 50, loss: 0 };
+
+// Précision d'un coup (formule Lichess)
+function moveAccuracy(loss) {
+  return Math.max(0, Math.min(100, 103.1668 * Math.exp(-0.04354 * loss) - 3.1669));
+}
+// 30 % moyenne + 70 % moyenne harmonique
+function gameAccuracy(accs) {
+  if (!accs.length) return null;
+  const mean = accs.reduce((a, b) => a + b, 0) / accs.length;
+  const harm = accs.length / accs.reduce((a, b) => a + 1 / Math.max(1, b), 0);
+  return 0.3 * mean + 0.7 * harm;
+}
+// Elo estimé à partir de la perte moyenne en centipions (approximation)
+// (moyenne de deux approximations : perte moyenne en centipions et précision)
+const ACC_ELO = [[0, 100], [40, 300], [50, 600], [60, 900], [70, 1300], [80, 1750], [85, 2050], [90, 2400], [95, 2750], [100, 3100]];
+function estimateElo(acpl, accuracy) {
+  if (acpl == null) return null;
+  const e1 = Math.max(100, Math.min(3200, 3100 * Math.exp(-0.01 * acpl)));
+  let e2 = e1;
+  if (accuracy != null) {
+    for (let i = 1; i < ACC_ELO.length; i++) {
+      const [a0, r0] = ACC_ELO[i - 1], [a1, r1] = ACC_ELO[i];
+      if (accuracy <= a1) { e2 = r0 + ((accuracy - a0) / (a1 - a0)) * (r1 - r0); break; }
+    }
+  }
+  return Math.round((e1 + e2) / 2 / 10) * 10;
+}
+
+// Score lisible du point de vue des Blancs
+function fmtScore(s, turn) {
+  if (!s) return '';
+  const sign = turn === 'b' ? -1 : 1;
+  if (s.mate !== undefined) {
+    const m = s.mate * sign;
+    if (s.mate === 0) return turn === 'w' ? '0-1' : '1-0';
+    return (m > 0 ? '#' : '-#') + Math.abs(m);
+  }
+  const v = (s.cp * sign) / 100;
+  return (v > 0 ? '+' : '') + v.toFixed(2);
+}
+const whiteWp = (s, turn) => (turn === 'w' ? winPct(s) : 100 - winPct(s));
+
+// ------------------------------------------------------------------ outils chess.js
+function uciToMove(uci) {
+  return { from: uci.slice(0, 2), to: uci.slice(2, 4), promotion: uci[4] || undefined };
+}
+function tryMove(chess, uci) {
+  try { return chess.move(uciToMove(uci)); } catch { return null; }
+}
+const FR_LETTERS = { K: 'R', Q: 'D', R: 'T', B: 'F', N: 'C' };
+const sanFr = (san) => san.replace(/[KQRBN]/g, (c) => FR_LETTERS[c]);
+const epd = (fen) => fen.split(' ').slice(0, 4).join(' ');
+
+function flipTurn(fen) {
+  const p = fen.split(' ');
+  p[1] = p[1] === 'w' ? 'b' : 'w';
+  p[3] = '-';
+  return p.join(' ');
+}
+function load(fen) {
+  try { return new Chess(fen); } catch { try { const c = new Chess(); c.load(fen, { skipValidation: true }); return c; } catch { return null; } }
+}
+// Échange statique sur une case : gain matériel pour le camp au trait s'il prend en premier (>= 0)
+function see(chess, sq, depth = 0) {
+  if (depth > 12) return 0;
+  const caps = chess.moves({ verbose: true }).filter((m) => m.to === sq && m.captured);
+  if (!caps.length) return 0;
+  caps.sort((a, b) => VALUE[a.piece] - VALUE[b.piece]);
+  const m = caps[0];
+  const gain = m.captured === 'k' ? 100 : VALUE[m.captured];
+  chess.move(m);
+  const r = gain + (m.promotion ? VALUE[m.promotion] - 1 : 0) - see(chess, sq, depth + 1);
+  chess.undo();
+  return Math.max(0, r);
+}
+function piecesOf(chess, color) {
+  const out = [];
+  for (const row of chess.board()) for (const p of row) if (p && p.color === color) out.push(p);
+  return out;
+}
+function material(chess, color) {
+  return piecesOf(chess, color).reduce((a, p) => a + VALUE[p.type], 0);
+}
+// Pièces (>= cavalier) du camp `color` qui sont en prise dans `chess` (où l'adversaire est au trait)
+function hangingPieces(chess, color) {
+  const res = [];
+  for (const p of piecesOf(chess, color)) {
+    if (VALUE[p.type] < 3) continue;
+    const g = see(chess, p.square);
+    if (g > 0) res.push({ square: p.square, type: p.type, gain: g });
+  }
+  return res;
+}
+
+// Le coup est-il un sacrifice (on laisse du matériel en prise) ?
+function isSacrifice(fenBefore, uci) {
+  const c = load(fenBefore);
+  if (!c) return false;
+  const mover = c.turn();
+  const m = tryMove(c, uci);
+  if (!m || m.promotion) return false;
+  if (c.isCheckmate()) return false;
+  const captured = m.captured ? VALUE[m.captured] : 0;
+  const before = load(flipTurn(fenBefore));
+  for (const h of hangingPieces(c, mover)) {
+    let net;
+    if (h.square === m.to) net = h.gain - captured;
+    else {
+      // était-elle déjà en prise avant le coup ?
+      const was = before && !before.inCheck() ? see(before, h.square) : 0;
+      net = was > 0 ? 0 : h.gain;
+    }
+    if (net >= 2) return true;
+  }
+  return false;
+}
+
+// ------------------------------------------------------------------ classement
+// ply : { color, uci, san, fenBefore, fenAfter, rating, captured }, rec : enregistrement du serveur
+// prev : { cls, wpBest, color, toSquare, captured } du demi-coup précédent
+function classifyMove(ply, rec, prev, { inBook = false, legalCount = 2 } = {}) {
+  const out = { cls: null, loss: 0, acc: 100, cpLoss: 0, wpBest: 50, wpPlayed: 50, isBest: false, forced: legalCount === 1 };
+  if (!rec || !rec.lines?.length) return out;
+  const best = rec.lines[0];
+  const bestUci = rec.tb?.best && rec.tb.root !== 'draw' ? rec.tb.best : best.pv[0];
+  let wpBest = winPct(best.score);
+  let wpPlayed = rec.played ? winPct(rec.played.score) : wpBest;
+  const isBest = ply.uci === best.pv[0] || ply.uci === bestUci;
+  if (rec.tb && rec.tb.played) { wpBest = TBWP[rec.tb.root]; wpPlayed = TBWP[rec.tb.played]; }
+  if (isBest && !rec.tb) wpPlayed = wpBest;
+  const loss = Math.max(0, wpBest - wpPlayed);
+  const clampCp = (s) => Math.max(-1000, Math.min(1000, scoreToCp(s)));
+  out.cpLoss = rec.played ? Math.max(0, clampCp(best.score) - clampCp(isBest ? best.score : rec.played.score)) : 0;
+  Object.assign(out, { loss, wpBest, wpPlayed, isBest, acc: moveAccuracy(loss) });
+
+  const f = ply.rating && ply.rating < 1400 ? 1.25 : 1; // un peu plus indulgent sous 1400 Elo
+  const T = [2.5, 6, 12, 22].map((x) => x * f);
+
+  if (inBook) { out.cls = 'theorie'; return out; }
+  let cls;
+  if (isBest || legalCount === 1) cls = 'meilleur';
+  else if (loss < T[0]) cls = 'excellent';
+  else if (loss < T[1]) cls = 'bon';
+  else if (loss < T[2]) cls = 'imprecision';
+  else if (loss < T[3]) cls = 'erreur';
+  else cls = 'gaffe';
+
+  // Occasion manquée : l'adversaire venait de se tromper et on n'en profite pas
+  if (BAD.has(cls) && prev && (prev.cls === 'erreur' || prev.cls === 'gaffe')) {
+    const myWpBefore = 100 - prev.wpBest; // mes chances avant la faute adverse
+    const opportunity = wpBest - myWpBefore;
+    if (opportunity >= T[2] && loss >= T[1] && wpPlayed >= myWpBefore - T[1]) cls = 'manquee';
+  }
+
+  // Brillant : sacrifice juste (meilleur coup ou presque, position toujours bonne après)
+  if ((cls === 'meilleur' || cls === 'excellent') && legalCount > 1 && wpPlayed >= 50 && loss < T[0] && isSacrifice(ply.fenBefore, ply.uci)) {
+    cls = 'brillant';
+  } else if (cls === 'meilleur' && legalCount > 1 && rec.lines.length > 1 && !rec.tb) {
+    // Très bon : le seul coup qui tient
+    const wpSecond = winPct(rec.lines[1].score);
+    const recapture = prev && prev.captured && prev.toSquare === ply.uci.slice(2, 4);
+    if (wpBest - wpSecond >= 15 && wpBest >= 35 && wpSecond < 85 && !recapture) cls = 'tresbon';
+  }
+  out.cls = cls;
+  return out;
+}
+
+// Analyse complète d'une partie (plies + enregistrements) → classements, précision, Elo
+function summarize(plies, records, book) {
+  let inBook = true;
+  let prev = null;
+  const results = [];
+  for (let i = 0; i < plies.length; i++) {
+    const ply = plies[i];
+    const rec = records[i];
+    if (inBook && !(book && book.has(epd(ply.fenAfter)))) inBook = false;
+    const c = new Chess(ply.fenBefore);
+    const legalCount = c.moves().length;
+    const r = classifyMove(ply, rec, prev, { inBook, legalCount });
+    results.push(r);
+    prev = { cls: r.cls, wpBest: r.wpBest, color: ply.color, toSquare: ply.uci.slice(2, 4), captured: ply.captured };
+  }
+  const players = {};
+  for (const color of ['w', 'b']) {
+    const idx = plies.map((p, i) => i).filter((i) => plies[i].color === color && records[i]);
+    const accs = idx.map((i) => results[i].acc);
+    const nonBook = idx.filter((i) => results[i].cls !== 'theorie');
+    const acpl = nonBook.length ? nonBook.reduce((a, i) => a + results[i].cpLoss, 0) / nonBook.length : null;
+    const counts = {};
+    for (const k of Object.keys(CLASSES)) counts[k] = 0;
+    for (const i of idx) if (results[i].cls) counts[results[i].cls]++;
+    const accuracy = gameAccuracy(accs);
+    players[color] = { accuracy, acpl, elo: estimateElo(acpl, accuracy), counts };
+  }
+  return { results, players };
+}
+
+// ------------------------------------------------------------------ commentaires
+function attackedTargets(chess, sq) {
+  // Pièces adverses attaquées par la pièce en `sq` (on simule que son camp rejoue)
+  const f = load(flipTurn(chess.fen()));
+  if (!f) return [];
+  return f.moves({ square: sq, verbose: true }).filter((m) => m.captured).map((m) => ({ square: m.to, type: m.captured, see: (() => { const g = load(f.fen()); return g ? see(g, m.to) : 0; })() }));
+}
+function threatensMate(chess) {
+  if (chess.inCheck()) return false;
+  const f = load(flipTurn(chess.fen()));
+  if (!f) return false;
+  for (const m of f.moves({ verbose: true })) {
+    f.move(m);
+    const mate = f.isCheckmate();
+    f.undo();
+    if (mate) return true;
+  }
+  return false;
+}
+
+// Commente une suite de coups (uci) à partir d'une position
+function commentLine(fen, pv, maxPlies = 8, prevCapTo = null) {
+  const c = load(fen);
+  if (!c) return { moves: [], summary: '' };
+  const startColor = c.turn();
+  const mat0 = material(c, startColor) - material(c, startColor === 'w' ? 'b' : 'w');
+  const moves = [];
+  let lastTo = prevCapTo;
+  let n = Math.min(pv.length, maxPlies);
+  for (let i = 0; i < n; i++) {
+    const before = c.fen();
+    const mover = c.turn();
+    const m = tryMove(c, pv[i]);
+    if (!m) break;
+    const notes = [];
+    if (m.flags.includes('k')) notes.push('petit roque');
+    if (m.flags.includes('q')) notes.push('grand roque');
+    if (m.captured) {
+      const recapture = c.moves({ verbose: true }).some((x) => x.to === m.to && x.captured);
+      const isExchange = lastTo === m.to; // reprise dans un échange : pas « non défendu »
+      notes.push(`prend ${DEF(m.captured)}${!recapture && !isExchange && m.captured !== 'p' ? (FEM[m.captured] ? ' non défendue' : ' non défendu') : ''}`);
+    }
+    lastTo = m.captured ? m.to : null;
+    if (m.promotion) notes.push(`promotion en ${NAME[m.promotion]}`);
+    if (c.isCheckmate()) notes.push('échec et mat !');
+    else if (c.isStalemate()) notes.push('pat (nulle)');
+    else {
+      if (c.inCheck()) notes.push('échec');
+      // fourchette / attaque
+      const targets = attackedTargets(c, m.to).filter((t) => t.type !== 'p' && t.type !== 'k' && (VALUE[t.type] > VALUE[m.piece] || t.see > 0));
+      const types = targets.map((t) => t.type);
+      if (c.inCheck()) types.unshift('k');
+      if (types.length >= 2) notes.push(`fourchette sur ${types.slice(0, 3).map(DEF).join(' et ')}`);
+      else if (targets.length === 1 && !c.inCheck()) {
+        const t = targets[0];
+        notes.push(`attaque ${DEF(t.type)} en ${t.square}${t.see >= VALUE[t.type] && VALUE[t.type] <= VALUE[m.piece] ? (FEM[t.type] ? ' non défendue' : ' non défendu') : ''}`);
+      }
+      if (threatensMate(c)) notes.push('menace de mat');
+      // pièces laissées en prise par ce coup
+      for (const h of hangingPieces(c, mover)) {
+        const was = (() => { const b = load(flipTurn(before)); return b && !b.inCheck() ? see(b, h.square) : 0; })();
+        const net = h.square === m.to ? h.gain - (m.captured ? VALUE[m.captured] : 0) : (was > 0 ? 0 : h.gain);
+        if (net >= 2) notes.push(`laisse ${DEF(h.type)} en ${h.square} sans défense suffisante`);
+      }
+    }
+    moves.push({ san: sanFr(m.san), color: mover, notes, num: Number(before.split(' ')[5]) });
+    // si le dernier coup affiché est une prise, on montre la reprise
+    if (i === n - 1 && m.captured && n < pv.length && n < maxPlies + 2) n++;
+  }
+  const mat1 = material(c, startColor) - material(c, startColor === 'w' ? 'b' : 'w');
+  const d = mat1 - mat0;
+  let summary = '';
+  if (c.isCheckmate()) summary = c.turn() === startColor ? 'Bilan : mat contre ce camp.' : 'Bilan : mat !';
+  else if (d >= 1) summary = `Bilan : gain de matériel (+${d}).`;
+  else if (d <= -1) summary = `Bilan : perte de matériel (${d}).`;
+  return { moves, summary };
+}
+
+function lineToText(line) {
+  return line.moves.map((m, i) => {
+    const num = m.color === 'w' ? `${m.num}. ` : i === 0 ? `${m.num}… ` : '';
+    return num + m.san + (m.notes.length ? ` (${m.notes.join(', ')})` : '');
+  }).join(' ');
+}
+
+const CLASS_EXPLAIN = {
+  theorie: 'Coup de théorie : il fait partie des ouvertures répertoriées.',
+  meilleur: 'Le meilleur coup selon Stockfish.',
+  brillant: 'Un sacrifice juste : vous laissez du matériel, mais la position reste excellente.',
+  tresbon: 'Le seul bon coup : toutes les autres options faisaient nettement baisser vos chances.',
+  excellent: 'Presque aussi bon que le meilleur coup.',
+  bon: 'Un coup correct, mais il y avait un peu mieux.',
+  imprecision: 'Une imprécision : il y avait mieux.',
+  erreur: 'Une erreur qui fait baisser nettement vos chances.',
+  gaffe: 'Une gaffe : ce coup fait chuter vos chances de gain.',
+  manquee: "Occasion manquée : l'adversaire venait de se tromper et ce coup n'en profite pas.",
+};
+
+// Explication complète d'un coup (texte + lignes commentées)
+function explainMove(ply, rec, r) {
+  const out = { title: r.cls ? CLASSES[r.cls].label : '', text: r.cls ? CLASS_EXPLAIN[r.cls] : '', best: null, played: null, bestSan: null };
+  if (!rec || !rec.lines?.length) return out;
+  const best = rec.lines[0];
+  const c = load(ply.fenBefore);
+  const bm = c && tryMove(c, best.pv[0]);
+  out.bestSan = bm ? sanFr(bm.san) : best.pv[0];
+  const extra = [];
+  if (!r.isBest && r.cls !== 'theorie') extra.push(`Ce coup fait perdre ${r.loss.toFixed(1).replace('.', ',')} % de chances de gain (${r.wpBest.toFixed(0)} % → ${r.wpPlayed.toFixed(0)} %).`);
+  if (rec.played?.score?.mate < 0) extra.push(`Après ce coup, l'adversaire a un mat en ${-rec.played.score.mate}.`);
+  if (best.score.mate > 0 && !(rec.played?.score?.mate > 0)) extra.push(`Il y avait un mat en ${best.score.mate}.`);
+  if (rec.tb) {
+    const w = { win: 'gagnante', draw: 'nulle', loss: 'perdante' };
+    extra.push(`Tables de finales : la position était ${w[rec.tb.root]}${rec.tb.played ? `, elle est ${w[rec.tb.played]} après votre coup` : ''}.`);
+  }
+  out.text = [out.text, ...extra].filter(Boolean).join(' ');
+  if (!r.isBest && r.cls !== 'theorie') {
+    out.best = commentLine(ply.fenBefore, best.pv, 8, ply.prevCapTo);
+    if (rec.played?.pv) out.played = commentLine(ply.fenBefore, rec.played.pv, 6, ply.prevCapTo);
+  }
+  return out;
+}
+
+// Question prête à coller sur claude.ai
+function claudePrompt({ ply, rec, r, playerColor, opening, players }) {
+  const col = ply.color === 'w' ? 'Blancs' : 'Noirs';
+  const lines = (rec?.lines || []).map((l, i) => {
+    const line = commentLine(ply.fenBefore, l.pv, 10);
+    return `  ${i + 1}) ${fmtScore(l.score, ply.color)} : ${lineToText(line)}`;
+  }).join('\n');
+  const playedLine = rec?.played ? `${fmtScore(rec.played.score, ply.color)} : ${lineToText(commentLine(ply.fenBefore, rec.played.pv, 10))}` : 'non évalué';
+  return `Bonjour Claude, peux-tu m'aider à comprendre un coup de ma partie d'échecs ?
+
+Position avant le coup (FEN) : ${ply.fenBefore}
+Trait aux ${col}${playerColor ? ` (je jouais les ${playerColor === 'w' ? 'Blancs' : 'Noirs'})` : ''}.${opening ? `\nOuverture : ${opening}` : ''}
+Coup joué : ${ply.moveNumber}${ply.color === 'w' ? '.' : '…'} ${sanFr(ply.san)} (${ply.uci})${r?.cls ? ` — classé « ${CLASSES[r.cls].label} »` : ''}${r && !r.isBest ? `, perte de ${r.loss.toFixed(1)} % de chances de gain` : ''}.
+
+Analyse de Stockfish (profondeur ${rec?.depth ?? '?'}, scores du point de vue des Blancs) :
+Meilleures lignes :
+${lines || '  (aucune)'}
+Mon coup : ${playedLine}
+
+Explique-moi simplement, en français :
+1. pourquoi mon coup est moins bon que le meilleur coup ;
+2. quelle idée ou quel motif tactique je n'ai pas vu ;
+3. un conseil pratique pour repérer ce genre de situation la prochaine fois.`;
+}
+
+return { CLASSES, BAD, summarize, classifyMove, explainMove, commentLine, claudePrompt, fmtScore, whiteWp, sanFr, epd, tryMove };
+})();
+const { Board } = (() => {
+// Échiquier interactif (cliquer-cliquer ou glisser-déposer)
+
+const FILES = 'abcdefgh';
+const UNICODE = { k: '♚', q: '♛', r: '♜', b: '♝', n: '♞', p: '♟' };
+
+class Board {
+  constructor(el, { onMove, pieceUrl } = {}) {
+    this.el = el;
+    this.pieceUrl = pieceUrl || ((code) => `pieces/${code}.svg`);
+    this.onMove = onMove;
+    this.orientation = 'w';
+    this.fen = new Chess().fen();
+    this.opts = {};
+    this.selected = null;
+    this.useImages = false;
+    this.el.classList.add('board');
+    this.el.innerHTML = '<div class="squares"></div><svg class="arrows" viewBox="0 0 8 8"></svg><div class="promo hidden"></div>';
+    this.sqEl = this.el.querySelector('.squares');
+    this.svg = this.el.querySelector('.arrows');
+    this.promoEl = this.el.querySelector('.promo');
+    this.el.addEventListener('pointerdown', (e) => this.down(e));
+    window.addEventListener('pointermove', (e) => this.move(e));
+    window.addEventListener('pointerup', (e) => this.up(e));
+    this.el.addEventListener('contextmenu', (e) => e.preventDefault());
+  }
+  setOrientation(c) { this.orientation = c; this.render(); }
+  flip() { this.setOrientation(this.orientation === 'w' ? 'b' : 'w'); }
+  set(fen, opts = {}) { this.fen = fen; this.opts = opts; this.selected = null; this.render(); }
+
+  squareAt(x, y) {
+    const r = this.el.getBoundingClientRect();
+    const fx = Math.floor(((x - r.left) / r.width) * 8);
+    const fy = Math.floor(((y - r.top) / r.height) * 8);
+    if (fx < 0 || fx > 7 || fy < 0 || fy > 7) return null;
+    return this.orientation === 'w' ? FILES[fx] + (8 - fy) : FILES[7 - fx] + (fy + 1);
+  }
+  coords(sq) {
+    const f = FILES.indexOf(sq[0]), r = Number(sq[1]) - 1;
+    return this.orientation === 'w' ? [f, 7 - r] : [7 - f, r];
+  }
+  render() {
+    const chess = new Chess(this.fen);
+    const o = this.opts;
+    const legal = this.selected ? chess.moves({ square: this.selected, verbose: true }).map((m) => m.to) : [];
+    let html = '';
+    for (let y = 0; y < 8; y++) for (let x = 0; x < 8; x++) {
+      const sq = this.orientation === 'w' ? FILES[x] + (8 - y) : FILES[7 - x] + (y + 1);
+      const light = (FILES.indexOf(sq[0]) + Number(sq[1])) % 2 === 1;
+      const p = chess.get(sq);
+      const cls = ['sq', light ? 'light' : 'dark'];
+      let style = '';
+      if (o.lastMove && (o.lastMove.from === sq || o.lastMove.to === sq)) { cls.push('last'); if (o.lastColor) style = `--hl:${o.lastColor}`; }
+      if (this.selected === sq) cls.push('sel');
+      if (o.check === sq) cls.push('check');
+      let inner = '';
+      if (y === 7) inner += `<span class="coord file">${sq[0]}</span>`;
+      if (x === 0) inner += `<span class="coord rank">${sq[1]}</span>`;
+      if (p && !(this.drag && this.drag.from === sq)) inner += this.pieceHtml(p);
+      if (legal.includes(sq)) inner += `<span class="${p ? 'capture-ring' : 'dot'}"></span>`;
+      if (o.badge && o.badge.square === sq) inner += `<span class="badge" style="background:${o.badge.color}">${o.badge.sym}</span>`;
+      html += `<div class="${cls.join(' ')}" data-sq="${sq}" style="${style}">${inner}</div>`;
+    }
+    this.sqEl.innerHTML = html;
+    // flèches
+    let svg = '<defs>';
+    (o.arrows || []).forEach((a, i) => { svg += `<marker id="ah${i}" markerWidth="4" markerHeight="4" refX="2.05" refY="2" orient="auto"><path d="M0,0 L4,2 L0,4 z" fill="${a.color}"/></marker>`; });
+    svg += '</defs>';
+    (o.arrows || []).forEach((a, i) => {
+      const [x1, y1] = this.coords(a.from), [x2, y2] = this.coords(a.to);
+      const cx1 = x1 + 0.5, cy1 = y1 + 0.5, cx2 = x2 + 0.5, cy2 = y2 + 0.5;
+      const len = Math.hypot(cx2 - cx1, cy2 - cy1);
+      const ex = cx2 - ((cx2 - cx1) / len) * 0.35, ey = cy2 - ((cy2 - cy1) / len) * 0.35;
+      svg += `<line x1="${cx1}" y1="${cy1}" x2="${ex}" y2="${ey}" stroke="${a.color}" stroke-width="0.17" stroke-linecap="round" opacity="${a.opacity ?? 0.85}" marker-end="url(#ah${i})"/>`;
+    });
+    this.svg.innerHTML = svg;
+  }
+  pieceHtml(p) {
+    if (this.useImages) return `<img class="piece" draggable="false" src="${this.pieceUrl(p.color + p.type.toUpperCase())}" alt="">`;
+    return `<span class="piece uni ${p.color === 'w' ? 'pw' : 'pb'}">${UNICODE[p.type]}</span>`;
+  }
+  down(e) {
+    if (e.button !== 0 || !this.onMove) return;
+    const sq = this.squareAt(e.clientX, e.clientY);
+    if (!sq) return;
+    const chess = new Chess(this.fen);
+    const p = chess.get(sq);
+    if (this.selected && this.selected !== sq) {
+      const ok = chess.moves({ square: this.selected, verbose: true }).some((m) => m.to === sq);
+      if (ok) { this.tryMove(this.selected, sq); return; }
+    }
+    if (p && p.color === chess.turn()) {
+      this.selected = sq;
+      this.drag = { from: sq, moved: false, x: e.clientX, y: e.clientY };
+      const img = this.pieceHtml(p);
+      this.ghost = document.createElement('div');
+      this.ghost.className = 'ghost';
+      this.ghost.innerHTML = img;
+      const size = this.el.getBoundingClientRect().width / 8;
+      this.ghost.style.width = this.ghost.style.height = size + 'px';
+      this.ghost.style.fontSize = size * 0.8 + 'px';
+      document.body.appendChild(this.ghost);
+      this.placeGhost(e);
+      this.render();
+      e.preventDefault();
+    } else { this.selected = null; this.render(); }
+  }
+  placeGhost(e) {
+    const s = parseFloat(this.ghost.style.width);
+    this.ghost.style.left = e.clientX - s / 2 + 'px';
+    this.ghost.style.top = e.clientY - s / 2 + 'px';
+  }
+  move(e) { if (this.drag && this.ghost) { this.drag.moved = true; this.placeGhost(e); } }
+  up(e) {
+    if (!this.drag) return;
+    const from = this.drag.from;
+    this.ghost?.remove(); this.ghost = null;
+    this.drag = null;
+    const to = this.squareAt(e.clientX, e.clientY);
+    if (to && to !== from) this.tryMove(from, to);
+    else this.render();
+  }
+  tryMove(from, to) {
+    const chess = new Chess(this.fen);
+    const moves = chess.moves({ square: from, verbose: true }).filter((m) => m.to === to);
+    this.selected = null;
+    if (!moves.length) return this.render();
+    if (moves.length > 1 && moves[0].promotion) {
+      const color = chess.turn();
+      this.promoEl.innerHTML = ['q', 'r', 'b', 'n'].map((t) => `<button data-p="${t}">${this.pieceHtml({ color, type: t })}</button>`).join('');
+      this.promoEl.classList.remove('hidden');
+      this.promoEl.onclick = (ev) => {
+        const b = ev.target.closest('button');
+        if (!b) return;
+        this.promoEl.classList.add('hidden');
+        this.onMove?.(from + to + b.dataset.p);
+      };
+      this.render();
+      return;
+    }
+    this.onMove?.(from + to + (moves[0].promotion || ''));
+  }
+}
+
+return { Board };
+})();
+const PIECE_URLS = {"wK": "data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2045%2045%22%3E%3Cg%20fill%3D%22none%22%20fill-rule%3D%22evenodd%22%20stroke%3D%22%23000%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%20stroke-width%3D%221.5%22%3E%3Cpath%20stroke-linejoin%3D%22miter%22%20d%3D%22M22.5%2011.63V6M20%208h5%22/%3E%3Cpath%20fill%3D%22%23fff%22%20stroke-linecap%3D%22butt%22%20stroke-linejoin%3D%22miter%22%20d%3D%22M22.5%2025s4.5-7.5%203-10.5c0%200-1-2.5-3-2.5s-3%202.5-3%202.5c-1.5%203%203%2010.5%203%2010.5%22/%3E%3Cpath%20fill%3D%22%23fff%22%20d%3D%22M11.5%2037c5.5%203.5%2015.5%203.5%2021%200v-7s9-4.5%206-10.5c-4-6.5-13.5-3.5-16%204V27v-3.5c-3.5-7.5-13-10.5-16-4-3%206%205%2010%205%2010z%22/%3E%3Cpath%20d%3D%22M11.5%2030c5.5-3%2015.5-3%2021%200m-21%203.5c5.5-3%2015.5-3%2021%200m-21%203.5c5.5-3%2015.5-3%2021%200%22/%3E%3C/g%3E%3C/svg%3E", "wQ": "data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2045%2045%22%3E%3Cg%20fill%3D%22%23fff%22%20fill-rule%3D%22evenodd%22%20stroke%3D%22%23000%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%20stroke-width%3D%221.5%22%3E%3Cpath%20d%3D%22M8%2012a2%202%200%201%201-4%200%202%202%200%201%201%204%200m16.5-4.5a2%202%200%201%201-4%200%202%202%200%201%201%204%200M41%2012a2%202%200%201%201-4%200%202%202%200%201%201%204%200M16%208.5a2%202%200%201%201-4%200%202%202%200%201%201%204%200M33%209a2%202%200%201%201-4%200%202%202%200%201%201%204%200%22/%3E%3Cpath%20stroke-linecap%3D%22butt%22%20d%3D%22M9%2026c8.5-1.5%2021-1.5%2027%200l2-12-7%2011V11l-5.5%2013.5-3-15-3%2015-5.5-14V25L7%2014z%22/%3E%3Cpath%20stroke-linecap%3D%22butt%22%20d%3D%22M9%2026c0%202%201.5%202%202.5%204%201%201.5%201%201%20.5%203.5-1.5%201-1.5%202.5-1.5%202.5-1.5%201.5.5%202.5.5%202.5%206.5%201%2016.5%201%2023%200%200%200%201.5-1%200-2.5%200%200%20.5-1.5-1-2.5-.5-2.5-.5-2%20.5-3.5%201-2%202.5-2%202.5-4-8.5-1.5-18.5-1.5-27%200z%22/%3E%3Cpath%20fill%3D%22none%22%20d%3D%22M11.5%2030c3.5-1%2018.5-1%2022%200M12%2033.5c6-1%2015-1%2021%200%22/%3E%3C/g%3E%3C/svg%3E", "wR": "data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2045%2045%22%3E%3Cg%20fill%3D%22%23fff%22%20fill-rule%3D%22evenodd%22%20stroke%3D%22%23000%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%20stroke-width%3D%221.5%22%3E%3Cpath%20stroke-linecap%3D%22butt%22%20d%3D%22M9%2039h27v-3H9zm3-3v-4h21v4zm-1-22V9h4v2h5V9h5v2h5V9h4v5%22/%3E%3Cpath%20d%3D%22m34%2014-3%203H14l-3-3%22/%3E%3Cpath%20stroke-linecap%3D%22butt%22%20stroke-linejoin%3D%22miter%22%20d%3D%22M31%2017v12.5H14V17%22/%3E%3Cpath%20d%3D%22m31%2029.5%201.5%202.5h-20l1.5-2.5%22/%3E%3Cpath%20fill%3D%22none%22%20stroke-linejoin%3D%22miter%22%20d%3D%22M11%2014h23%22/%3E%3C/g%3E%3C/svg%3E", "wB": "data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2045%2045%22%3E%3Cg%20fill%3D%22none%22%20fill-rule%3D%22evenodd%22%20stroke%3D%22%23000%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%20stroke-width%3D%221.5%22%3E%3Cg%20fill%3D%22%23fff%22%20stroke-linecap%3D%22butt%22%3E%3Cpath%20d%3D%22M9%2036c3.39-.97%2010.11.43%2013.5-2%203.39%202.43%2010.11%201.03%2013.5%202%200%200%201.65.54%203%202-.68.97-1.65.99-3%20.5-3.39-.97-10.11.46-13.5-1-3.39%201.46-10.11.03-13.5%201-1.35.49-2.32.47-3-.5%201.35-1.94%203-2%203-2z%22/%3E%3Cpath%20d%3D%22M15%2032c2.5%202.5%2012.5%202.5%2015%200%20.5-1.5%200-2%200-2%200-2.5-2.5-4-2.5-4%205.5-1.5%206-11.5-5-15.5-11%204-10.5%2014-5%2015.5%200%200-2.5%201.5-2.5%204%200%200-.5.5%200%202z%22/%3E%3Cpath%20d%3D%22M25%208a2.5%202.5%200%201%201-5%200%202.5%202.5%200%201%201%205%200z%22/%3E%3C/g%3E%3Cpath%20stroke-linejoin%3D%22miter%22%20d%3D%22M17.5%2026h10M15%2030h15m-7.5-14.5v5M20%2018h5%22/%3E%3C/g%3E%3C/svg%3E", "wN": "data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2045%2045%22%3E%3Cg%20fill%3D%22none%22%20fill-rule%3D%22evenodd%22%20stroke%3D%22%23000%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%20stroke-width%3D%221.5%22%3E%3Cpath%20fill%3D%22%23fff%22%20d%3D%22M22%2010c10.5%201%2016.5%208%2016%2029H15c0-9%2010-6.5%208-21%22/%3E%3Cpath%20fill%3D%22%23fff%22%20d%3D%22M24%2018c.38%202.91-5.55%207.37-8%209-3%202-2.82%204.34-5%204-1.042-.94%201.41-3.04%200-3-1%200%20.19%201.23-1%202-1%200-4.003%201-4-4%200-2%206-12%206-12s1.89-1.9%202-3.5c-.73-.994-.5-2-.5-3%201-1%203%202.5%203%202.5h2s.78-1.992%202.5-3c1%200%201%203%201%203%22/%3E%3Cpath%20fill%3D%22%23000%22%20d%3D%22M9.5%2025.5a.5.5%200%201%201-1%200%20.5.5%200%201%201%201%200m5.433-9.75a.5%201.5%2030%201%201-.866-.5.5%201.5%2030%201%201%20.866.5%22/%3E%3C/g%3E%3C/svg%3E", "wP": "data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2045%2045%22%3E%3Cpath%20fill%3D%22%23fff%22%20stroke%3D%22%23000%22%20stroke-linecap%3D%22round%22%20stroke-width%3D%221.5%22%20d%3D%22M22.5%209c-2.21%200-4%201.79-4%204%200%20.89.29%201.71.78%202.38C17.33%2016.5%2016%2018.59%2016%2021c0%202.03.94%203.84%202.41%205.03-3%201.06-7.41%205.55-7.41%2013.47h23c0-7.92-4.41-12.41-7.41-13.47%201.47-1.19%202.41-3%202.41-5.03%200-2.41-1.33-4.5-3.28-5.62.49-.67.78-1.49.78-2.38%200-2.21-1.79-4-4-4z%22/%3E%3C/svg%3E", "bK": "data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2045%2045%22%3E%3Cg%20fill%3D%22none%22%20fill-rule%3D%22evenodd%22%20stroke%3D%22%23000%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%20stroke-width%3D%221.5%22%3E%3Cpath%20stroke-linejoin%3D%22miter%22%20d%3D%22M22.5%2011.6V6%22/%3E%3Cpath%20fill%3D%22%23000%22%20stroke-linecap%3D%22butt%22%20stroke-linejoin%3D%22miter%22%20d%3D%22M22.5%2025s4.5-7.5%203-10.5c0%200-1-2.5-3-2.5s-3%202.5-3%202.5c-1.5%203%203%2010.5%203%2010.5%22/%3E%3Cpath%20fill%3D%22%23000%22%20d%3D%22M11.5%2037a22.3%2022.3%200%200%200%2021%200v-7s9-4.5%206-10.5c-4-6.5-13.5-3.5-16%204V27v-3.5c-3.5-7.5-13-10.5-16-4-3%206%205%2010%205%2010z%22/%3E%3Cpath%20stroke-linejoin%3D%22miter%22%20d%3D%22M20%208h5%22/%3E%3Cpath%20stroke%3D%22%23ececec%22%20d%3D%22M32%2029.5s8.5-4%206-9.7C34.1%2014%2025%2018%2022.5%2024.6v2.1-2.1C20%2018%209.9%2014%207%2019.9c-2.5%205.6%204.8%209%204.8%209%22/%3E%3Cpath%20stroke%3D%22%23ececec%22%20d%3D%22M11.5%2030c5.5-3%2015.5-3%2021%200m-21%203.5c5.5-3%2015.5-3%2021%200m-21%203.5c5.5-3%2015.5-3%2021%200%22/%3E%3C/g%3E%3C/svg%3E", "bQ": "data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2045%2045%22%3E%3Cg%20fill-rule%3D%22evenodd%22%20stroke%3D%22%23000%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%20stroke-width%3D%221.5%22%3E%3Cg%20stroke%3D%22none%22%3E%3Ccircle%20cx%3D%226%22%20cy%3D%2212%22%20r%3D%222.75%22/%3E%3Ccircle%20cx%3D%2214%22%20cy%3D%229%22%20r%3D%222.75%22/%3E%3Ccircle%20cx%3D%2222.5%22%20cy%3D%228%22%20r%3D%222.75%22/%3E%3Ccircle%20cx%3D%2231%22%20cy%3D%229%22%20r%3D%222.75%22/%3E%3Ccircle%20cx%3D%2239%22%20cy%3D%2212%22%20r%3D%222.75%22/%3E%3C/g%3E%3Cpath%20stroke-linecap%3D%22butt%22%20d%3D%22M9%2026c8.5-1.5%2021-1.5%2027%200l2.5-12.5L31%2025l-.3-14.1-5.2%2013.6-3-14.5-3%2014.5-5.2-13.6L14%2025%206.5%2013.5z%22/%3E%3Cpath%20stroke-linecap%3D%22butt%22%20d%3D%22M9%2026c0%202%201.5%202%202.5%204%201%201.5%201%201%20.5%203.5-1.5%201-1.5%202.5-1.5%202.5-1.5%201.5.5%202.5.5%202.5%206.5%201%2016.5%201%2023%200%200%200%201.5-1%200-2.5%200%200%20.5-1.5-1-2.5-.5-2.5-.5-2%20.5-3.5%201-2%202.5-2%202.5-4-8.5-1.5-18.5-1.5-27%200z%22/%3E%3Cpath%20fill%3D%22none%22%20stroke-linecap%3D%22butt%22%20d%3D%22M11%2038.5a35%2035%201%200%200%2023%200%22/%3E%3Cpath%20fill%3D%22none%22%20stroke%3D%22%23ececec%22%20d%3D%22M11%2029a35%2035%201%200%201%2023%200m-21.5%202.5h20m-21%203a35%2035%201%200%200%2022%200m-23%203a35%2035%201%200%200%2024%200%22/%3E%3C/g%3E%3C/svg%3E", "bR": "data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2045%2045%22%3E%3Cg%20fill-rule%3D%22evenodd%22%20stroke%3D%22%23000%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%20stroke-width%3D%221.5%22%3E%3Cpath%20stroke-linecap%3D%22butt%22%20d%3D%22M9%2039h27v-3H9zm3.5-7%201.5-2.5h17l1.5%202.5zm-.5%204v-4h21v4z%22/%3E%3Cpath%20stroke-linecap%3D%22butt%22%20stroke-linejoin%3D%22miter%22%20d%3D%22M14%2029.5v-13h17v13z%22/%3E%3Cpath%20stroke-linecap%3D%22butt%22%20d%3D%22M14%2016.5%2011%2014h23l-3%202.5zM11%2014V9h4v2h5V9h5v2h5V9h4v5z%22/%3E%3Cpath%20fill%3D%22none%22%20stroke%3D%22%23ececec%22%20stroke-linejoin%3D%22miter%22%20stroke-width%3D%221%22%20d%3D%22M12%2035.5h21m-20-4h19m-18-2h17m-17-13h17M11%2014h23%22/%3E%3C/g%3E%3C/svg%3E", "bB": "data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2045%2045%22%3E%3Cg%20fill%3D%22none%22%20fill-rule%3D%22evenodd%22%20stroke%3D%22%23000%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%20stroke-width%3D%221.5%22%3E%3Cg%20fill%3D%22%23000%22%20stroke-linecap%3D%22butt%22%3E%3Cpath%20d%3D%22M9%2036c3.4-1%2010.1.4%2013.5-2%203.4%202.4%2010.1%201%2013.5%202%200%200%201.6.5%203%202-.7%201-1.6%201-3%20.5-3.4-1-10.1.5-13.5-1-3.4%201.5-10.1%200-13.5%201-1.4.5-2.3.5-3-.5%201.4-2%203-2%203-2z%22/%3E%3Cpath%20d%3D%22M15%2032c2.5%202.5%2012.5%202.5%2015%200%20.5-1.5%200-2%200-2%200-2.5-2.5-4-2.5-4%205.5-1.5%206-11.5-5-15.5-11%204-10.5%2014-5%2015.5%200%200-2.5%201.5-2.5%204%200%200-.5.5%200%202z%22/%3E%3Cpath%20d%3D%22M25%208a2.5%202.5%200%201%201-5%200%202.5%202.5%200%201%201%205%200z%22/%3E%3C/g%3E%3Cpath%20stroke%3D%22%23ececec%22%20stroke-linejoin%3D%22miter%22%20d%3D%22M17.5%2026h10M15%2030h15m-7.5-14.5v5M20%2018h5%22/%3E%3C/g%3E%3C/svg%3E", "bN": "data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2045%2045%22%3E%3Cg%20fill%3D%22none%22%20fill-rule%3D%22evenodd%22%20stroke%3D%22%23000%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%20stroke-width%3D%221.5%22%3E%3Cpath%20fill%3D%22%23000%22%20d%3D%22M22%2010c10.5%201%2016.5%208%2016%2029H15c0-9%2010-6.5%208-21%22/%3E%3Cpath%20fill%3D%22%23000%22%20d%3D%22M24%2018c.38%202.91-5.55%207.37-8%209-3%202-2.82%204.34-5%204-1.04-.94%201.41-3.04%200-3-1%200%20.19%201.23-1%202-1%200-4%201-4-4%200-2%206-12%206-12s1.89-1.9%202-3.5c-.73-1-.5-2-.5-3%201-1%203%202.5%203%202.5h2s.78-2%202.5-3c1%200%201%203%201%203%22/%3E%3Cpath%20fill%3D%22%23ececec%22%20stroke%3D%22%23ececec%22%20d%3D%22M9.5%2025.5a.5.5%200%201%201-1%200%20.5.5%200%201%201%201%200m5.43-9.75a.5%201.5%2030%201%201-.86-.5.5%201.5%2030%201%201%20.86.5%22/%3E%3Cpath%20fill%3D%22%23ececec%22%20stroke%3D%22none%22%20d%3D%22m24.55%2010.4-.45%201.45.5.15c3.15%201%205.65%202.49%207.9%206.75S35.75%2029.06%2035.25%2039l-.05.5h2.25l.05-.5c.5-10.06-.88-16.85-3.25-21.34s-5.79-6.64-9.19-7.16z%22/%3E%3C/g%3E%3C/svg%3E", "bP": "data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2045%2045%22%3E%3Cpath%20stroke%3D%22%23000%22%20stroke-linecap%3D%22round%22%20stroke-width%3D%221.5%22%20d%3D%22M22.5%209a4%204%200%200%200-3.22%206.38%206.48%206.48%200%200%200-.87%2010.65c-3%201.06-7.41%205.55-7.41%2013.47h23c0-7.92-4.41-12.41-7.41-13.47a6.46%206.46%200%200%200-.87-10.65A4.01%204.01%200%200%200%2022.5%209z%22/%3E%3C/svg%3E"};
+// ===================== Version iPhone : tout tourne dans la page =====================
+const SF_VERSION = '19.0.1';
+const SF_FLAVORS = {
+  lite: { label: 'Stockfish 19 « lite » (1,8 Mo, conseillé)', base: `https://unpkg.com/stockfish@${SF_VERSION}/bin/stockfish-19-lite-single` },
+  full: { label: 'Stockfish 19 complet (99 Mo, plus fort, lent à charger)', base: `https://unpkg.com/stockfish@${SF_VERSION}/bin/stockfish-19-single` },
+};
+const MULTIPV = 2;
+const MAX_MS = 15000;
+const UA_HDR = {};
+const $ = (s) => document.querySelector(s);
+const esc = (s) => String(s ?? '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+
+// ------------------------------------------------------------------ stockage local (IndexedDB)
+const store = (() => {
+  let dbp = null;
+  const mem = new Map();
+  function open() {
+    if (dbp) return dbp;
+    dbp = new Promise((res) => {
+      try {
+        const rq = indexedDB.open('analyse-echecs', 1);
+        rq.onupgradeneeded = () => rq.result.createObjectStore('kv');
+        rq.onsuccess = () => res(rq.result);
+        rq.onerror = () => res(null);
+      } catch { res(null); }
+    });
+    return dbp;
+  }
+  return {
+    async get(k) {
+      const db = await open();
+      if (!db) return mem.get(k);
+      return new Promise((res) => {
+        try { const rq = db.transaction('kv').objectStore('kv').get(k); rq.onsuccess = () => res(rq.result); rq.onerror = () => res(mem.get(k)); }
+        catch { res(mem.get(k)); }
+      });
+    },
+    async set(k, v) {
+      mem.set(k, v);
+      const db = await open();
+      if (!db) return;
+      return new Promise((res) => {
+        try { const tx = db.transaction('kv', 'readwrite'); tx.objectStore('kv').put(v, k); tx.oncomplete = () => res(); tx.onerror = () => res(); }
+        catch { res(); }
+      });
+    },
+    async keys(prefix) {
+      const db = await open();
+      if (!db) return [...mem.keys()].filter((k) => k.startsWith(prefix));
+      return new Promise((res) => {
+        try { const rq = db.transaction('kv').objectStore('kv').getAllKeys(); rq.onsuccess = () => res(rq.result.filter((k) => String(k).startsWith(prefix))); rq.onerror = () => res([]); }
+        catch { res([]); }
+      });
+    },
+  };
+})();
+const settings = { depth: 18, flavor: 'lite' };
+try { Object.assign(settings, JSON.parse(localStorage.getItem('reglages') || '{}')); } catch {}
+const saveSettings = () => { try { localStorage.setItem('reglages', JSON.stringify(settings)); } catch {} };
+
+// ------------------------------------------------------------------ moteur Stockfish (WebAssembly, dans un Worker)
+class WebEngine {
+  constructor(flavor) {
+    this.flavor = flavor;
+    this.name = 'Stockfish 19';
+    this.chain = Promise.resolve();
+    this.onLine = null;
+    this.ready = this.start();
+  }
+  async start() {
+    const f = SF_FLAVORS[this.flavor] || SF_FLAVORS.lite;
+    const js = await (await fetch(f.base + '.js')).text();
+    const url = URL.createObjectURL(new Blob([js], { type: 'text/javascript' })) + '#' + encodeURIComponent(f.base + '.wasm');
+    this.w = new Worker(url);
+    this.w.onmessage = (e) => {
+      const l = String(e.data);
+      if (l.startsWith('id name ')) this.name = l.slice(8);
+      this.onLine?.(l);
+    };
+    this.w.onerror = (e) => { this.dead = e.message || 'erreur du moteur'; this.reject?.(new Error(this.dead)); };
+    await this.waitFor('uci', (l) => l === 'uciok');
+    this.send(`setoption name MultiPV value ${MULTIPV}`);
+    this.send('setoption name Hash value 64');
+    await this.waitFor('isready', (l) => l === 'readyok');
+  }
+  send(c) { this.w.postMessage(c); }
+  waitFor(cmd, done, collect) {
+    return new Promise((resolve, reject) => {
+      if (this.dead) return reject(new Error(this.dead));
+      this.reject = reject;
+      const timer = setTimeout(() => reject(new Error('Le moteur ne répond pas')), MAX_MS * 2 + 60000);
+      this.onLine = (l) => { collect?.(l); if (done(l)) { clearTimeout(timer); this.onLine = null; this.reject = null; resolve(l); } };
+      this.send(cmd);
+    });
+  }
+  search(fen, { depth = settings.depth, searchmoves = null, newGame = false } = {}) {
+    const run = async () => {
+      await this.ready;
+      if (newGame) { this.send('ucinewgame'); await this.waitFor('isready', (l) => l === 'readyok'); }
+      this.send(`position fen ${fen}`);
+      const lines = new Map();
+      let reached = 0;
+      const go = `go depth ${depth} movetime ${MAX_MS}` + (searchmoves ? ` searchmoves ${searchmoves.join(' ')}` : '');
+      await this.waitFor(go, (l) => l.startsWith('bestmove'), (l) => {
+        if (!l.startsWith('info ') || !l.includes(' pv ') || !l.includes(' score ')) return;
+        if (l.includes('lowerbound') || l.includes('upperbound')) return;
+        const t = l.split(' ');
+        const get = (k) => t[t.indexOf(k) + 1];
+        const d = Number(get('depth'));
+        const mpv = t.includes('multipv') ? Number(get('multipv')) : 1;
+        const si = t.indexOf('score');
+        const score = t[si + 1] === 'mate' ? { mate: Number(t[si + 2]) } : { cp: Number(t[si + 2]) };
+        reached = Math.max(reached, d);
+        lines.set(mpv, { depth: d, score, pv: t.slice(t.indexOf('pv') + 1) });
+      });
+      return { depth: reached, lines: [...lines.keys()].sort((a, b) => a - b).map((k) => lines.get(k)) };
+    };
+    const p = this.chain.then(run, run);
+    this.chain = p.catch(() => {});
+    return p;
+  }
+  stop() { try { this.send('stop'); } catch {} }
+  terminate() { try { this.w.terminate(); } catch {} }
+}
+let engine = null;
+function getEngine() {
+  if (!engine || engine.dead || engine.flavor !== settings.flavor) {
+    engine?.terminate();
+    engine = new WebEngine(settings.flavor);
+    engine.ready.then(() => showEngine()).catch((e) => { engine.dead = e.message; showEngine(); });
+  }
+  return engine;
+}
+function showEngine() {
+  const e = engine;
+  $('#engineStatus').textContent = !e ? '' : e.dead ? `Moteur indisponible : ${e.dead}` : `${e.name} · profondeur ${settings.depth}`;
+}
+
+// ------------------------------------------------------------------ Lichess
+let cloudPausedUntil = 0;
+async function cloudEval(fen) {
+  if (Date.now() < cloudPausedUntil) return null;
+  try {
+    const r = await fetch(`https://lichess.org/api/cloud-eval?fen=${encodeURIComponent(fen)}&multiPv=${MULTIPV}`, { signal: AbortSignal.timeout(8000) });
+    if (r.status === 429) { cloudPausedUntil = Date.now() + 65000; return null; }
+    if (!r.ok) return null;
+    const j = await r.json();
+    if (!j.pvs?.length) return null;
+    const black = fen.split(' ')[1] === 'b';
+    const flip = (s) => (black ? -s : s);
+    return { depth: j.depth, lines: j.pvs.map((p) => ({ depth: j.depth, pv: p.moves.split(' '), score: p.mate !== undefined ? { mate: flip(p.mate) } : { cp: flip(p.cp) } })) };
+  } catch { return null; }
+}
+const TB_MAP = { win: 'win', 'syzygy-win': 'win', 'maybe-win': 'win', 'cursed-win': 'draw', draw: 'draw', 'blessed-loss': 'draw', loss: 'loss', 'syzygy-loss': 'loss', 'maybe-loss': 'loss' };
+const INVERT = { win: 'loss', loss: 'win', draw: 'draw' };
+async function tablebase(fen, uci) {
+  const [b, , castling] = fen.split(' ');
+  if (b.replace(/[^a-zA-Z]/g, '').length > 7 || castling !== '-') return null;
+  try {
+    const r = await fetch(`https://tablebase.lichess.ovh/standard?fen=${encodeURIComponent(fen)}`, { signal: AbortSignal.timeout(8000) });
+    if (!r.ok) return null;
+    const j = await r.json();
+    const root = TB_MAP[j.category];
+    if (!root) return null;
+    const best = j.moves?.[0];
+    const mv = j.moves?.find((m) => m.uci === uci);
+    return { root, played: mv && TB_MAP[mv.category] ? INVERT[TB_MAP[mv.category]] : null, best: best?.uci || null, dtz: j.dtz ?? null, dtm: j.dtm ?? null };
+  } catch { return null; }
+}
+
+async function analyzePosition(fen, uci, { useCloud = true, newGame = false } = {}) {
+  const depth = settings.depth;
+  const rec = { fen, uci, source: 'local', depth, lines: [], played: null, tb: null };
+  const eng = getEngine();
+  let res = null;
+  if (useCloud) {
+    const c = await cloudEval(fen);
+    rec.cloudHit = !!c;
+    if (c && c.depth >= depth && (!uci || c.lines.some((l) => l.pv[0] === uci))) { res = c; rec.source = 'cloud'; }
+  }
+  if (!res) res = await eng.search(fen, { newGame, depth });
+  rec.depth = res.depth;
+  rec.lines = res.lines.map((l) => ({ pv: l.pv, score: l.score }));
+  if (uci) {
+    const hit = res.lines.find((l) => l.pv[0] === uci);
+    if (hit) rec.played = { pv: hit.pv, score: hit.score };
+    else {
+      const r2 = await eng.search(fen, { searchmoves: [uci], depth });
+      const l = r2.lines.find((x) => x.pv[0] === uci) || r2.lines[0];
+      rec.played = l ? { pv: l.pv, score: l.score } : null;
+    }
+  }
+  rec.tb = await tablebase(fen, uci);
+  return rec;
+}
+
+// ------------------------------------------------------------------ chess.com
+async function getJSON(url, tries = 4) {
+  for (let i = 0; i < tries; i++) {
+    const r = await fetch(url, { headers: UA_HDR, signal: AbortSignal.timeout(30000) });
+    if (r.status === 429) { await sleep(2000 * (i + 1)); continue; }
+    if (r.status === 404) { const e = new Error('introuvable'); e.status = 404; throw e; }
+    if (!r.ok) throw new Error(`chess.com a répondu ${r.status}`);
+    return r.json();
+  }
+  throw new Error('chess.com limite les requêtes, réessayez dans une minute');
+}
+function isFinished(g) {
+  if (!g || !g.pgn || !g.end_time) return false;
+  const m = g.pgn.match(/\[Result "([^"]+)"\]/);
+  if (!m || m[1] === '*') return false;
+  return Date.now() / 1000 - g.end_time >= 60;
+}
+async function loadGames(user, progress) {
+  const u = user.toLowerCase();
+  const arch = await getJSON(`https://api.chess.com/pub/player/${encodeURIComponent(u)}/games/archives`);
+  const urls = arch.archives || [];
+  const now = new Date();
+  const currentKey = `${now.getUTCFullYear()}-${String(now.getUTCMonth() + 1).padStart(2, '0')}`;
+  const all = [];
+  for (let i = 0; i < urls.length; i++) {
+    const m = urls[i].match(/(\d{4})\/(\d{2})$/);
+    const key = m ? `${m[1]}-${m[2]}` : `x${i}`;
+    const past = key < currentKey;
+    const ck = `arch:${u}:${key}`;
+    let games = past ? await store.get(ck) : null;
+    if (!games) {
+      const j = await getJSON(urls[i]);
+      games = (j.games || []).filter((g) => (g.rules || 'chess') === 'chess').map((g) => ({
+        uuid: g.uuid, url: g.url, end_time: g.end_time, time_class: g.time_class, time_control: g.time_control, rated: g.rated, rules: g.rules,
+        white: { username: g.white?.username, rating: g.white?.rating, result: g.white?.result },
+        black: { username: g.black?.username, rating: g.black?.rating, result: g.black?.result }, pgn: g.pgn,
+      }));
+      if (past) await store.set(ck, games);
+    }
+    all.push(...games);
+    progress?.(i + 1, urls.length);
+  }
+  return all.filter(isFinished).map((g) => ({ ...g, id: g.uuid || g.url, userColor: (g.white.username || '').toLowerCase() === u ? 'w' : 'b' }))
+    .sort((a, b) => b.end_time - a.end_time);
+}
+
+// ------------------------------------------------------------------ ouvertures (lichess-org/chess-openings)
+async function loadOpenings() {
+  const cached = await store.get('openings:v1');
+  if (cached) return cached;
+  const names = {}, book = [];
+  const seen = new Set();
+  for (const l of 'abcde') {
+    let txt = null;
+    for (const u of [`https://cdn.jsdelivr.net/gh/lichess-org/chess-openings@master/${l}.tsv`, `https://raw.githubusercontent.com/lichess-org/chess-openings/master/${l}.tsv`]) {
+      try { const r = await fetch(u); if (r.ok) { txt = await r.text(); break; } } catch {}
+    }
+    if (!txt) throw new Error('base d\'ouvertures inaccessible');
+    for (const row of txt.split('\n').slice(1)) {
+      const [eco, name, pgn] = row.split('\t');
+      if (!pgn) continue;
+      try {
+        const c = new Chess();
+        c.loadPgn(pgn);
+        for (const h of c.history({ verbose: true })) { const e = epd(h.after); if (!seen.has(e)) { seen.add(e); book.push(e); } }
+        names[epd(c.fen())] = `${eco} ${name}`;
+      } catch {}
+    }
+    await sleep(0);
+  }
+  const data = { names, book };
+  await store.set('openings:v1', data);
+  return data;
+}
+
+// ===================== Interface iPhone =====================
+const S = { user: '', games: [], shown: 40, game: null, plies: [], startFen: null, analysis: null, sum: null, idx: 0, variation: null, book: new Set(), names: {}, analyzing: null };
+const board = new Board($('#board'), { onMove: onBoardMove, pieceUrl: (code) => PIECE_URLS[code] });
+board.useImages = true;
+
+(function init() {
+  try { const u = localStorage.getItem('pseudo'); if (u) $('#user').value = u; } catch {}
+  $('#depthSel').value = String(settings.depth);
+  $('#flavorSel').value = settings.flavor;
+  board.set(new Chess().fen());
+  showView('games');
+  loadOpenings().then((j) => { S.names = j.names; S.book = new Set(j.book); if (S.game) { recompute(); render(); } })
+    .catch(() => { $('#opening').textContent = ''; });
+})();
+
+function showView(v) {
+  document.body.dataset.view = v;
+  for (const b of document.querySelectorAll('.tabbar button')) b.classList.toggle('on', b.dataset.view === v);
+  if (v === 'board') render();
+}
+document.querySelector('.tabbar').addEventListener('click', (e) => { const b = e.target.closest('button'); if (b) showView(b.dataset.view); });
+$('#settingsBtn').addEventListener('click', () => $('#settings').classList.toggle('hidden'));
+$('#depthSel').addEventListener('change', (e) => { settings.depth = Number(e.target.value); saveSettings(); showEngine(); });
+$('#flavorSel').addEventListener('change', (e) => { settings.flavor = e.target.value; saveSettings(); if (engine) getEngine(); });
+
+function toast(html, ms = 4000) {
+  const t = $('#toast');
+  t.innerHTML = html;
+  t.classList.remove('hidden');
+  clearTimeout(toast.t);
+  toast.t = setTimeout(() => t.classList.add('hidden'), ms);
+}
+function setProgress(el, done, total, label) {
+  el.classList.remove('hidden');
+  el.querySelector('div').style.width = (total ? (100 * done) / total : 0) + '%';
+  el.querySelector('span').textContent = label;
+}
+
+// ------------------------------------------------------------------ parties
+$('#userForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const user = $('#user').value.trim();
+  if (!/^[A-Za-z0-9_-]{2,40}$/.test(user)) return toast('Pseudo invalide');
+  $('#user').blur();
+  try { localStorage.setItem('pseudo', user); } catch {}
+  S.user = user.toLowerCase();
+  $('#games').innerHTML = '<li class="empty">Récupération des parties sur chess.com…</li>';
+  const pr = $('#gamesProgress');
+  setProgress(pr, 0, 1, 'Connexion à chess.com…');
+  try {
+    S.games = await loadGames(user, (d, t) => setProgress(pr, d, t, `Mois ${d} / ${t}`));
+    const done = new Set((await store.keys('ana:')).map((k) => k.slice(4)));
+    for (const g of S.games) g.analyzed = done.has(g.id);
+    S.shown = 40;
+    renderGames();
+  } catch (err) {
+    $('#games').innerHTML = `<li class="empty">Erreur : ${esc(err.status === 404 ? `le pseudo « ${user} » n'existe pas sur chess.com` : err.message)}</li>`;
+  }
+  pr.classList.add('hidden');
+});
+$('#fTc').addEventListener('change', () => { S.shown = 40; renderGames(); });
+$('#fQ').addEventListener('input', () => { S.shown = 40; renderGames(); });
+$('#more').addEventListener('click', () => { S.shown += 60; renderGames(); });
+
+const DRAWS = new Set(['agreed', 'repetition', 'stalemate', 'insufficient', '50move', 'timevsinsufficient']);
+function outcome(g) {
+  const me = g.userColor === 'w' ? g.white : g.black;
+  if (me.result === 'win') return ['win', 'Gagné'];
+  if (DRAWS.has(me.result)) return ['draw', 'Nulle'];
+  return ['loss', 'Perdu'];
+}
+const TC = { bullet: 'Bullet', blitz: 'Blitz', rapid: 'Rapide', daily: 'Par jour' };
+function filtered() {
+  const tc = $('#fTc').value, q = $('#fQ').value.trim().toLowerCase();
+  return S.games.filter((g) => (tc === 'all' || g.time_class === tc) && (!q || (g.userColor === 'w' ? g.black : g.white).username.toLowerCase().includes(q)));
+}
+function renderGames() {
+  const list = filtered();
+  $('#gamesCount').textContent = `(${list.length})`;
+  if (!list.length) { $('#games').innerHTML = '<li class="empty">Aucune partie terminée.</li>'; $('#more').classList.add('hidden'); return; }
+  $('#games').innerHTML = list.slice(0, S.shown).map((g) => {
+    const opp = g.userColor === 'w' ? g.black : g.white;
+    const me = g.userColor === 'w' ? g.white : g.black;
+    const [oc, ol] = outcome(g);
+    const d = new Date(g.end_time * 1000).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' });
+    return `<li data-id="${esc(g.id)}" class="${S.game?.id === g.id ? 'active' : ''}">
+      <span class="opp">${g.userColor === 'w' ? '⚪' : '⚫'} ${esc(opp.username)} <span class="muted">(${opp.rating})</span></span>
+      <span class="res ${oc}">${ol}</span>
+      <span class="meta">${d} · ${TC[g.time_class] || g.time_class} · vous ${me.rating}</span>
+      <span class="done-mark">${g.analyzed ? '✓ analysée' : ''}</span></li>`;
+  }).join('');
+  $('#more').classList.toggle('hidden', list.length <= S.shown);
+}
+$('#games').addEventListener('click', (e) => { const li = e.target.closest('li[data-id]'); if (li) openGame(li.dataset.id); });
+
+async function openGame(id) {
+  if (S.analyzing) return toast('Une analyse est en cours : annulez-la d\'abord.');
+  const g = S.games.find((x) => x.id === id);
+  if (!g) return;
+  const c = new Chess();
+  try { c.loadPgn(g.pgn); } catch (err) { return toast('PGN illisible : ' + esc(err.message)); }
+  const hist = c.history({ verbose: true });
+  S.game = g;
+  S.startFen = hist.length ? hist[0].before : c.fen();
+  S.plies = hist.map((h) => ({
+    san: h.san, uci: h.lan, color: h.color, fenBefore: h.before, fenAfter: h.after,
+    moveNumber: Number(h.before.split(' ')[5]), captured: h.captured, from: h.from, to: h.to,
+    rating: h.color === 'w' ? g.white.rating : g.black.rating,
+  }));
+  S.plies.forEach((p, i) => { const q = S.plies[i - 1]; p.prevCapTo = q && q.captured ? q.to : null; });
+  const saved = await store.get('ana:' + id);
+  S.partial = await store.get('part:' + id);
+  S.analysis = saved && saved.plies?.length === S.plies.length ? saved : null;
+  S.variation = null;
+  S.idx = 0;
+  board.setOrientation(g.userColor);
+  recompute();
+  renderGames();
+  showView('board');
+}
+function recompute() { S.sum = S.analysis ? summarize(S.plies, S.analysis.plies, S.book) : null; }
+
+// ------------------------------------------------------------------ analyse (dans le téléphone)
+$('#analyzeBtn').addEventListener('click', analyze);
+$('#cancelBtn').addEventListener('click', () => { if (S.analyzing) { S.analyzing.cancel = true; engine?.stop(); } });
+async function analyze() {
+  if (!S.game || !S.plies.length || S.analyzing) return;
+  const game = S.game, plies = S.plies;
+  const job = { cancel: false };
+  S.analyzing = job;
+  const pr = $('#anaProgress');
+  $('#analyzeBtn').classList.add('hidden');
+  $('#cancelBtn').classList.remove('hidden');
+  setProgress(pr, 0, plies.length, 'Chargement de Stockfish…');
+  let lock = null;
+  try { lock = await navigator.wakeLock?.request('screen'); } catch {}
+  const part = (await store.get('part:' + game.id)) || null;
+  const records = part && part.depth === settings.depth && part.n === plies.length ? part.records : [];
+  const t0 = Date.now(), start = records.length;
+  try {
+    const eng = getEngine();
+    await eng.ready;
+    let misses = 0;
+    for (let i = records.length; i < plies.length; i++) {
+      if (job.cancel) break;
+      const useCloud = i < 40 && misses < 3;
+      const rec = await analyzePosition(plies[i].fenBefore, plies[i].uci, { useCloud, newGame: i === start });
+      if (job.cancel) break;
+      if (useCloud) misses = rec.cloudHit ? 0 : misses + 1;
+      delete rec.cloudHit;
+      records.push(rec);
+      if (records.length % 4 === 0) await store.set('part:' + game.id, { depth: settings.depth, n: plies.length, records });
+      const done = i + 1 - start, el = (Date.now() - t0) / 1000;
+      const left = Math.round((el / done) * (plies.length - i - 1));
+      setProgress(pr, i + 1, plies.length, `Coup ${i + 1} / ${plies.length} · encore ~${left < 60 ? left + ' s' : Math.round(left / 60) + ' min'}`);
+    }
+    if (!job.cancel && records.length === plies.length) {
+      const analysis = { version: 1, id: game.id, engine: engine.name, depth: settings.depth, date: new Date().toISOString(), plies: records };
+      await store.set('ana:' + game.id, analysis);
+      await store.set('part:' + game.id, null);
+      game.analyzed = true;
+      if (S.game === game) { S.analysis = analysis; recompute(); }
+      renderGames();
+    } else {
+      await store.set('part:' + game.id, { depth: settings.depth, n: plies.length, records });
+      toast(`Analyse en pause (${records.length} / ${plies.length}). Elle reprendra où elle s'est arrêtée.`);
+    }
+  } catch (err) {
+    await store.set('part:' + game.id, { depth: settings.depth, n: plies.length, records });
+    toast('Analyse interrompue : ' + esc(err.message));
+  }
+  try { await lock?.release(); } catch {}
+  S.analyzing = null;
+  pr.classList.add('hidden');
+  $('#analyzeBtn').classList.remove('hidden');
+  $('#cancelBtn').classList.add('hidden');
+  render();
+}
+
+// ------------------------------------------------------------------ navigation
+const rec = (i) => S.analysis?.plies[i];
+const res = (i) => S.sum?.results[i];
+const baseFen = (i) => (i === 0 ? S.startFen || new Chess().fen() : S.plies[i - 1].fenAfter);
+function curFen() {
+  if (S.variation) { const v = S.variation; return v.vidx ? v.moves[v.vidx - 1].fenAfter : baseFen(v.base); }
+  return baseFen(S.idx);
+}
+function go(where) {
+  if (S.variation) {
+    const v = S.variation;
+    if (where === 'prev') { if (v.vidx > 0) v.vidx--; else S.variation = null; }
+    else if (where === 'next') v.vidx = Math.min(v.moves.length, v.vidx + 1);
+    else if (where === 'first') v.vidx = 0;
+    else if (where === 'last') v.vidx = v.moves.length;
+  } else {
+    const n = S.plies.length;
+    if (where === 'prev') S.idx = Math.max(0, S.idx - 1);
+    else if (where === 'next') S.idx = Math.min(n, S.idx + 1);
+    else if (where === 'first') S.idx = 0;
+    else if (where === 'last') S.idx = n;
+    else if (typeof where === 'number') S.idx = Math.max(0, Math.min(n, where));
+  }
+  render();
+}
+document.querySelector('.nav').addEventListener('click', (e) => {
+  const b = e.target.closest('button');
+  if (!b) return;
+  if (b.dataset.nav === 'flip') { board.flip(); renderPlayers(); renderEval(); return; }
+  go(b.dataset.nav);
+});
+// balayage horizontal sur l'échiquier non utilisé (conflit avec le glisser des pièces) : boutons uniquement
+$('#exitVar').addEventListener('click', () => { S.variation = null; render(); });
+
+async function onBoardMove(uci) {
+  if (!S.variation && S.idx < S.plies.length && S.plies[S.idx].uci === uci) { go('next'); return; }
+  if (S.analyzing) return toast('Attendez la fin de l\'analyse pour jouer vos coups.');
+  const fenBefore = curFen();
+  const c = new Chess(fenBefore);
+  const m = tryMove(c, uci);
+  if (!m) return;
+  if (!S.variation) S.variation = { base: S.idx, moves: [], vidx: 0 };
+  const v = S.variation;
+  v.moves.length = v.vidx;
+  const g = S.game;
+  const mv = {
+    san: m.san, uci, color: m.color, fenBefore, fenAfter: c.fen(), moveNumber: Number(fenBefore.split(' ')[5]),
+    captured: m.captured, from: m.from, to: m.to, rating: g ? (m.color === 'w' ? g.white.rating : g.black.rating) : null,
+    rec: null, r: null, pending: true,
+  };
+  { const pm = v.moves[v.moves.length - 1] || (v.base > 0 ? S.plies[v.base - 1] : null); mv.prevCapTo = pm && pm.captured ? pm.to : null; }
+  v.moves.push(mv);
+  v.vidx = v.moves.length;
+  render();
+  try {
+    mv.rec = await analyzePosition(fenBefore, uci, { useCloud: true });
+    delete mv.rec.cloudHit;
+    const i = v.moves.indexOf(mv);
+    const prevMv = i > 0 ? v.moves[i - 1] : null;
+    let prev = null;
+    if (prevMv?.r) prev = { cls: prevMv.r.cls, wpBest: prevMv.r.wpBest, color: prevMv.color, toSquare: prevMv.to, captured: prevMv.captured };
+    else if (i === 0 && v.base > 0 && res(v.base - 1)) { const p = S.plies[v.base - 1], rr = res(v.base - 1); prev = { cls: rr.cls, wpBest: rr.wpBest, color: p.color, toSquare: p.to, captured: p.captured }; }
+    const legalCount = new Chess(fenBefore).moves().length;
+    const inBook = S.book.has(epd(mv.fenAfter)) && (v.base === 0 || res(v.base - 1)?.cls === 'theorie' || !S.sum) && v.moves.slice(0, i).every((x) => x.r?.cls === 'theorie');
+    mv.r = classifyMove(mv, mv.rec, prev, { inBook, legalCount });
+  } catch (err) { toast('Évaluation impossible : ' + esc(err.message)); }
+  mv.pending = false;
+  render();
+}
+
+// ------------------------------------------------------------------ rendu
+function currentMove() {
+  if (S.variation) {
+    const v = S.variation;
+    if (v.vidx) { const m = v.moves[v.vidx - 1]; return { ply: m, rec: m.rec, r: m.r, pending: m.pending, variation: true }; }
+    if (v.base === 0) return null;
+    return { ply: S.plies[v.base - 1], rec: rec(v.base - 1), r: res(v.base - 1) };
+  }
+  if (!S.idx) return null;
+  return { ply: S.plies[S.idx - 1], rec: rec(S.idx - 1), r: res(S.idx - 1) };
+}
+function render() {
+  const fen = curFen();
+  const c = new Chess(fen);
+  const cm = currentMove();
+  const opts = { arrows: [] };
+  if (cm) {
+    opts.lastMove = { from: cm.ply.uci.slice(0, 2), to: cm.ply.uci.slice(2, 4) };
+    if (cm.r?.cls) {
+      const k = CLASSES[cm.r.cls];
+      opts.lastColor = k.color;
+      opts.badge = { square: opts.lastMove.to, color: k.color, sym: k.sym };
+      if (!cm.r.isBest && cm.rec?.lines?.[0] && cm.r.cls !== 'theorie') {
+        const b = cm.rec.lines[0].pv[0];
+        opts.arrows.push({ from: b.slice(0, 2), to: b.slice(2, 4), color: '#4caf50' });
+      }
+    }
+  }
+  if (c.inCheck()) for (const row of c.board()) for (const p of row) if (p && p.type === 'k' && p.color === c.turn()) opts.check = p.square;
+  board.set(fen, opts);
+  const showAna = !!S.game && !S.analysis;
+  $('#analyzeBox').classList.toggle('hidden', !showAna);
+  if (showAna && !S.analyzing) {
+    const n = S.partial && S.partial.depth === settings.depth && S.partial.n === S.plies.length ? S.partial.records.length : 0;
+    $('#analyzeBtn').textContent = n ? `Reprendre l'analyse (${n} / ${S.plies.length})` : `Analyser cette partie (profondeur ${settings.depth})`;
+  }
+  $('#variationBar').classList.toggle('hidden', !S.variation);
+  renderPlayers(); renderEval(); renderSummary(); renderDetail(cm); renderLines(); renderMoves(); renderOpening();
+}
+function renderPlayers() {
+  const g = S.game;
+  const top = board.orientation === 'w' ? 'b' : 'w';
+  for (const [el, col] of [[$('#playerTop'), top], [$('#playerBottom'), top === 'w' ? 'b' : 'w']]) {
+    if (!g) { el.innerHTML = ''; continue; }
+    const p = col === 'w' ? g.white : g.black;
+    const s = S.sum?.players[col];
+    el.innerHTML = `<span>${col === 'w' ? '⚪' : '⚫'} ${esc(p.username)}</span><span class="rating">(${p.rating})</span>${s?.accuracy != null ? `<span class="acc">${s.accuracy.toFixed(1).replace('.', ',')}</span>` : ''}`;
+  }
+}
+function evalAt() {
+  const c = new Chess(curFen());
+  if (c.isCheckmate()) return { wp: c.turn() === 'w' ? 0 : 100, txt: c.turn() === 'w' ? '0-1' : '1-0' };
+  if (c.isStalemate() || c.isInsufficientMaterial()) return { wp: 50, txt: '½' };
+  const cm = currentMove();
+  let score = null, persp = null, tb = null;
+  if (cm?.rec) {
+    score = cm.r?.isBest || !cm.rec.played ? cm.rec.lines?.[0]?.score : cm.rec.played.score; persp = cm.ply.color;
+    if (cm.rec.tb?.played) tb = cm.ply.color === 'w' ? cm.rec.tb.played : INVERT[cm.rec.tb.played];
+  } else if (!cm && !S.variation && rec(0)) { score = rec(0).lines?.[0]?.score; persp = S.plies[0].color; }
+  if (tb) return { wp: { win: 100, draw: 50, loss: 0 }[tb], txt: 'TB' };
+  if (!score) return null;
+  return { wp: whiteWp(score, persp), txt: fmtScore(score, persp) };
+}
+function renderEval() {
+  const bar = $('#evalBar');
+  const e = evalAt();
+  const flipped = board.orientation === 'b';
+  bar.classList.toggle('flipped', flipped);
+  const wp = e ? e.wp : 50;
+  bar.querySelector('.fill').style.width = wp + '%';
+  const t = bar.querySelector('.txt');
+  t.textContent = e ? e.txt.replace(/^\+/, '') : '';
+  const whiteAhead = wp >= 50;
+  t.classList.toggle('right', whiteAhead === flipped);
+  t.classList.toggle('light', !whiteAhead);
+}
+function renderSummary() {
+  const el = $('#summary');
+  if (!S.sum) { el.innerHTML = ''; return; }
+  const P = S.sum.players, g = S.game;
+  const fmt = (x) => (x == null ? '–' : x.toFixed(1).replace('.', ','));
+  let h = `<table class="sumTable"><tr><th></th><th>⚪ ${esc(g.white.username)}</th><th>⚫ ${esc(g.black.username)}</th></tr>
+  <tr><td>Précision</td><td class="big">${fmt(P.w.accuracy)}</td><td class="big">${fmt(P.b.accuracy)}</td></tr>
+  <tr><td>Elo estimé</td><td class="big sm">${P.w.elo ?? '–'}</td><td class="big sm">${P.b.elo ?? '–'}</td></tr>`;
+  for (const [k, c] of Object.entries(CLASSES).sort((a, b) => a[1].order - b[1].order)) {
+    h += `<tr><td><span class="sym" style="background:${c.color}">${c.sym}</span>${c.label}</td>`;
+    for (const col of ['w', 'b']) { const n = P[col].counts[k]; h += `<td class="n ${n ? '' : 'zero'}" style="color:${c.color}" data-cls="${k}" data-col="${col}">${n}</td>`; }
+    h += '</tr>';
+  }
+  h += `</table><p class="muted small">${esc(S.analysis.engine)} · profondeur ${S.analysis.depth} · ${S.analysis.plies.filter((p) => p.source === 'cloud').length} positions via l'analyse cloud Lichess</p>`;
+  el.innerHTML = h;
+}
+$('#summary').addEventListener('click', (e) => {
+  const td = e.target.closest('td.n');
+  if (!td || td.classList.contains('zero')) return;
+  const { cls, col } = td.dataset;
+  const idxs = S.plies.map((p, i) => i).filter((i) => S.plies[i].color === col && res(i)?.cls === cls);
+  if (!idxs.length) return;
+  S.variation = null;
+  const next = idxs.find((i) => i > S.idx - 1) ?? idxs[0];
+  go(next + 1);
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+});
+function lineHtml(line) {
+  return `<ul class="lineMoves">${line.moves.map((m, i) => `<li>${m.color === 'w' ? m.num + '.' : (i === 0 ? m.num + '…' : '&nbsp;&nbsp;…')} <b>${esc(m.san)}</b>${m.notes.length ? ` <span class="note">— ${esc(m.notes.join(', '))}</span>` : ''}</li>`).join('')}</ul>${line.summary ? `<div class="muted">${esc(line.summary)}</div>` : ''}`;
+}
+function renderDetail(cm) {
+  const el = $('#detail');
+  if (!cm) { el.innerHTML = ''; return; }
+  const { ply, rec: r0, r } = cm;
+  const num = `${ply.moveNumber}${ply.color === 'w' ? '.' : '…'} ${esc(sanFr(ply.san))}`;
+  if (cm.pending) { el.innerHTML = `<div class="card"><h4>${num}</h4>Stockfish réfléchit… (profondeur ${settings.depth})</div>`; return; }
+  if (!r0 || !r?.cls) { el.innerHTML = S.analysis || cm.variation ? '' : `<div class="card"><h4>${num}</h4><span class="muted">Lancez l'analyse pour voir le classement des coups.</span></div>`; return; }
+  const k = CLASSES[r.cls];
+  const ex = explainMove(ply, r0, r);
+  let h = `<div class="card" style="--c:${k.color}"><h4><span class="sym" style="background:${k.color}">${k.sym}</span>${num} — ${k.label}</h4><div>${esc(ex.text)}</div>`;
+  if (ex.best) h += `<div class="line"><b>Meilleur coup : ${esc(ex.bestSan)}</b> (${fmtScore(r0.lines[0].score, ply.color)})${lineHtml(ex.best)}</div>`;
+  if (ex.played && BAD.has(r.cls)) h += `<div class="line"><b style="color:${k.color}">Suite probable après votre coup</b> (${fmtScore(r0.played.score, ply.color)})${lineHtml(ex.played)}</div>`;
+  h += `<button class="claudeBtn" id="askClaude">✳ Demander à Claude</button></div>`;
+  el.innerHTML = h;
+  $('#askClaude').onclick = () => askClaude(cm);
+}
+async function askClaude(cm) {
+  const txt = claudePrompt({ ply: cm.ply, rec: cm.rec, r: cm.r, playerColor: S.game?.userColor, opening: openingName() });
+  let ok = false;
+  try { await navigator.clipboard.writeText(txt); ok = true; } catch {
+    const ta = document.createElement('textarea');
+    ta.value = txt; ta.setAttribute('readonly', ''); ta.style.position = 'fixed'; ta.style.opacity = '0';
+    document.body.appendChild(ta); ta.select(); ta.setSelectionRange(0, txt.length);
+    try { ok = document.execCommand('copy'); } catch {}
+    ta.remove();
+  }
+  toast(ok ? 'Question copiée ! Collez-la dans une conversation <a href="https://claude.ai/new" target="_blank" rel="noopener">Claude</a>.' : 'Copie impossible.', 7000);
+}
+function renderLines() {
+  const el = $('#lines');
+  const r0 = S.variation ? null : rec(S.idx);
+  if (!r0?.lines?.length) { el.innerHTML = ''; return; }
+  const fen = curFen(), turn = fen.split(' ')[1];
+  el.innerHTML = '<h3>Stockfish dans cette position</h3>' + r0.lines.map((l) => {
+    const c = new Chess(fen), sans = [];
+    for (const u of l.pv.slice(0, 8)) { const m = tryMove(c, u); if (!m) break; sans.push(sanFr(m.san)); }
+    return `<div class="eline"><span class="score">${fmtScore(l.score, turn)}</span> ${esc(sans.join(' '))}</div>`;
+  }).join('');
+}
+function moveCell(p, r, cur, attrs) {
+  const k = r?.cls ? CLASSES[r.cls] : null;
+  const showSym = k && !['meilleur', 'excellent', 'bon', 'theorie'].includes(r.cls);
+  return `<span class="mv ${cur ? 'cur' : ''}" ${attrs}>${esc(sanFr(p.san))}${showSym ? `<span class="s" style="color:${k.color}">${k.sym}</span>` : ''}${k && r.cls === 'theorie' ? '<span class="s" style="opacity:.6">📖</span>' : ''}</span>`;
+}
+function renderMoves() {
+  const el = $('#moves');
+  if (!S.plies.length && !S.variation) { el.innerHTML = ''; return; }
+  let h = '';
+  const v = S.variation;
+  const varHtml = () => `<div class="var">↳ ${v.moves.map((m, j) => `${m.color === 'w' || j === 0 ? `<span class="num">${m.moveNumber}${m.color === 'w' ? '.' : '…'}</span>` : ''}${moveCell(m, m.r, v.vidx === j + 1, `data-v="${j + 1}"`)}${m.pending ? '<span class="muted">…</span>' : ''}`).join('')}</div>`;
+  if (v && v.base === 0) h += varHtml();
+  for (let i = 0; i < S.plies.length; i++) {
+    const p = S.plies[i];
+    if (p.color === 'w' || i === 0) { h += `<span class="num">${p.moveNumber}.</span>`; if (p.color === 'b') h += '<span></span>'; }
+    h += moveCell(p, res(i), !v && S.idx === i + 1, `data-i="${i + 1}"`);
+    if (v && v.base === i + 1) { if (p.color === 'w') h += '<span></span>'; h += varHtml(); if (p.color === 'w' && S.plies[i + 1]) h += `<span class="num">${p.moveNumber}…</span><span></span>`; }
+  }
+  el.innerHTML = h;
+  const cur = el.querySelector('.mv.cur');
+  if (cur) el.scrollTop = cur.offsetTop - el.clientHeight / 2;
+}
+$('#moves').addEventListener('click', (e) => {
+  const m = e.target.closest('.mv');
+  if (!m) return;
+  if (m.dataset.v) { S.variation.vidx = Number(m.dataset.v); render(); }
+  else { S.variation = null; go(Number(m.dataset.i)); }
+});
+function openingName() {
+  let name = '';
+  const upto = S.variation ? S.variation.base : S.plies.length;
+  for (let i = 0; i < upto; i++) { const n = S.names[epd(S.plies[i].fenAfter)]; if (n) name = n; }
+  return name;
+}
+function renderOpening() { const n = openingName(); $('#opening').textContent = n ? '📖 ' + n : ''; }
+
+</script>
+</body></html>
